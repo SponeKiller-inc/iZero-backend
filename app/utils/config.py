@@ -4,16 +4,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_hostname: str
-    database_port: str
+    database_port: int
     database_password: str
     database_name: str
     database_username: str
     secret_key: str
     algorithm: str
-    access_token_expire_minutes: str
-    refresh_token_expire_minutes: str
-    refresh_token_length: str
-    csrf_token_length: str
+    access_token_expire_minutes: int
+    refresh_token_expire_minutes: int
+    refresh_token_length: int
+    csrf_token_length: int
     pwd_context_scheme: str
     cors_allow_origins: str
     cors_allow_methods: str
