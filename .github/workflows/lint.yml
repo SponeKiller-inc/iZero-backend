@@ -23,4 +23,4 @@ jobs:
 
       - name: Lint check via ruff
         run: |
-          ruff check.
+          ruff check .
