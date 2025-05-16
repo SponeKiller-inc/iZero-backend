@@ -7,7 +7,7 @@ until pg_isready -h "$DATABASE_HOSTNAME" -p "$DATABASE_PORT"; do
   sleep 1
 done
 
-Migrate database tables
+# Migrate database tables
 alembic upgrade head
 
 # start Uvicorn
