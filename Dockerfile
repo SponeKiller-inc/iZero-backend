@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
-# Start aplication
+# Start application
 EXPOSE 8000
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
