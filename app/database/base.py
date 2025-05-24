@@ -1,21 +1,32 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, DateTime
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import DateTime, MetaData
 from datetime import datetime, timezone
 
-class TimestampMixin:    
-    created_at = Column(
+class TimestampMixin:
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(timezone.utc)
+        default=lambda: datetime.now(timezone.utc),
     )
-    updated_at = Column(
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc)
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
-# Adding Timestamp to model without need to declare in models
-Base = declarative_base(cls=TimestampMixin)
+
+class Base(TimestampMixin, DeclarativeBase):
+    """
+    Base class for all ORM models, combining timestamp fields and shared metadata.
+
+    Inherits:
+        TimestampMixin: adds created_at and updated_at timestamps to all models.
+        DeclarativeBase: SQLAlchemy declarative base.
+
+    Attributes:
+        metadata (MetaData): SQLAlchemy MetaData object for defining table schemas.
+    """
+    metadata = MetaData()
 
 

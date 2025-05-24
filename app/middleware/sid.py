@@ -3,6 +3,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 import uuid
 
 class SIDMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware that ensures each request has a session ID ('sid').
+
+    Retrieves 'sid' from cookies or generates a new UUID, assigns it to
+    `request.state.sid` to work with in endpoints, and sets the cookie 
+    on the response if it was missing.
+    """
     
     async def dispatch(self, request: Request, call_next):
         
