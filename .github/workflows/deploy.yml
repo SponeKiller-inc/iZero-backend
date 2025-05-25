@@ -1,6 +1,6 @@
 name: Deploy to production Server
 
-# spustí se po pushi / mergi do větve main
+# Runs on push or merge to the main branch
 on:
   push:
     branches:
