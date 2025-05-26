@@ -12,7 +12,7 @@ from app.exceptions.domain import (
 router = APIRouter(prefix="/users", tags=["authentications"])
 
 @router.post("/local", status_code=status.HTTP_201_CREATED)
-async def register(
+async def register_local(
     user: schema.LocalRegistrationIn,
     user_service: UserService = Depends(get_user_service)
 ):
@@ -33,7 +33,7 @@ async def register(
         )
 
 @router.post("/google", status_code=status.HTTP_201_CREATED)
-async def register(
+async def register_google(
     user: schema.GoogleRegistrationIn,
     user_service: UserService = Depends(get_user_service)
 ):
