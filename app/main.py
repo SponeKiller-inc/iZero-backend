@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import sentry_sdk
 
+from app.middleware.sid import SIDMiddleware
 from app.api.v1 import routers as routers_v1
 from app.utils.config import settings
 
@@ -25,7 +26,7 @@ app.add_middleware(
 )
 
 ##HTTP
-
+app.add_middleware(SIDMiddleware)
 
 
 
