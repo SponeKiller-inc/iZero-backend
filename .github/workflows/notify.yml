@@ -1,0 +1,19 @@
+name: Notify izero-infra about new merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  notify:
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify izero-infra
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.DISPATCH_INFRA_PAT }}
+          repository: SponeKiller-inc/iZero-infra
+          event-type: backend-merged
