@@ -1,4 +1,6 @@
-class GoogleAPIError(Exception):
+from app.exceptions.domain.errors import DomainError
+
+class GoogleAPIError(DomainError):
     """General exception for google apis"""
 
 class GoogleAuthError(GoogleAPIError):

@@ -1,12 +1,17 @@
 from app.repositories.user_repo import UserRepository
 from app.models.users import Users
-from app.exceptions.domain import (
+from app.exceptions.domain.user import (
     LocalUserExistsError, 
     GoogleUserExistsError, 
     UserExistsError, 
-    RegistrationError
+    RegistrationError,
+    LocalUserNotVerifiedError,
+    GoogleUserNotVerifiedError,
+    LocalUserVerificationError,
+    GoogleUserVerificationError,
 )
-from app.exceptions.google import GoogleAuthError
+from app.exceptions.domain.google import GoogleAuthError
+from app.exceptions.infrastucture.repository import QueryExecutionError
 from app.utils import utils
 from app.services.google import GoogleAPI
 class UserService:
@@ -94,3 +99,51 @@ class UserService:
             ) from e
         except RegistrationError:
             raise
+    
+    def verify_user_local(self, email: str, password: str) -> None:
+        """
+        Verifies user locally registered
+
+        Args:
+            email (str): user email
+            password (str): user password 
+        Raises:
+            LocalUserVerificationError: Error while verifying on our side
+            LocalUserNotVerifiedError: Invalid credential / not found
+        """
+        try:
+            if (self.repo.exists_local(email)):
+                # User exists, verify password
+                user: Users = self.repo.get_user_local(email)
+                verified = utils.verify_hash(password, user.password)
+            else:
+                # User doesnt exist
+                verified = False
+        except QueryExecutionError as e:
+            raise LocalUserVerificationError from e
+
+        if not verified:
+            raise LocalUserNotVerifiedError
+    
+    def verify_user_google(self, jwt_token: str) -> None:
+        """
+        Verifies user registered via google api
+
+        Args:
+            jwt_token (str) - token which user got
+            from google to get user data
+        Raises:
+            GoogleUserVerificationError: Error while verifying on our side
+            GoogleUserNotVerifiedError: Invalid token / not found
+        """
+        # Validate token + verify existance of user 
+        try:
+            data = self.google_api.get_registration_info(jwt_token)
+            verified = self.repo.exists_google(data["user_id"], data["email"])
+        except GoogleAuthError as e:
+            raise GoogleUserVerificationError from e
+        except QueryExecutionError as e:
+            raise GoogleUserVerificationError from e
+        
+        if not verified:
+            raise GoogleUserNotVerifiedError

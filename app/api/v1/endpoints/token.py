@@ -1,0 +1,59 @@
+from fastapi import APIRouter, Response, Depends, HTTPException, status, Cookie, Security
+from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
+
+
+from ..schemas.token import Token
+from ..dependencies.token import TokenDependencies
+from ..dependencies.user import UserDependencies
+from app.services.token import TokenService
+from app.services.user import UserService
+from app.exceptions.domain.user import (
+    LocalUserNotVerifiedError,
+    LocalUserVerificationError,
+)
+
+router = APIRouter(prefix="/token",
+                   tags=["authentications"])
+
+@router.post("/local", response_model=Token)
+async def local_login(
+    response: Response,
+    user_credentials: OAuth2PasswordRequestForm = Depends(),
+    user_service: UserService = Depends(UserDependencies),
+    token_service: TokenService = Depends(TokenDependencies),
+) -> Token:
+    
+    try:
+        user_service.verify_user_local(
+            user_credentials.username, 
+            user_credentials.password,
+        )
+    except LocalUserNotVerifiedError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
+    except LocalUserVerificationError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong, please try again later",
+        )
+        
+    access_token = token_service.create_access_token({"user_id": user.id})
+    refresh_token, refresh_token_expires = token_service.create_refresh_token()
+    csrf_token = token_service.create_csrf_token()
+    
+    response.set_cookie(key="refresh_token",
+                        value=f"{refresh_token}",
+                        httponly=True,
+                        secure=True,
+                        samesite="strict",
+                        expires=refresh_token_expires)
+    
+    response.set_cookie(key="csrf_token",
+                        value=f"{csrf_token}",
+                        secure=True,
+                        samesite="strict")
+    
+    return {"access_token": access_token,   
+            "token_type": "bearer"}

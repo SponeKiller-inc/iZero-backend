@@ -1,13 +1,58 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.models.users import Users
-from app.exceptions.domain import UserExistsError, RegistrationError
+from app.exceptions.domain.user import UserExistsError, RegistrationError
+from app.exceptions.infrastucture.repository import QueryExecutionError
+
 
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
-        
+    
+    def get_user_local(self, email: str) -> Users | None:
+        """
+        Retrieve user data registered locally
+
+        Args:
+            email (str): user e-mai
+
+        Returns:
+            Users: local user data 
+        """
+        try: 
+            return (
+                self.db
+                    .query(Users)
+                    .filter(Users.email == email)
+                    .first()
+            )
+        except SQLAlchemyError as e:
+            raise QueryExecutionError("Failed to retrieve user data") from e
+    
+    def get_user_google(self, provider_user_id: str) -> Users | None:
+        """
+        Retrieve user data registered via google
+
+        Args:
+            provider_user_id (str): google user id
+
+        Returns:
+            Users: user data 
+        """
+        try:
+            return (
+                self.db
+                    .query(Users)
+                    .filter(
+                        Users.provider_user_id == provider_user_id,
+                        Users.provider == "google"
+                    )
+                    .first()
+            )
+        except SQLAlchemyError as e:
+            raise QueryExecutionError("Failed to retrieve user data") from e
+            
     def exists_local(self, email: str) -> bool:
         """
         Check if user created locally exists in db 
@@ -18,14 +63,16 @@ class UserRepository:
         Returns:
             bool: returns True if user exists
         """
+        try:
+            return (
+                self.db
+                    .query(Users)
+                    .filter(Users.email == email)
+                    .first() is not None
+            )
+        except SQLAlchemyError as e:
+            raise QueryExecutionError("Failed to verify local user existance")
         
-        return (
-            self.db
-                .query(Users)
-                .filter(Users.email == email)
-                .first() is not None
-        )
-
     def exists_google(self, provider_user_id: str, email: str) -> bool:
         """
         Check if user created via google exists in db
@@ -39,27 +86,27 @@ class UserRepository:
         """
         
         # Use exists if found via e-mail or provider_user_id
+        try: 
+            is_provider_user_id = (
+                self.db
+                    .query(Users)
+                    .filter(
+                        Users.provider_user_id == provider_user_id,
+                        Users.provider == "google"
+                    )
+                    .first() is not None
+            )
+            
+            is_email = (
+                self.db
+                    .query(Users)
+                    .filter(Users.email == email)
+                    .first() is not None
+            )
         
-        is_provider_user_id = (
-            self.db
-                .query(Users)
-                .filter(
-                    Users.provider_user_id == provider_user_id,
-                    Users.provider == "google"
-                )
-                .first() is not None
-        )
-        
-        is_email = (
-            self.db
-                .query(Users)
-                .filter(Users.email == email)
-                .first() is not None
-        )
-                           
-        
-        
-        return is_provider_user_id or is_email
+            return is_provider_user_id or is_email
+        except SQLAlchemyError as e:
+            raise QueryExecutionError("Failed to verify google user existance")
     
     def create_user(self, new_user: Users) -> Users:
         """
@@ -82,5 +129,8 @@ class UserRepository:
             return new_user
         except IntegrityError as e:
             raise UserExistsError from e
-        except OperationalError as e:
+        except SQLAlchemyError as e:
             raise RegistrationError from e
+        
+        
+    

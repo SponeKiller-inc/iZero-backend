@@ -4,7 +4,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from google.auth.exceptions import GoogleAuthError as AuthError
 
-from app.exceptions.google import GoogleAuthError
+from app.exceptions.domain.google import GoogleAuthError
 from app.utils.config import settings
 
 class GoogleAPI:

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..schemas import user as schema
-from app.services.user_service import UserService
-from app.api.dependencies import get_user_service
-from app.exceptions.domain import (
+from app.services.user import UserService
+from app.api.v1.dependencies.user import UserDependencies
+from app.exceptions.domain.user import (
     LocalUserExistsError,
     GoogleUserExistsError,
     RegistrationError
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["authentications"])
 @router.post("/local", status_code=status.HTTP_201_CREATED)
 async def register_local(
     user: schema.LocalRegistrationIn,
-    user_service: UserService = Depends(get_user_service)
+    user_service: UserService = Depends(UserDependencies)
 ):
     try:
         user_service.register_user_local(
@@ -35,7 +35,7 @@ async def register_local(
 @router.post("/google", status_code=status.HTTP_201_CREATED)
 async def register_google(
     user: schema.GoogleRegistrationIn,
-    user_service: UserService = Depends(get_user_service)
+    user_service: UserService = Depends(UserDependencies)
 ):
     try:
         user_service.register_user_google(user.jwt_token)
