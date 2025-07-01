@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
     refresh_token_expire_minutes: int
+    session_expire_minutes: int
     refresh_token_length: int
     csrf_token_length: int
     pwd_context_scheme: str

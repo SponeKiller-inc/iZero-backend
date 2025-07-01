@@ -2,7 +2,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
-from app.repositories.user_repo import UserRepository
+from app.repositories.user import UserRepository
 from app.services.user import UserService
 from app.services.google import GoogleAPI
 

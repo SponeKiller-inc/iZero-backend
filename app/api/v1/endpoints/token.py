@@ -11,6 +11,11 @@ from app.exceptions.domain.user import (
     LocalUserNotVerifiedError,
     LocalUserVerificationError,
 )
+from app.exceptions.domain.token import (
+    RefreshTokenServiceError,
+    AccessTokenServiceError,
+    CSRFTokenCreationError
+)
 
 router = APIRouter(prefix="/token",
                    tags=["authentications"])
@@ -24,7 +29,7 @@ async def local_login(
 ) -> Token:
     
     try:
-        user_service.verify_user_local(
+        user_id = user_service.authenticate_user_local(
             user_credentials.username, 
             user_credentials.password,
         )
@@ -39,9 +44,20 @@ async def local_login(
             detail="Something went wrong, please try again later",
         )
         
-    access_token = token_service.create_access_token({"user_id": user.id})
-    refresh_token, refresh_token_expires = token_service.create_refresh_token()
-    csrf_token = token_service.create_csrf_token()
+    try:
+        access_token = token_service.create_access_token(user_id)
+        refresh_token, refresh_token_expires = token_service.create_refresh_token()
+        csrf_token = token_service.create_csrf_token()
+    except (
+        AccessTokenServiceError, 
+        RefreshTokenServiceError,
+        CSRFTokenCreationError,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong, please try again later",
+        )
+    
     
     response.set_cookie(key="refresh_token",
                         value=f"{refresh_token}",

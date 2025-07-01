@@ -6,8 +6,8 @@ from sqlalchemy import (
 
 from app.database.base import Base
 
-class Sessions(Base):
-    __tablename__ = "sessions"
+class SessionLog(Base):
+    __tablename__ = "session_log"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     session_id: Mapped[int] = mapped_column(
