@@ -1,79 +1,176 @@
-import secrets
-
-from jose import JWTError, jwt
-from datetime import datetime
+import uuid
 
 from app.repositories.session import SessionRepository
+from app.services.token import TokenService
 from app.models.sessions import Sessions
 from app.models.session_log import SessionLog
 from app.exceptions.repository.session import (
     SessionCreationError,
     SessionUpdateError,
+    SessionLogCreationError,
 )
 from app.exceptions.infrastucture.repository import (
     CreateExecutionError,
     UpdateExecutionError,
+    QueryExecutionError,
+    
 )
 from app.exceptions.domain.session import (
     LogSessionServiceError,
     UserSessionServiceError,
+    InicializeSessionServiceError,
 )
+from app.exceptions.domain.token import AccessTokenServiceError
 
 from app.utils.config import settings
-from app.utils.utils import create_UTC_exp_time
-from app.utils.validation import validate_positive_int
+from app.utils.utils import create_UTC_exp_time, get_UTC_current_time
+
+class SessionEventType:
+    SESSION_INITIALIZED   = "session_initialized"
+    SESSION_RESUMED       = "session_resumed"
+    PAGE_VIEW             = "page_view"
+    API_CALL              = "api_call"
+    USER_LOGGED_IN        = "user_logged_in"
+    USER_LOGGED_OUT       = "user_logged_out"
+    SESSION_EXPIRED       = "session_expired"
 class SessionService:
     def __init__(
         self, 
         repo: SessionRepository,
+        token_service: TokenService
     ):
         self.repo = repo
-    
-    def create_user_session(
+        self.token_service = token_service
+        
+    def inicialize_session(
         self, 
-        user_id: int,
-        ip_adress: str,
+        external_id: str, 
+        jwt_token: str, 
+        ip_address: str, 
         user_agent: str,
-        metadata: dict,
     ) -> int:
+        """
+        Inicialize session
+        (validate current session if not OK, create new)
+
+        Args:
+            external_id (str): session id provided to user
+            jwt_token (str): jwt acces token with user id
+            ip_address (str): user ip_address
+            user_agent (str): user agent from http header
+        
+        Returns:
+            int: current user session
+        
+        Raises:
+            InicializeSessionServiceError: issue while inicializing session
+        """
+        
+        
         
         try:
-            # Invalidate all current user session
-            self.repo.expire_session(user_id)
+            if jwt_token: 
+                # User logged in
+                user_id = self.token_service.verify_access_token(jwt_token)
+            else:
+                user_id = 0
+                
+            # Clean up previous user session
+            if external_id is None and user_id > 0:
+                # session not exist bud we know user
+                session = self.repo.get_last_user_session(user_id)
+                if session.expired_at > get_UTC_current_time():
+                    # expire last user session if not expired
+                    self.repo.expire_session(session.id)
             
-            expire = create_UTC_exp_time(
+            if external_id is not None:
+                # Verify session
+                session = self.repo.get_session(external_id)
+                
+                if session is None:
+                    # Not valid = as it did not existed
+                    external_id = 0
+            
+            if external_id is None:
+                # Create new session
+                session = self._create_session(user_id, ip_address, user_agent)
+        except (
+            AccessTokenServiceError,
+            UserSessionServiceError, 
+            SessionUpdateError,
+            QueryExecutionError,
+            UpdateExecutionError,
+        ) as e:
+            raise InicializeSessionServiceError from e
+        
+        return session.id
+        
+    def _create_session(
+        self, 
+        user_id: int,
+        ip_address: str,
+        user_agent: str,
+    ) -> Sessions:
+        """
+        Create session
+
+        Args:
+            user_id (int): user id
+            ip_address (str): user ip_address
+            user_agent (str): user agent from http header
+        
+        Returns:
+            Sessions: created session
+        
+        Raises:
+            UserSessionServiceError: issue while creating new session
+        """
+        
+        try:
+            expired_at = create_UTC_exp_time(
                 int(settings.session_expire_minutes)
             )
             
             new_session = Sessions(
+                external_id=uuid.uuid4(),
                 user_id=user_id,
-                ip_adress=ip_adress,
+                ip_address=ip_address,
                 user_agent=user_agent,
-                expired_at=expire,
-                metadata=metadata,
+                expired_at=expired_at,
             )
-            # Create new session
-            session = self.repo.create_session(new_session)
             
-            return session.id
+            # Create new session
+            return self.repo.create_session(new_session)
         except (
-            SessionUpdateError, 
             SessionCreationError,
-            UpdateExecutionError,
             CreateExecutionError,
         ) as e:
             raise UserSessionServiceError from e
     
-    def create_session_log(
+    def record_session_event(
         self, 
         session_id: int, 
         event_type: str, 
-        metadata: dict
-    ):
+    ) -> None:
+        """
+        Records session event
+
+        Args:
+            session_id (int): session id
+            event_type (str): which resources user asked    
+        
+        Raises:
+            LogSessionServiceError: issue while inserting session record
+        """
+
         try:
-            pass
+            new_session_log = SessionLog(
+                session_id=session_id,
+                event_type=event_type
+            )
+            self.repo.create_session_log(new_session_log)
         except (
             SessionLogCreationError,
             CreateExecutionError,
         ) as e:
-            raise
+            raise LogSessionServiceError from e

@@ -10,7 +10,6 @@ class TokenDependencies:
     Dependency container for token-related operations.
     
     Attributes:
-        repo (TokenRepository): repository to work with token
         service (TokenService): business logic for token
     """
     def __init__(

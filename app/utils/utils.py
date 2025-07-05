@@ -1,8 +1,10 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 
+from fastapi import Request
+from fastapi.security import OAuth2PasswordBearer
+
 from app.utils.config import settings
-from app.utils.validation import validate_non_empty_str, validate_positive_int
 
 pwd_context = CryptContext(
     schemes=[settings.pwd_context_scheme],
@@ -44,16 +46,42 @@ def create_UTC_exp_time(minutes: int) -> datetime:
     Create expiration time
 
     Args:
-        minutes (int): minutest to expiration
+        minutes (int): minutes to expiration 
+            (if 0, expiration = now + 100ms)
     
     Returns:
         datetime: time of expiration 
-        (YYYY-MM-DD HH:MM:SS.ffffff±HH:MM)
+            (YYYY-MM-DD HH:MM:SS.ffffff±HH:MM)
     """
+    now = datetime.now(timezone.utc)
     
-    expire = (
-        datetime.now(timezone.utc) 
-        + timedelta(minutes=minutes)
-    )
+    if minutes == 0:
+        delta = timedelta(milliseconds=100)
+    else:
+        delta = timedelta(minutes=minutes)
+        
+    return now + delta
+
+def get_UTC_current_time() -> datetime:
+    """
+    Returns current utc time
     
-    return expire
+    Returns:
+        datetime: current time
+            (YYYY-MM-DD HH:MM:SS.ffffff±HH:MM)
+    """
+    return datetime.now(timezone.utc)
+
+async def extract_access_token(request: Request) -> str|None:
+    """
+    Extract auth token from Request
+    
+    Args:
+        request (Request) : Fastapi request
+    
+    Returns:
+        str or None: Access token or None if not present in header
+    """
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
+    
+    return await oauth2_scheme(request)

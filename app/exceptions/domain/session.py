@@ -1,4 +1,4 @@
-from errors import DomainError
+from .errors import DomainError
 
 class SessionServiceError(DomainError):
     """Unable to generate session"""
@@ -12,3 +12,8 @@ class LogSessionServiceError(DomainError):
     """Reserved for generation session log"""
     def __init__(self):
         super().__init__(f"Unable to generate session log")
+               
+class InicializeSessionServiceError(DomainError):
+    """Reserved for session inicialization"""
+    def __init__(self):
+        super().__init__(f"Unable to inicialize session")

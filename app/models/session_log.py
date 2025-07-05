@@ -15,4 +15,3 @@ class SessionLog(Base):
         nullable=False
     )
     event_type: Mapped[str] = mapped_column(nullable=False)
-    metadata: Mapped[dict] = mapped_column(JSON, nullable=True)

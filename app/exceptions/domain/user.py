@@ -1,4 +1,4 @@
-from app.exceptions.domain.errors import DomainError
+from .errors import DomainError
 
 # Base user Error
 class RegistrationError(DomainError):

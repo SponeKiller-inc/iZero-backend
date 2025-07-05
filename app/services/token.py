@@ -108,3 +108,33 @@ class TokenService:
             return secrets.token_hex(int(settings.csrf_token_length)) 
         except (ValueError, TypeError) as e:
             raise CSRFTokenCreationError from e
+    
+    def verify_access_token(token: str) -> int:
+        """
+        Verify  access token
+        
+        Returns:
+            int: user id
+
+        Raises:
+            AccessTokenServiceError - unable to validate correctly access token
+        """
+    
+        try:
+            payload = jwt.decode(
+                token,
+                settings.secret_key,
+                algorithms=settings.algorithm,
+            )
+            
+            user_id = payload.get("user_id")
+            
+            if user_id is None:
+                raise AccessTokenServiceError(
+                    "Access token does not contain user id"
+                ) 
+            
+            return user_id 
+        except JWTError as e:
+            raise AccessTokenServiceError("Not valid access token") from e
+    

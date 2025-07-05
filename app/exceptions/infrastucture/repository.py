@@ -1,4 +1,4 @@
-from errors import DataAccessError
+from .errors import DataAccessError
 
 class QueryExecutionError(DataAccessError):
     """Reserved for query eror on db side (timeout, connection ...)"""

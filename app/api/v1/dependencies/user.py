@@ -11,7 +11,6 @@ class UserDependencies:
     Dependency container for user-related operations.
     
     Attributes:
-        repo (UserRepository): repository to work with user
         service (UserService): business logic for user
     """
     def __init__(

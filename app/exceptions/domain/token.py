@@ -1,4 +1,4 @@
-from errors import DomainError
+from .errors import DomainError
 
 class TokenServiceError(DomainError):
     """Unable to generate token"""

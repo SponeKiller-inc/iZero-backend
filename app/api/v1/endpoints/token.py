@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Response, Depends, HTTPException, status, Cookie, Security
-from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import APIRouter, Response, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 
 
 from ..schemas.token import Token
 from ..dependencies.token import TokenDependencies
-from ..dependencies.user import UserDependencies
+from ..dependencies.auth import AuthDependencies
 from app.services.token import TokenService
-from app.services.user import UserService
+from app.services.auth import AuthService
 from app.exceptions.domain.user import (
     LocalUserNotVerifiedError,
     LocalUserVerificationError,
@@ -24,12 +24,12 @@ router = APIRouter(prefix="/token",
 async def local_login(
     response: Response,
     user_credentials: OAuth2PasswordRequestForm = Depends(),
-    user_service: UserService = Depends(UserDependencies),
+    auth_service: AuthService = Depends(AuthDependencies),
     token_service: TokenService = Depends(TokenDependencies),
 ) -> Token:
     
     try:
-        user_id = user_service.authenticate_user_local(
+        user_id = auth_service.authenticate_user_local(
             user_credentials.username, 
             user_credentials.password,
         )

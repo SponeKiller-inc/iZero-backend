@@ -9,6 +9,27 @@ from app.exceptions.infrastucture.repository import QueryExecutionError
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
+        
+    def get_user(self, user_id: str) -> Users | None:
+        """
+        Retrieve user data by id
+
+        Args:
+            user_id (int): user id
+
+        Returns:
+            Users or None:  user data if found else None
+        """
+        try: 
+            return (
+                self.db
+                    .query(Users)
+                    .filter(Users.id == user_id)
+                    .first()
+            )
+        except SQLAlchemyError as e:
+            raise QueryExecutionError("Failed to retrieve user data") from e
+        
     
     def get_user_local(self, email: str) -> Users | None:
         """

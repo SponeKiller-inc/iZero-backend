@@ -1,4 +1,4 @@
-from errors import RepositoryError
+from .errors import RepositoryError
 
 class RefreshTokenNotFoundError(RepositoryError):
     """Reserved for refresh token not found (not existing ID...)"""
