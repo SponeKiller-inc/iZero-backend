@@ -56,7 +56,7 @@ class TokenService:
         
         
     
-    def create_refresh_token(self, session_id: str) -> tuple[str, datetime]:
+    def create_refresh_token(self, session_id: int) -> tuple[str, datetime]:
         """
         Create refresh token
 
