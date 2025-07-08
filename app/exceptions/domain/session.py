@@ -17,3 +17,8 @@ class InicializeSessionServiceError(DomainError):
     """Reserved for session inicialization"""
     def __init__(self):
         super().__init__(f"Unable to inicialize session")
+
+class GetSessionServiceError(DomainError):
+    """Reserved for retrieving session data"""
+    def __init__(self):
+        super().__init__(f"Unable to retriev session data")

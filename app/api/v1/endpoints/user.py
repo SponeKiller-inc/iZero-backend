@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+import sentry_sdk
 
 from ..schemas import user as schema
 from app.services.user import UserService
+
 from app.api.v1.dependencies.user import UserDependencies
 from app.exceptions.domain.user import (
     LocalUserExistsError,
@@ -21,12 +23,16 @@ async def register_local(
             user.email,
             user.password
         )
-    except LocalUserExistsError:
+    except LocalUserExistsError as e:
+        sentry_sdk.capture_exception(e)
+        
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists"
         )
-    except RegistrationError:
+    except RegistrationError as e:
+        sentry_sdk.capture_exception(e)
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Something went wrong, please try again later"
@@ -39,12 +45,16 @@ async def register_google(
 ):
     try:
         user_service.register_user_google(user.jwt_token)
-    except GoogleUserExistsError:
+    except GoogleUserExistsError as e:
+        sentry_sdk.capture_exception(e)
+        
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists"
         )
-    except RegistrationError:
+    except RegistrationError as e:
+        sentry_sdk.capture_exception(e)
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Something went wrong, please try again later"

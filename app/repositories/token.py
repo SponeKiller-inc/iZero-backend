@@ -9,17 +9,12 @@ class TokenRepository:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_refresh_token(self, user_id):
-        pass
-    
     def create_refresh_token(self, new_token: RefreshToken):
         try:
             self.db.add(new_token)
             self.db.commit()
         except IntegrityError as e:
-            raise RefreshTokenCreationError(
-                "Session id not exists or invalid data"
-            ) from e
+            raise RefreshTokenCreationError from e
         except SQLAlchemyError as e:
             raise  CreateExecutionError(
                 "Unable to creat refresh token due to server issue"

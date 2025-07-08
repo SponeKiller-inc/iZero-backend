@@ -72,7 +72,7 @@ def get_UTC_current_time() -> datetime:
     """
     return datetime.now(timezone.utc)
 
-async def extract_access_token(request: Request) -> str|None:
+async def extract_access_token(request: Request) -> str | None:
     """
     Extract auth token from Request
     

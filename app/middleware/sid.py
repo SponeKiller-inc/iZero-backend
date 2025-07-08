@@ -1,6 +1,7 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+import sentry_sdk
 
 from .dependency.session import SessionDependencies
 from app.services.session import SessionEventType
@@ -12,11 +13,9 @@ from app.exceptions.domain.session import (
 )
 class SIDMiddleware(BaseHTTPMiddleware):
     """
-    Middleware that ensures each request has a session ID ('sid').
+    Middleware that ensures ensure to inicialize
+    Session and set session id cookie
 
-    Retrieves 'sid' from cookies or generates a new UUID, assigns it to
-    `request.state.sid` to work with in endpoints, and sets the cookie 
-    on the response if it was missing.
     """
     def __init__(self, app):
 
@@ -32,7 +31,7 @@ class SIDMiddleware(BaseHTTPMiddleware):
         jwt_token = await extract_access_token(request)
         ip_address = request.client.host
         try:
-            session_id = self.session_service.inicialize_session(
+            session_id, external_id = self.session_service.inicialize_session(
                 external_id,
                 jwt_token,
                 ip_address,
@@ -46,14 +45,21 @@ class SIDMiddleware(BaseHTTPMiddleware):
         except (
             InicializeSessionServiceError,
             LogSessionServiceError,
-        ):
+        ) as e:
+            sentry_sdk.capture_exception(e)
+            
             return JSONResponse(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content={
-                    "detail": "Something went wrong please try again later"
+                content = {
+                    "detail":
+                        "Something went wrong while creating session. "
+                        "Please try again later"
                 }
             )
-                
+        # Store external session id to state
+        # for use in endpoints
+        request.state.sid = external_id
+         
         response = await call_next(request)
 
         if request.cookies.get("sid") is None:

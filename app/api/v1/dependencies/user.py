@@ -6,12 +6,9 @@ from app.repositories.user import UserRepository
 from app.services.user import UserService
 from app.services.google import GoogleAPI
 
-class UserDependencies:
+class UserDependencies(UserService):
     """
     Dependency container for user-related operations.
-    
-    Attributes:
-        service (UserService): business logic for user
     """
     def __init__(
         self,
@@ -19,9 +16,5 @@ class UserDependencies:
         google_api: GoogleAPI = Depends(GoogleAPI),
     ):
         repo = UserRepository(session)
-        
-        # business logic
-        self.service = UserService(repo, google_api)
-        
-    def __call__(self) -> UserService:
-        return self.service    
+        super().__init__(repo, google_api)
+ 

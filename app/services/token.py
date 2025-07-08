@@ -1,10 +1,13 @@
 import secrets
+from datetime import datetime
 
 from jose import JWTError, jwt
-from datetime import datetime
 
 from app.repositories.token import TokenRepository
 from app.models.refresh_token import RefreshToken
+from app.utils.config import settings
+from app.utils.utils import create_UTC_exp_time
+
 from app.exceptions.infrastucture.repository import CreateExecutionError
 from app.exceptions.domain.token import (
     RefreshTokenServiceError,
@@ -13,9 +16,6 @@ from app.exceptions.domain.token import (
 )
 from app.exceptions.repository.token import RefreshTokenCreationError
 
-from app.utils.config import settings
-from app.utils.utils import create_UTC_exp_time
-from app.utils.validation import validate_positive_int
 class TokenService:
     def __init__(
         self, 
@@ -37,7 +37,6 @@ class TokenService:
             AccessTokenServiceError - Unable to generate Access token
         """
         try:
-            validate_positive_int("user_id", user_id)
             
             expire = create_UTC_exp_time(
                 int(settings.access_token_expire_minutes)
@@ -52,7 +51,7 @@ class TokenService:
             
             return encoded_jwt
         
-        except (ValueError, TypeError, JWTError) as e:
+        except JWTError as e:
             raise AccessTokenServiceError from e
         
         
@@ -71,7 +70,6 @@ class TokenService:
             RefreshTokenServiceError - Unable to generate token
         """
         try:
-            validate_positive_int("session_id", session_id)
             
             expire = create_UTC_exp_time(int(settings.refresh_token_expire_minutes))
             token = secrets.token_hex(int(settings.refresh_token_length))
@@ -109,7 +107,7 @@ class TokenService:
         except (ValueError, TypeError) as e:
             raise CSRFTokenCreationError from e
     
-    def verify_access_token(token: str) -> int:
+    def verify_access_token(self, token: str) -> int:
         """
         Verify  access token
         

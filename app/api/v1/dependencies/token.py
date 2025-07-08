@@ -5,12 +5,9 @@ from app.database.session import get_db
 from app.repositories.token import TokenRepository
 from app.services.token import TokenService
 
-class TokenDependencies:
+class TokenDependencies(TokenService):
     """
     Dependency container for token-related operations.
-    
-    Attributes:
-        service (TokenService): business logic for token
     """
     def __init__(
         self,
@@ -19,7 +16,4 @@ class TokenDependencies:
         repo = TokenRepository(session)
         
         # business logic
-        self.service = TokenService(repo)
-    
-    def __call__(self):
-        return self.service
+        super().__init__(repo)

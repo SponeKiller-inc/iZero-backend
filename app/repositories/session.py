@@ -3,6 +3,8 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from app.models.sessions import Sessions
 from app.models.session_log import SessionLog
+from app.utils.utils import create_UTC_exp_time
+
 from app.exceptions.repository.session import (
     SessionCreationError,
     SessionUpdateError,
@@ -13,22 +15,20 @@ from app.exceptions.infrastucture.repository import (
     CreateExecutionError,
     UpdateExecutionError,
 )
-from app.utils.utils import create_UTC_exp_time
-
 
 class SessionRepository:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_last_user_session(self, user_id: int) -> Sessions:
+    def get_last_user_session(self, user_id: int) -> Sessions | None:
         """
-        Retrieve data of last user session
+        Retrieve data of user session
 
         Args:
             user_id (int): user e-mail
         
         Returns:
-            Sessions: session data
+            Sessions or None: session data or None if no data present
         
         Raises:
             QueryExecutionError: IF any issue on server side
@@ -43,7 +43,7 @@ class SessionRepository:
                 )
         except SQLAlchemyError as e:
             raise QueryExecutionError("Unable to find user session, db issue")
-    def get_session(self, external_id: str):
+    def get_session(self, external_id: str) -> Sessions | None:
         """
         Retrieve session data
 
@@ -51,7 +51,7 @@ class SessionRepository:
             external_id (str): external session id provided to user
                     
         Returns:
-            Sessions: session data
+            Sessions or None: session data or None if no data present
         
         Raises:
             QueryExecutionError: IF any issue on server side
@@ -85,6 +85,8 @@ class SessionRepository:
         try:
             self.db.add(new_session)
             self.db.commit()
+            self.db.refresh(new_session)
+            return new_session
         except IntegrityError as e:
             raise SessionCreationError from e
         except SQLAlchemyError as e:
@@ -95,7 +97,7 @@ class SessionRepository:
         Expire session
 
         Args:
-            new_session (Sessions) - data tu create session
+            new_session (Sessions) - data to create session
         
         Raises:
             SessionUpdateError - invalid session id
@@ -111,7 +113,7 @@ class SessionRepository:
             self.db.execute(stmt)
             self.db.commit()
         except IntegrityError as e:
-            raise SessionUpdateError("Session id does not exist") from e
+            raise SessionUpdateError from e
         except SQLAlchemyError as e:
             raise UpdateExecutionError("Unable to expire session, db issue")
     

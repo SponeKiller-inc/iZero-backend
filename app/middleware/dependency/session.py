@@ -10,14 +10,20 @@ class SessionDependencies(SessionService):
     """
 
     def __init__(self) -> None:
+        self._db_gen = get_db()
+        
         # Inicialize db + prepare needed repository and services
-        db_session = get_db()
-        session_repo = SessionRepository(db_session)
-        token_repo   = TokenRepository(db_session)
+        db = next(self._db_gen)
+        session_repo = SessionRepository(db)
+        token_repo   = TokenRepository(db)
         token_svc    = TokenService(token_repo)
 
         # Inicialize session service
         super().__init__(session_repo, token_svc)
-
-    def __call__(self) -> SessionService:
-        return self
+    
+    def __del__(self):
+        # End db session
+        try:
+            next(self._db_gen)       
+        except StopIteration:
+            pass

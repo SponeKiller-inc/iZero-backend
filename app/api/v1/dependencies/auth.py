@@ -8,12 +8,9 @@ from app.services.auth import AuthService
 from app.services.token import TokenService
 from app.services.google import GoogleAPI
 
-class AuthDependencies:
+class AuthDependencies(AuthService):
     """
     Dependency container for auth-related operations.
-    
-     Attributes:
-        service (AuthService): business logic for authorization
     """
     def __init__(
         self,
@@ -25,13 +22,5 @@ class AuthDependencies:
         token_repo = TokenRepository(session)
         token_service = TokenService(token_repo)
         
-        
-        self.service = AuthService(
-            user_repo, 
-            token_repo, 
-            token_service, 
-            google_api,
-        )
-        
-    def __call__(self) -> AuthService:
-        return self.service    
+        super().__init__(user_repo, token_repo, token_service, google_api)
+    

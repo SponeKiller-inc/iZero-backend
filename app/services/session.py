@@ -19,6 +19,7 @@ from app.exceptions.domain.session import (
     LogSessionServiceError,
     UserSessionServiceError,
     InicializeSessionServiceError,
+    GetSessionServiceError,
 )
 from app.exceptions.domain.token import AccessTokenServiceError
 
@@ -33,6 +34,7 @@ class SessionEventType:
     USER_LOGGED_IN        = "user_logged_in"
     USER_LOGGED_OUT       = "user_logged_out"
     SESSION_EXPIRED       = "session_expired"
+    
 class SessionService:
     def __init__(
         self, 
@@ -48,7 +50,7 @@ class SessionService:
         jwt_token: str, 
         ip_address: str, 
         user_agent: str,
-    ) -> int:
+    ) -> tuple[int, str]:
         """
         Inicialize session
         (validate current session if not OK, create new)
@@ -66,17 +68,19 @@ class SessionService:
             InicializeSessionServiceError: issue while inicializing session
         """
         
-        
-        
         try:
             if jwt_token: 
                 # User logged in
                 user_id = self.token_service.verify_access_token(jwt_token)
             else:
-                user_id = 0
+                user_id = None
                 
             # Clean up previous user session
-            if external_id is None and user_id > 0:
+            if (
+                external_id is None and 
+                user_id is not None and
+                user_id > 0
+            ):
                 # session not exist bud we know user
                 session = self.repo.get_last_user_session(user_id)
                 if session.expired_at > get_UTC_current_time():
@@ -103,7 +107,7 @@ class SessionService:
         ) as e:
             raise InicializeSessionServiceError from e
         
-        return session.id
+        return (session.id, session.external_id)
         
     def _create_session(
         self, 
@@ -174,3 +178,22 @@ class SessionService:
             CreateExecutionError,
         ) as e:
             raise LogSessionServiceError from e
+    
+    def retrieve_session(self, external_id: str) -> Sessions:
+        """
+        Retrieve session
+
+        Args:
+            external_id (str): session id provided to user
+        
+        Returns:
+            Sessions: session data
+        
+        Raises:
+            GetSessionServiceError: issue while retrieving session info
+        """
+        
+        try:
+            return self.repo.get_session(external_id)
+        except QueryExecutionError as e:
+            raise GetSessionServiceError from e

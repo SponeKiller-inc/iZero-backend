@@ -18,7 +18,10 @@ class UserRepository:
             user_id (int): user id
 
         Returns:
-            Users or None:  user data if found else None
+            Users or None:  user data or None if no user found
+            
+        Raises:
+            QueryExecutionError - server side error while execution
         """
         try: 
             return (
@@ -39,7 +42,10 @@ class UserRepository:
             email (str): user e-mai
 
         Returns:
-            Users: local user data 
+            Users or None: local user data 
+            
+        Raises:
+            QueryExecutionError - server side error while execution
         """
         try: 
             return (
@@ -59,7 +65,10 @@ class UserRepository:
             provider_user_id (str): google user id
 
         Returns:
-            Users: user data 
+            Users or None: user data or None if user not found 
+        
+        Raises:
+            QueryExecutionError - server side error while execution
         """
         try:
             return (
@@ -83,6 +92,9 @@ class UserRepository:
 
         Returns:
             bool: returns True if user exists
+        
+        Raises:
+            QueryExecutionError - server side error while execution
         """
         try:
             return (
@@ -104,6 +116,9 @@ class UserRepository:
 
         Returns:
             bool: returns True if user exists
+        
+        Raises:
+            QueryExecutionError - server side error while execution
         """
         
         # Use exists if found via e-mail or provider_user_id
@@ -144,8 +159,9 @@ class UserRepository:
             RegistrationError: something went wrong with
                 registration
         """
-        self.db.add(new_user)
+        
         try:
+            self.db.add(new_user)
             self.db.commit()
             return new_user
         except IntegrityError as e:
