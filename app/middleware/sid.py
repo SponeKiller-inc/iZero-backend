@@ -13,8 +13,7 @@ from app.exceptions.domain.session import (
 )
 class SIDMiddleware(BaseHTTPMiddleware):
     """
-    Middleware that ensures ensure to inicialize
-    Session and set session id cookie
+    Middleware that initializes sessions and sets a session ID cookie.
 
     """
     def __init__(self, app):
