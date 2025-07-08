@@ -17,5 +17,5 @@ class TokenRepository:
             raise RefreshTokenCreationError from e
         except SQLAlchemyError as e:
             raise  CreateExecutionError(
-                "Unable to creat refresh token due to server issue"
+                "Unable to create refresh token due to server issue"
             ) from e
