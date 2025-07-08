@@ -41,7 +41,7 @@ class SessionRepository:
                     .order_by(Sessions.id.desc())
                     .first()
                 )
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             raise QueryExecutionError("Unable to find user session, db issue")
     def get_session(self, external_id: str) -> Sessions | None:
         """
@@ -65,7 +65,7 @@ class SessionRepository:
                     )
                     .first()
                 )
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             raise QueryExecutionError("Unable to find session, db issue")
     
     def create_session(self, new_session: Sessions) -> Sessions:
@@ -89,7 +89,7 @@ class SessionRepository:
             return new_session
         except IntegrityError as e:
             raise SessionCreationError from e
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             raise CreateExecutionError("Unable to create session, db issue")
     
     def expire_session(self, session_id: int) -> None:
@@ -114,7 +114,7 @@ class SessionRepository:
             self.db.commit()
         except IntegrityError as e:
             raise SessionUpdateError from e
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             raise UpdateExecutionError("Unable to expire session, db issue")
     
     def create_session_log(self, new_session_log: SessionLog) -> None:
@@ -134,5 +134,5 @@ class SessionRepository:
             self.db.commit()
         except IntegrityError as e:
             raise SessionLogCreationError from e
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             raise CreateExecutionError("Unable to create session log, db issue")

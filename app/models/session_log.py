@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import (
-    ForeignKey, 
-    JSON,
+    ForeignKey,
 )
 
 from app.database.base import Base

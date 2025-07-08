@@ -104,7 +104,9 @@ class UserRepository:
                     .first() is not None
             )
         except SQLAlchemyError as e:
-            raise QueryExecutionError("Failed to verify local user existance")
+            raise QueryExecutionError(
+                "Failed to verify local user existance"
+            ) from e
         
     def exists_google(self, provider_user_id: str, email: str) -> bool:
         """
@@ -142,7 +144,9 @@ class UserRepository:
         
             return is_provider_user_id or is_email
         except SQLAlchemyError as e:
-            raise QueryExecutionError("Failed to verify google user existance")
+            raise QueryExecutionError(
+                "Failed to verify google user existance"
+            ) from e
     
     def create_user(self, new_user: Users) -> Users:
         """

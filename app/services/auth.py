@@ -109,7 +109,7 @@ class AuthService:
             user = self.user_repo.get_user(user_id)
             
             if user is None:
-                raise UserNotVerifiedError(f"User does not exist")
+                raise UserNotVerifiedError("User does not exist")
             
             return user.id
         except AccessTokenServiceError as e:
