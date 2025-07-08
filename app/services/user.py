@@ -1,14 +1,14 @@
-from app.repositories.user_repo import UserRepository
+from app.repositories.user import UserRepository
 from app.models.users import Users
-from app.exceptions.domain import (
+from app.services.google import GoogleAPI
+from app.exceptions.domain.user import (
     LocalUserExistsError, 
     GoogleUserExistsError, 
     UserExistsError, 
-    RegistrationError
+    RegistrationError,
 )
-from app.exceptions.google import GoogleAuthError
+from app.exceptions.domain.google import GoogleAuthError
 from app.utils import utils
-from app.services.google import GoogleAPI
 class UserService:
     def __init__(
         self, 
@@ -94,3 +94,5 @@ class UserService:
             ) from e
         except RegistrationError:
             raise
+    
+    
