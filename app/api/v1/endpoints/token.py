@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response, Request, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 import sentry_sdk
 
-from ..schemas.token import TokenOut
+from ..schemas.token import TokenOut, GoogleTokenIn
 from ..dependencies.token import TokenDependencies
 from ..dependencies.session import SessionDependencies
 from ..dependencies.auth import AuthDependencies
@@ -16,6 +16,8 @@ from app.exceptions.domain.user import (
     UserVerificationError,
     LocalUserNotVerifiedError,
     LocalUserVerificationError,
+    GoogleUserNotVerifiedError,
+    GoogleUserVerificationError,
 )
 from app.exceptions.domain.token import (
     RefreshTokenServiceError,
@@ -93,6 +95,71 @@ async def local_login(
     return {"access_token": access_token,   
             "token_type": "bearer"}
 
+@router.post("/google", response_model=TokenOut)
+async def google_login(
+    response: Response,
+    request: Request,
+    user_credentials: GoogleTokenIn,
+    auth_service: AuthService = Depends(AuthDependencies),
+    session_service: SessionService = Depends(SessionDependencies),
+    token_service: TokenService = Depends(TokenDependencies),
+) -> TokenOut:
+    
+    try:
+        user_id = auth_service.authenticate_user_google(
+            user_credentials.jwt_token, 
+        )
+    except GoogleUserNotVerifiedError as e:
+        sentry_sdk.capture_exception(e)
+        
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+    except GoogleUserVerificationError as e:
+        sentry_sdk.capture_exception(e)
+        
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong, please try again later",
+        )
+        
+    try:
+        session = session_service.retrieve_session(request.state.sid)
+        
+        access_token = token_service.create_access_token(user_id)
+        refresh_token, refresh_token_expires = (
+            token_service.create_refresh_token(session.id)
+        )
+        csrf_token = token_service.create_csrf_token()
+    except (
+        GetSessionServiceError,
+        AccessTokenServiceError, 
+        RefreshTokenServiceError,
+        CSRFTokenCreationError,
+    ) as e:
+        sentry_sdk.capture_exception(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong, please try again later",
+        )
+    
+    
+    response.set_cookie(key="refresh_token",
+                        value=f"{refresh_token}",
+                        httponly=True,
+                        secure=True,
+                        samesite="strict",
+                        expires=refresh_token_expires)
+    
+    response.set_cookie(key="csrf_token",
+                        value=f"{csrf_token}",
+                        secure=True,
+                        samesite="strict")
+    
+    return {"access_token": access_token,   
+            "token_type": "bearer"}
+    
 @router.get("/me", status_code=status.HTTP_204_NO_CONTENT)
 async def me(
     auth_service: AuthService = Depends(AuthDependencies),
