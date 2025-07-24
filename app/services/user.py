@@ -6,8 +6,12 @@ from app.exceptions.domain.user import (
     GoogleUserExistsError, 
     UserExistsError, 
     RegistrationError,
+    UserNotFoundError,
 )
 from app.exceptions.domain.google import GoogleAuthError
+from app.exceptions.infrastucture.repository import QueryExecutionError 
+from app.exceptions.infrastucture.domain import UserServiceError
+
 from app.utils import utils
 class UserService:
     def __init__(
@@ -56,7 +60,6 @@ class UserService:
         self, 
         jwt_token
     ) -> Users:
-    
         """
         Registration user via Google API
 
@@ -95,4 +98,28 @@ class UserService:
         except RegistrationError:
             raise
     
-    
+    def retrieve_user(self, user_id: int) -> Users:
+        """
+        Retrieve user data 
+
+        Args:
+            user_id (int) - user id
+        
+        Returns:
+            Users: user data 
+        
+        Raises:
+            UserNotFoundError: user id not found in db
+            UserServiceError: Server side err, while processing
+        """
+
+        try:
+            user = self.repo.get_user(user_id)
+            
+            if user is None:
+                raise UserNotFoundError
+            
+            return user
+        except QueryExecutionError as e:
+            raise UserServiceError("Unable to retrieve user data")
+            

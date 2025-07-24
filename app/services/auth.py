@@ -6,14 +6,11 @@ from app.services.google import GoogleAPI
 from app.models.users import Users
 
 from app.exceptions.domain.user import (
-    UserVerificationError,
-    UserNotVerifiedError,
     LocalUserNotVerifiedError,
     GoogleUserNotVerifiedError,
     LocalUserVerificationError,
     GoogleUserVerificationError,
 )
-from app.exceptions.domain.token import AccessTokenServiceError
 from app.exceptions.domain.google import GoogleAuthError
 from app.exceptions.infrastucture.repository import QueryExecutionError
 
@@ -89,30 +86,3 @@ class AuthService:
             raise GoogleUserNotVerifiedError
         
         return user.id
-    
-    def authenticate_user_token(self, jwt_token: str) -> int:
-        """
-        Verifies user auth token
-
-        Args:
-            jwt_token (str) - access token
-        
-        Returns:
-            int: user id
-            
-        Raises:
-            UserVerificationError: Error while verifying on our side
-            UserNotVerifiedError: Invalid token / not found
-        """
-        try:
-            user_id = self.token_service.verify_access_token(jwt_token)
-            user = self.user_repo.get_user(user_id)
-            
-            if user is None:
-                raise UserNotVerifiedError("User does not exist")
-            
-            return user.id
-        except AccessTokenServiceError as e:
-            raise UserNotVerifiedError("Unable to validate token") from e
-        except QueryExecutionError as e:
-            raise UserVerificationError("Unable to verify user, server side error") from e
