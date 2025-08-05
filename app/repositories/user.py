@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.models.users import Users
+from app.models.user_roles import UserRoles
+from app.models.role_types import RoleTypes
 from app.exceptions.domain.user import UserExistsError, RegistrationError
 from app.exceptions.infrastucture.repository import QueryExecutionError
 
@@ -82,6 +84,30 @@ class UserRepository:
             )
         except SQLAlchemyError as e:
             raise QueryExecutionError("Failed to retrieve user data") from e
+    def get_user_role(self, user_id: int) -> str | None:
+        """
+        Get user role
+
+        Args:
+            user_id (int): user id
+
+        Returns:
+            str or None: user role or None if user not found 
+        
+        Raises:
+            QueryExecutionError - server side error while execution
+        """
+        
+        try:
+            return (
+                self.db
+                    .query(RoleTypes.name)
+                    .join(UserRoles, RoleTypes.id == UserRoles.role_type_id)
+                    .filter(UserRoles.user_id == user_id)
+                    .first()
+            )
+        except SQLAlchemyError as e:
+            raise QueryExecutionError("Failed to get user role") from e
             
     def exists_local(self, email: str) -> bool:
         """

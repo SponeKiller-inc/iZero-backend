@@ -23,6 +23,11 @@ async def verify_and_store_user(
         request (Request): The HTTP request object.
         token (str):  JWT-access token
         user_service (User_Service )
+    Raises:
+        HTTPException: 
+            If token expired or invalid (401) 
+            If the user is not found (404)
+            if server side error (500)
     """
     
     try:

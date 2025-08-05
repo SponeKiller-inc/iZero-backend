@@ -11,6 +11,11 @@ class UserNotFoundError(DomainError):
     def __init__(self):
         super().__init__("User has not been found")
 
+class UserRoleNotFoundError(DomainError):
+    """Reserved for user role not found in system"""
+    def __init__(self):
+        super().__init__("User role has not been found")
+
 class UserExistsError(DomainError):
     """Reserved for user exists in db"""
     pass

@@ -7,6 +7,7 @@ from app.exceptions.domain.user import (
     UserExistsError, 
     RegistrationError,
     UserNotFoundError,
+    UserRoleNotFoundError,
 )
 from app.exceptions.domain.google import GoogleAuthError
 from app.exceptions.infrastucture.repository import QueryExecutionError 
@@ -121,5 +122,29 @@ class UserService:
             
             return user
         except QueryExecutionError as e:
-            raise UserServiceError("Unable to retrieve user data")
+            raise UserServiceError("Unable to retrieve user data") from e
+    
+    def retrieve_user_role(self, user_id: int) -> str:
+        """
+        Retrieve user role 
+
+        Args:
+            user_id (int) - user id
+        
+        Returns:
+            str - user role
+        
+        Raises:
+            UserRoleNotFoundError: user role not found
+            UserServiceError: Server side err, while processing
+        """
+        
+        try:
+            user_role = self.repo.get_user_role(user_id)
             
+            if user_role is None:
+                raise UserRoleNotFoundError
+            
+            return user_role
+        except QueryExecutionError as e:
+            raise UserServiceError("Unable to retrieve user role") from e
