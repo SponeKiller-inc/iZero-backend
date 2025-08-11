@@ -1,11 +1,13 @@
-from pydantic import BaseModel, EmailStr
+from typing import Dict, List
+from datetime import datetime
 
-class LocalRegistrationIn(BaseModel):
-    email: EmailStr
-    password: str
+from pydantic import BaseModel
 
-class GoogleRegistrationIn(BaseModel):
-    jwt_token: str
+class UserModuleOut(BaseModel):
+    user_modules: Dict[str, List[str]]
 
-   
-
+class UserModuleIn(BaseModel):
+    module_id: int
+    valid_from: datetime
+    valid_to: datetime
+    

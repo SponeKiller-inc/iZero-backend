@@ -1,29 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 import sentry_sdk
 
-from ..schemas import user as schema
-from app.services.user import UserService
+from ..schemas.module_group import ModuleGroupIn, ModuleIn
+from app.services.module import ModuleService
 
-from app.api.v1.dependencies.user import UserDependencies
-from app.exceptions.domain.user import (
-    LocalUserExistsError,
-    GoogleUserExistsError,
-    RegistrationError
-)
+from app.api.v1.dependencies.module import ModuleDependencies
+from app.exceptions.domain.module import ModuleGroupNotCreatedError
 
-router = APIRouter(prefix="/users", tags=["authentications"])
+router = APIRouter(prefix="/module_groups", tags=["authentications"])
 
-@router.post("/local", status_code=status.HTTP_201_CREATED)
-async def register_local(
-    user: schema.LocalRegistrationIn,
-    user_service: UserService = Depends(UserDependencies)
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def create_module_group(
+    module_group: ModuleGroupIn,
+    module_service: ModuleService = Depends(ModuleDependencies)
 ):
     try:
-        user_service.register_user_local(
-            user.email,
-            user.password
-        )
-    except LocalUserExistsError as e:
+        module_service.create_module_group(module_group.name)
+    except GoogleUserExistsError as e:
         sentry_sdk.capture_exception(e)
         
         raise HTTPException(
@@ -39,7 +32,7 @@ async def register_local(
         )
 
 @router.post("/google", status_code=status.HTTP_201_CREATED)
-async def register_google(
+async def create_module(
     user: schema.GoogleRegistrationIn,
     user_service: UserService = Depends(UserDependencies)
 ):

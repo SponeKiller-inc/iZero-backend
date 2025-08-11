@@ -6,11 +6,11 @@ from app.exceptions.domain.user import UserRoleNotFoundError
 from app.exceptions.infrastucture.domain import UserServiceError
 
 
-def require_roles(allowed_role: str):
+def require_role(allowed_role: str) -> None:
     """
     Dependency to enforce that the current user has the specified role.
 
-    Usage in a router:
+    Example Usage in a router:
         @router.get("/admin", dependencies=[require_roles("admin")])
         async def admin_endpoint():
             ...

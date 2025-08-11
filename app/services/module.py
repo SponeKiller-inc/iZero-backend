@@ -6,7 +6,7 @@ from app.models.module_groups import ModuleGroups
 from app.models.modules import Modules
 from app.repositories.module import ModuleRepository
 from app.exceptions.domain.module import (
-    ModuleNotFoundError, 
+    UserModuleNotFoundError, 
     UserModuleNotAssignedError,
     ModuleGroupNotCreatedError,
     ModuleNotCreatedError,
@@ -43,7 +43,7 @@ class ModuleService:
                 (ModuleGroup: list of modules)
         
         Raises:
-            ModuleNotFoundError: No module found 
+            UserModuleNotFoundError: No module found 
             ModuleServiceError: Something went wrong, while procesing
         """
 
@@ -51,7 +51,7 @@ class ModuleService:
             data = self.module_repo.get_user_modules(user_id)
             
             if data is None:
-                raise ModuleNotFoundError
+                raise UserModuleNotFoundError
             
             return data
         except QueryExecutionError as e:
@@ -150,7 +150,7 @@ class ModuleService:
                 module_group_id=module_group_id,
                 name=module_name,
             )
-            module = self.module_repo.add_module_group(new_module)
+            module = self.module_repo.add_module(new_module)
             
             return module.id
         except ModuleNotAddedError as e:
