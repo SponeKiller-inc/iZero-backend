@@ -1,6 +1,8 @@
 from app.repositories.user import UserRepository
 from app.models.users import Users
+from app.models.user_roles import UserRoles
 from app.services.google import GoogleAPI
+from .constants import SERVICE_CONST
 from app.exceptions.domain.user import (
     LocalUserExistsError, 
     GoogleUserExistsError, 
@@ -9,8 +11,15 @@ from app.exceptions.domain.user import (
     UserNotFoundError,
     UserRoleNotFoundError,
 )
+from app.exceptions.repository.user import (
+    UserRoleNotAddedError,
+    UserRoleNotUpdatedError,
+)
 from app.exceptions.domain.google import GoogleAuthError
-from app.exceptions.infrastucture.repository import QueryExecutionError 
+from app.exceptions.infrastucture.repository import (
+    QueryExecutionError,
+    CreateExecutionError,
+)
 from app.exceptions.infrastucture.domain import UserServiceError
 
 from app.utils import utils
@@ -44,18 +53,31 @@ class UserService:
             RegistrationError: If something went wrong while
                 creating user in db
         """
-
-        new_user = Users(
-            email=email,
-            password=utils.hash_password(password),
-        )
     
         try:
-            return self.repo.create_user(new_user)
+            # Create user
+            new_user = Users(
+            email=email,
+            password=utils.hash_password(password),
+            )
+            new_user = self.repo.create_user(new_user)
+            
+            # Create user role
+            new_user_role = UserRoles(
+                user_id=new_user.id,
+                role_type_id=SERVICE_CONST.DEFAULT_USER_ROLE
+            )
+            self.repo.add_user_role(new_user_role)
+            
+            return new_user
         except UserExistsError as e:
             raise LocalUserExistsError(email) from e
-        except RegistrationError:
-            raise
+        except (
+            RegistrationError, 
+            UserRoleNotAddedError, 
+            CreateExecutionError,
+        )  as e:
+            raise RegistrationError from e
         
     def register_user_google(
         self, 
@@ -78,26 +100,38 @@ class UserService:
                 creating user in db
         """
         try:
+            # Validate google user token
             data = self.google_api.get_registration_info(jwt_token)
-        except GoogleAuthError as e:
-            raise RegistrationError from e
-        
 
-        new_user = Users(
-            email=data["email"],
-            provider_user_id=data["user_id"],
-            provider='google'
-        )
-
-        try:
-            return self.repo.create_user(new_user)
+            # Create new user
+            new_user = Users(
+                email=data["email"],
+                provider_user_id=data["user_id"],
+                provider='google'
+            )
+            
+            new_user = self.repo.create_user(new_user)
+            
+            # Create user role
+            new_user_role = UserRoles(
+                user_id=new_user.id,
+                role_type_id=SERVICE_CONST.DEFAULT_USER_ROLE
+            )
+            self.repo.add_user_role(new_user_role)
+            
+            return new_user
         except UserExistsError as e:
             raise GoogleUserExistsError(
                 data["email"], 
                 data["user_id"]
             ) from e
-        except RegistrationError:
-            raise
+        except (
+            RegistrationError, 
+            UserRoleNotAddedError, 
+            CreateExecutionError,
+            GoogleAuthError,
+        )  as e:
+            raise RegistrationError from e
     
     def retrieve_user(self, user_id: int) -> Users:
         """

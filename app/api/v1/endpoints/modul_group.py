@@ -2,53 +2,65 @@ from fastapi import APIRouter, Depends, HTTPException, status
 import sentry_sdk
 
 from ..schemas.module_group import ModuleGroupIn, ModuleIn
+from ..dependencies.role_access import require_role
 from app.services.module import ModuleService
-
 from app.api.v1.dependencies.module import ModuleDependencies
-from app.exceptions.domain.module import ModuleGroupNotCreatedError
+from app.exceptions.domain.module import ModuleGroupNotCreatedError, ModuleNotCreatedError
+from app.exceptions.infrastucture.domain import ModuleServiceError
 
-router = APIRouter(prefix="/module_groups", tags=["authentications"])
+router = APIRouter(prefix="/module_groups", tags=["module_group"])
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", 
+    status_code=status.HTTP_201_CREATED, 
+    dependencies=[require_role("admin")]
+)
 async def create_module_group(
     module_group: ModuleGroupIn,
     module_service: ModuleService = Depends(ModuleDependencies)
 ):
     try:
         module_service.create_module_group(module_group.name)
-    except GoogleUserExistsError as e:
-        sentry_sdk.capture_exception(e)
-        
+    except ModuleGroupNotCreatedError as e:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User already exists"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid data"
         )
-    except RegistrationError as e:
+    except ModuleServiceError as e:
         sentry_sdk.capture_exception(e)
         
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Something went wrong, please try again later"
+            detail=(
+                "Something went wrong while creating module group, "
+                "please try again later"
+            )
         )
 
-@router.post("/google", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/{module_group_id}/modules", 
+    status_code=status.HTTP_201_CREATED, 
+    dependencies=[require_role("admin")]
+)
 async def create_module(
-    user: schema.GoogleRegistrationIn,
-    user_service: UserService = Depends(UserDependencies)
+    module_group_id: int,
+    module: ModuleIn,
+    module_service: ModuleService = Depends(ModuleDependencies)
 ):
     try:
-        user_service.register_user_google(user.jwt_token)
-    except GoogleUserExistsError as e:
-        sentry_sdk.capture_exception(e)
-        
+        module_service.create_module(module.name, module_group_id)
+    except ModuleNotCreatedError as e:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User already exists"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid data or module group not exists"
         )
-    except RegistrationError as e:
+    except ModuleService as e:
         sentry_sdk.capture_exception(e)
         
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Something went wrong, please try again later"
+            detail=(
+                "Something went wrong while creating module, "
+                "please try again later"
+            )
         )

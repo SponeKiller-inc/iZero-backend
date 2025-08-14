@@ -12,7 +12,7 @@ from app.exceptions.domain.module import (
 )
 from app.exceptions.infrastucture.domain import ModuleServiceError
 
-router = APIRouter(tags=["module"], dependencies=[verify_user_owns_resource])
+router = APIRouter(tags=["user-module"], dependencies=[Depends(verify_user_owns_resource)])
 
 @router.get(
     "/{user_id}/modules", 

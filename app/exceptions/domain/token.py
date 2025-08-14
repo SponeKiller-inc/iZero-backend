@@ -5,15 +5,15 @@ class TokenServiceError(DomainError):
     
 class AccessTokenServiceError(DomainError):
     """Reserved for access token error"""
-    def __init__(self):
-        super().__init__("Unable to generate access token")
+    def __init__(self, err: str = ""):
+        super().__init__("Unable to generate access token" + err)
     
 class RefreshTokenServiceError(DomainError):
     """Reserved for refresh token error"""
-    def __init__(self):
-        super().__init__("Unable to generate refresh token")
+    def __init__(self, err: str = ""):
+        super().__init__("Unable to generate refresh token" + err)
 
 class CSRFTokenCreationError(DomainError):
     """Reserved for CSRF token error"""
-    def __init__(self):
-        super().__init__("Unable to generate CSRF token")
+    def __init__(self, err: str = ""):
+        super().__init__("Unable to generate CSRF token" + err)

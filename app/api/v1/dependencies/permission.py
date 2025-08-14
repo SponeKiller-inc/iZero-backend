@@ -31,10 +31,11 @@ async def verify_and_store_user(
     """
     
     try:
-        user_id = jwt.decode(token,
+        payload = jwt.decode(token,
                              settings.secret_key,
                              algorithms=settings.algorithm)
         
+        user_id = payload.get("user_id", 0)
 
         if user_id is None:
             raise HTTPException(
