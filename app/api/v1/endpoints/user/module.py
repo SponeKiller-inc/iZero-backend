@@ -61,7 +61,7 @@ async def assign_module_to_user(
                 "is active in requested period"
             )
         )
-    except ModuleService as e:
+    except ModuleServiceError as e:
         sentry_sdk.capture_exception(e)
         
         raise HTTPException(
