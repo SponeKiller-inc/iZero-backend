@@ -10,6 +10,7 @@ from app.exceptions.domain.user import (
 )
 from app.exceptions.repository.user import (
     UserRoleNotAddedError,
+    UserRoleNotUpdatedError,
 )
 from app.exceptions.infrastucture.repository import (
     QueryExecutionError,
@@ -163,16 +164,11 @@ class UserRepository:
             user_role = self.db.query(UserRoles).filter(UserRoles.user_id == user_id).first()
             
             if user_role is None:
-                raise UserRoleNotAddedError
-            
-            user_role.role_type_id = role_type_id
-            self.db.commit()
-            return user_role
-        except IntegrityError as e:
                 raise UserRoleNotUpdatedError
             
             user_role.role_type_id = role_type_id
             self.db.commit()
+            
             return user_role
         except IntegrityError as e:
             raise UserRoleNotUpdatedError from e
