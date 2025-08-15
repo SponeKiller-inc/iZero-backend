@@ -47,7 +47,7 @@ class ModuleRepository(BaseRepository):
                 ## Process data to output type
                 data: dict[str, list[str]] = {}
                 for _, module, module_group in rows:
-                    data = data.setdefault(module_group.name, []).append(module.name)
+                    data.setdefault(module_group.name, []).append(module.name)
             else:
                 data = None
             return data
