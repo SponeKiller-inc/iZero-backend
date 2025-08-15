@@ -17,7 +17,7 @@ router = APIRouter(tags=["user-module"], dependencies=[Depends(verify_user_owns_
 @router.get(
     "/{user_id}/modules", 
     response_model=UserModuleOut, 
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_200_OK
 )
 async def get_user_modules(
     user_id: int,
