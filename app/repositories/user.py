@@ -169,7 +169,13 @@ class UserRepository:
             self.db.commit()
             return user_role
         except IntegrityError as e:
-            raise UserRoleNotAddedError from e
+                raise UserRoleNotUpdatedError
+            
+            user_role.role_type_id = role_type_id
+            self.db.commit()
+            return user_role
+        except IntegrityError as e:
+            raise UserRoleNotUpdatedError from e
         except SQLAlchemyError as e:
             raise UpdateExecutionError("Failed to update user role") from e
             
