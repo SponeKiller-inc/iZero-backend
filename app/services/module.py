@@ -94,7 +94,7 @@ class ModuleService:
             valid_to,
         ):
             raise UserModuleNotAssignedError(
-                "Unable to assigne module, because is active"
+                "Unable to assign module, because is active"
             )
         
         try:
