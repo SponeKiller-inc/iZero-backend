@@ -54,7 +54,7 @@ async def create_module(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid data or module group not exists"
         )
-    except ModuleService as e:
+    except ModuleServiceError as e:
         sentry_sdk.capture_exception(e)
         
         raise HTTPException(
