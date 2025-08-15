@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 import sentry_sdk
 
-from ..schemas import user as schema
+from ..schemas import auth as schema
 from app.services.user import UserService
 
 from app.api.v1.dependencies.user import UserDependencies
@@ -11,7 +11,7 @@ from app.exceptions.domain.user import (
     RegistrationError
 )
 
-router = APIRouter(prefix="/users", tags=["authentications"])
+router = APIRouter(prefix="/auth", tags=["authentications"])
 
 @router.post("/local", status_code=status.HTTP_201_CREATED)
 async def register_local(

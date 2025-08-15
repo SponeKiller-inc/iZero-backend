@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     refresh_token_length: int
     csrf_token_length: int
     pwd_context_scheme: str
+    user_module_expire_minutes: int
     cors_allow_origins: str
     cors_allow_methods: str
     cors_allow_headers: str
