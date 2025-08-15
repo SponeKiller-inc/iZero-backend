@@ -81,7 +81,7 @@ class ModuleRepository(BaseRepository):
         filters.append(UserModules.user_id == user_id)
         filters.append(UserModules.module_id == module_id)
         
-        if (valid_from or valid_to is not None):
+        if valid_from is not None or valid_to is not None:
             if valid_from is not None:
                 filters.append(UserModules.valid_from <= valid_from)
             if valid_to is not None:
