@@ -16,7 +16,7 @@ from app.exceptions.infrastucture.repository import QueryExecutionError, CreateE
 
 class ModuleRepository(BaseRepository):
     
-    def get_user_modules(self, user_id: str) -> dict[str, list[str]] | None:
+    def get_user_modules(self, user_id: int) -> dict[str, list[str]] | None:
         """
         Retrieve available user modules
 
