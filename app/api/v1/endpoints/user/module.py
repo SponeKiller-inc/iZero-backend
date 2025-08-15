@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 import sentry_sdk
 
 from ...schemas.user import UserModuleOut, UserModuleIn
@@ -53,7 +53,7 @@ async def assign_module_to_user(
             module.valid_from, 
             module.valid_to
         )
-    except UserModuleNotAssignedError as e:
+    except UserModuleNotAssignedError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=(

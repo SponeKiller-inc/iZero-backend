@@ -130,7 +130,7 @@ class ModuleService:
         except ModuleGroupNotAddedError as e:
             raise ModuleGroupNotCreatedError from e
         except CreateExecutionError as e:
-            raise ModuleServiceError("Unable to create module group")
+            raise ModuleServiceError("Unable to create module group") from e
         
     def create_module(self, module_name: str, module_group_id: int) -> int:
         """
@@ -156,5 +156,5 @@ class ModuleService:
         except ModuleNotAddedError as e:
             raise ModuleNotCreatedError from e
         except CreateExecutionError as e:
-            raise ModuleServiceError("Unable to create module")
+            raise ModuleServiceError("Unable to create module") from e
             

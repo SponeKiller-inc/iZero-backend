@@ -13,7 +13,6 @@ from app.exceptions.domain.user import (
 )
 from app.exceptions.repository.user import (
     UserRoleNotAddedError,
-    UserRoleNotUpdatedError,
 )
 from app.exceptions.domain.google import GoogleAuthError
 from app.exceptions.infrastucture.repository import (

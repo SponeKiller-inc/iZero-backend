@@ -3,17 +3,17 @@ from .errors import DomainError
 # Base user Error
 class RegistrationError(DomainError):
     """Reserved for failed registration"""
-    def __init__(self):
+    def __init__(self, err: str = ""):
         super().__init__("Unable to register user at this time" + err)
 
 class UserNotFoundError(DomainError):
     """Reserved for user not found in system"""
-    def __init__(self):
+    def __init__(self, err: str = ""):
         super().__init__("User has not been found" + err)
 
 class UserRoleNotFoundError(DomainError):
     """Reserved for user role not found in system"""
-    def __init__(self):
+    def __init__(self, err: str = ""):
         super().__init__("User role has not been found" + err)
 
 class UserExistsError(DomainError):
