@@ -55,7 +55,7 @@ class ModuleService:
             
             return data
         except QueryExecutionError as e:
-            raise ModuleServiceError("Unable to retrive user modules") from e
+            raise ModuleServiceError("Unable to retrieve user modules") from e
         
     def assign_module_to_user(
         self, 
