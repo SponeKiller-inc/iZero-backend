@@ -1,7 +1,9 @@
+from typing import Dict, List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 import sentry_sdk
 
-from ...schemas.user import UserModuleOut, UserModuleIn
+from ...schemas.user import UserModuleIn
 from app.services.module import ModuleService
 from ...dependencies.security import verify_user_owns_resource
 
@@ -16,7 +18,7 @@ router = APIRouter(tags=["user-module"], dependencies=[Depends(verify_user_owns_
 
 @router.get(
     "/{user_id}/modules", 
-    response_model=UserModuleOut, 
+    response_model=Dict[str, List[str]], 
     status_code=status.HTTP_200_OK
 )
 async def get_user_modules(
