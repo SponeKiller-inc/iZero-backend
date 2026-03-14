@@ -181,3 +181,21 @@ class UserService:
             return user_role
         except QueryExecutionError as e:
             raise UserServiceError("Unable to retrieve user role") from e
+    
+    def exists_user(self, user_id: int) -> bool:
+        """
+        Check if user exists in db
+
+        Args:
+            user_id (int): user id
+
+        Returns:
+            bool: returns True if user exists
+        
+        Raises:
+            UserServiceError: Server side err, while processing
+        """
+        try:
+            return self.repo.exists_user(user_id)
+        except QueryExecutionError as e:
+            raise UserServiceError("Unable to verify user existance") from e

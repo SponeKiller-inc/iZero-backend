@@ -239,6 +239,31 @@ class UserRepository:
             raise QueryExecutionError(
                 "Failed to verify google user existance"
             ) from e
+        
+    def exists_user(self, user_id: int) -> bool:
+        """
+        Check if user exists in db
+
+        Args:
+            user_id (int): user id
+
+        Returns:
+            bool: returns True if user exists
+        
+        Raises:
+            QueryExecutionError - server side error while execution
+        """
+        try:
+            return (
+                self.db
+                    .query(Users)
+                    .filter(Users.id == user_id)
+                    .first() is not None
+            )
+        except SQLAlchemyError as e:
+            raise QueryExecutionError(
+                "Failed to verify user existance"
+            ) from e
     
     def create_user(self, new_user: Users) -> Users:
         """

@@ -8,20 +8,50 @@ from sqlalchemy import DateTime, MetaData
 
 from app.utils.utils import get_UTC_current_time
 
+class ValidityMixin:
+    """
+    Mixin for adding validity fields to models
+    """
+    valid_from: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        nullable=False,
+        sort_order=996,
+    )
+    valid_to: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        nullable=False,
+        sort_order=997,
+    )
+
+    @declared_attr
+    def __table_args__(cls):
+        return (
+            CheckConstraint(
+                cls.valid_to > cls.valid_from,
+                # Dynamický název podle jména tabulky
+                name=f"ck_{cls.__tablename__}_valid_dates"
+            ),
+        )
+
 class TimestampMixin:
+    """
+    Mixin for adding timestamp fields to models
+    """
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.now(timezone.utc),
+        sort_order=998,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
+        sort_order=999,
     )
 
-class ValidityMixin:
+class CurrentMixin:
     @hybrid_method
     def is_current(cls, at: datetime = None) -> Union[BooleanClauseList, bool]:
         """
@@ -43,7 +73,7 @@ class ValidityMixin:
         now = at or get_UTC_current_time()
         return (cls.valid_from <= now) & (cls.valid_to >= now)
 
-class Base(TimestampMixin, ValidityMixin, DeclarativeBase):
+class Base(TimestampMixin, CurrentMixin, DeclarativeBase):
     """
     Base class for all ORM models, combining timestamp fields and shared metadata.
 
