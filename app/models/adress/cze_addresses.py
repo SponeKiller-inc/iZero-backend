@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
@@ -7,11 +7,13 @@ class CzeAddresses(Base):
     __tablename__ = "cze_addresses"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    ruian_id: Mapped[int] = mapped_column(unique=True)
     address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
-    street_name: Mapped[str] = mapped_column()
-    house_number: Mapped[str] = mapped_column()
-    district: Mapped[str] = mapped_column()
-    city: Mapped[str] = mapped_column()
-    postal_code: Mapped[str] = mapped_column()
-    region: Mapped[str] = mapped_column()
-    
+    street: Mapped[str | None] = mapped_column(String(48))
+    number_type: Mapped[str] = mapped_column(String(4))
+    building_number: Mapped[int] = mapped_column()
+    orientation_number: Mapped[int | None] = mapped_column()
+    orientation_number_letter: Mapped[str | None] = mapped_column(String(1))
+    district: Mapped[str | None] = mapped_column(String(48))
+    city: Mapped[str] = mapped_column(String(48))
+    postal_code: Mapped[str] = mapped_column(String(5))

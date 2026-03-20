@@ -6,5 +6,5 @@ class RoleTypes(Base):
     __tablename__ = "role_types"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(unique=True)
     
