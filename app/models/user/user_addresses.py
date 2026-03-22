@@ -9,6 +9,5 @@ class UserAddresses(Base, ValidityMixin):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
-    address_type_id: Mapped[int] = mapped_column(ForeignKey("address_types.id"))
     
     

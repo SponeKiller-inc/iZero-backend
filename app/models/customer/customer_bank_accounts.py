@@ -3,12 +3,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base, ValidityMixin
 
-class CustomerAddresses(Base, ValidityMixin):
-    __tablename__ = "customer_addresses"
+class CustomerBankAccounts(Base, ValidityMixin):
+    __tablename__ = "customer_bank_accounts"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"))
-    address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
+    bank_account_id: Mapped[int] = mapped_column(ForeignKey("bank_accounts.id"))
     
     
     
