@@ -3,8 +3,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
 
-class CzeAddresses(Base):
-    __tablename__ = "cze_addresses"
+class CzechAddresses(Base):
+    __tablename__ = "czech_addresses"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     ruian_id: Mapped[int] = mapped_column(unique=True)

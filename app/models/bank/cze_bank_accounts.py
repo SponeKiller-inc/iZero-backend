@@ -9,7 +9,7 @@ class CzeBanks(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     bank_id: Mapped[int] = mapped_column(ForeignKey("banks.id"))
     owner_name: Mapped[str] = mapped_column()
-    prefix: Mapped[str] = mapped_column(String(6))
+    account_prefix: Mapped[str] = mapped_column(String(6))
     account_number: Mapped[str] = mapped_column(String(10))
     iban: Mapped[str] = mapped_column(String(24))
     

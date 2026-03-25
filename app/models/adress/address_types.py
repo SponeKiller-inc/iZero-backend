@@ -3,8 +3,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
 
-class Banks(Base):
-    __tablename__ = "banks"
+class AddressTypes(Base):
+    __tablename__ = "address_types"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"))
+    description: Mapped[str] = mapped_column()
