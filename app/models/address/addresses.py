@@ -1,12 +1,7 @@
-import enum
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
-
-class AddressType(str, enum.Enum):
-    CORRESPONDENT = "correspondent"
-    PERMANENT = "permanent"
 
 
 class Addresses(Base):
@@ -14,4 +9,3 @@ class Addresses(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"))
-    type: Mapped[AddressType] = mapped_column(nullable=False)

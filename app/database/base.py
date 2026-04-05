@@ -23,6 +23,11 @@ class ValidityMixin:
         sort_order=997,
     )
 
+    @classmethod
+    def valid_at(cls, ref_date: datetime):
+        """Returns a filter for the record valid at a specific point in time."""
+        return (cls.valid_from <= ref_date) & (cls.valid_to > ref_date)
+
     @declared_attr
     def __table_args__(cls):
         return (
