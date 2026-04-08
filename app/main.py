@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import sentry_sdk
 
 from app.middleware.sid import SIDMiddleware
@@ -36,3 +37,12 @@ app.add_middleware(SIDMiddleware)
 ##API v1
 app.include_router(routers_v1.router)
 
+#Global exceptions
+@app.exception_handler(Exception)
+async def global_fallback_handler(request: Request, exc: Exception):
+    sentry_sdk.capture_exception(exc) 
+
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error. Administrators have been notified."},
+    )
