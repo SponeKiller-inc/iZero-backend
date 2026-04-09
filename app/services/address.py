@@ -1,6 +1,5 @@
 from app.repositories.address import AddressRepository
-
-from app.models.types.addresses import ModelsUnion
+from app.models.types.addresses import AddressesUnion
 
 
 class AddressService:
@@ -10,43 +9,50 @@ class AddressService:
     ):
         self.repo = repo
         
-    def retrieve_all_addresses(
-        self,
-        user_id: int,
-        customer_id: int
-    ) -> ModelsUnion:
+    def retrieve_all_addresses(self) -> dict[str, list[AddressesUnion]] | []:
         
         """
-        Retrieve users customer data
-
-        Args:
-            user_id (int): user id
-            customer_id (int): customer id
+        Retrieve all addresses
         
         Returns:
-            Customer: Object 
-        
-        Raises:
-            CustomerNotFoundError - user does not have customer with provided id
-            CustomerServiceError - server side error
+            dict[str, list[AddressesUnion]] or []:  dictionary of addresses 
+                or empty list if no addresses found
         """
-        try:
-            customer = self.repo.get_user_customer(user_id, customer_id)
+
+        address_registry = self.repo.get_all_available_countries()
+
+        addresses = {}
+
+        for country in address_registry:
+            address_repository = getattr(
+                self.repo, "get_all" + country.table_name
+            )
+            addresses[country.country_code] = address_repository()
+
+        return addresses
         
-            if customer is None:
-                raise CustomerNotFoundError
+    def retrieve_address(self, address_id: int) -> AddressesUnion | None:
+        """
+        Retrieve address data
 
-            return customer
-        except SQLAlchemyError as e:
-            raise CustomerServiceError("Unable to retrieve customer data") from e
+        Args:
+            address_id (int): address id
+        
+        Returns:
+            Proper Address object or None
+        """
+        country_code = self.repo.get_country_code(address_id)
 
-    def retrieve_address(self, address_id: int) -> ModelsUnion:
-        try:
-            address = self.repo.get_address(address_id)
+        if country_code is None:
+            return None
 
-            if address is None:
-                raise AddressNotFoundError
+        address_registry = self.repo.get_available_country(country_code)
 
-            return address
-        except SQLAlchemyError as e:
-            raise AddressServiceError("Unable to retrieve address data") from e
+        if address_registry is None:
+            return None
+
+        address_repository = getattr(
+            self.repo, "get_" + address_registry.table_name
+        )
+
+        return address_repository(address_id)

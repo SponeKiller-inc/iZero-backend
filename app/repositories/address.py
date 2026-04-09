@@ -48,35 +48,54 @@ class AddressRepository:
                 .all()
         )
     
-    def get_country_code(self, country_code: str) -> Addresses | None:
+    def get_country_code(self, address_id: int) -> Addresses | None:
         """
         Retrieve country code
 
         Args:
-            country_code (str): country code - ISO 3-alpha code (e.g. "CZE")
+            address_id (int): address id
 
         Returns:
-            CzechAddresses or None:  czech address or None if no czech address found
+            Addresses or None:  country code or None if no country code found
         """
 
         return (
             self.db
-                .query(CzechAddresses)
+                .query(Addresses)
                 .filter(
-                    CzechAddresses.country_code == country_code
+                    Addresses.id == address_id
+                )
+                .first()
+        )
+    
+    def get_available_country(
+        self,
+        country_code: str
+    ) -> AddressRegistry | None:
+        """
+        Provides proper repository function to get address data
+        Args:
+            country_code (str): country code
+
+        Returns:
+            AddressRegistry or None:  available country 
+                or None if no available country found
+        """
+        
+        return (
+            self.db
+                .query(AddressRegistry)
+                .filter(
+                    AddressRegistry.country_code == country_code,
+                    AddressRegistry.valid_at(get_UTC_current_time())
                 )
                 .first()
         )
      
-    def get_available_countries(
-        self, 
-        ref_date: datetime = get_UTC_current_time()
-    ) -> list[AddressRegistry] | []:
+    def get_all_available_countries(self) -> list[AddressRegistry] | []:
         """
-        Get all available countries
-
-        Args:
-            ref_date (datetime): reference date (default: current UTC datetime)
+        Get all available countries and proper repository function
+        to get address data
 
         Returns:
             list[AddressRegistry] or []:  list of available countries 
@@ -86,6 +105,23 @@ class AddressRepository:
         return (
             self.db
                 .query(AddressRegistry)
-                .filter(AddressRegistry.valid_at(ref_date))
+                .filter(AddressRegistry.valid_at(get_UTC_current_time()))
                 .all()
         )
+     
+    def get_all_available_countries(self) -> list[AddressRegistry] | []:
+        """
+        Get all available countries
+
+        Returns:
+            list[AddressRegistry] or []:  list of available countries 
+                or empty list if no available countries found
+        """
+        
+        return (
+            self.db
+                .query(AddressRegistry)
+                .filter(AddressRegistry.valid_at(get_UTC_current_time()))
+                .all()
+        )
+    
