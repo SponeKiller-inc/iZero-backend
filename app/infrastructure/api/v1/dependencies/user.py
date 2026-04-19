@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.database.session import get_db
 from app.infrastructure.database.repositories.user import UserRepository
-from app.domain.services.user import UserService
+from app.domain.entities.user import UserService
 from app.domain.services.google import GoogleAPI
 
 class UserDependencies(UserService):

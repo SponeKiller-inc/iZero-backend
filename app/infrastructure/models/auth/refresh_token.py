@@ -7,8 +7,9 @@ from sqlalchemy import (
     func,
 )
 
-from app.database.base import Base
-class RefreshToken(Base):
+from app.infrastructure.database.base import Base
+
+class RefreshTokenModel(Base):
     __tablename__ = "refresh_token"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

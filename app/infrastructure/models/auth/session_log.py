@@ -3,9 +3,9 @@ from sqlalchemy import (
     ForeignKey,
 )
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 
-class SessionLog(Base):
+class SessionLogModel(Base):
     __tablename__ = "session_log"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

@@ -8,9 +8,9 @@ from sqlalchemy import (
     func,
 )
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 
-class Sessions(Base):
+class SessionModel(Base):
     __tablename__ = "sessions"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

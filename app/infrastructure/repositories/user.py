@@ -12,11 +12,6 @@ from app.exceptions.repository.user import (
     UserRoleNotAddedError,
     UserRoleNotUpdatedError,
 )
-from app.exceptions.infrastucture.repository import (
-    QueryExecutionError,
-    CreateExecutionError,
-    UpdateExecutionError,
-)
 
 
 class UserRepository:
@@ -32,20 +27,14 @@ class UserRepository:
 
         Returns:
             Users or None:  user data or None if no user found
-            
-        Raises:
-            QueryExecutionError - server side error while execution
         """
-        try: 
-            return (
-                self.db
-                    .query(Users)
-                    .filter(Users.id == user_id)
-                    .first()
-            )
-        except SQLAlchemyError as e:
-            raise QueryExecutionError("Failed to retrieve user data") from e
-        
+
+        return (
+            self.db
+                .query(Users)
+                .filter(Users.id == user_id)
+                .first()
+        )
     
     def get_user_local(self, email: str) -> Users | None:
         """
@@ -56,19 +45,14 @@ class UserRepository:
 
         Returns:
             Users or None: local user data 
-            
-        Raises:
-            QueryExecutionError - server side error while execution
         """
-        try: 
-            return (
-                self.db
-                    .query(Users)
-                    .filter(Users.email == email)
-                    .first()
-            )
-        except SQLAlchemyError as e:
-            raise QueryExecutionError("Failed to retrieve user data") from e
+
+        return (
+            self.db
+                .query(Users)
+                .filter(Users.email == email)
+                .first()
+        )
     
     def get_user_google(self, provider_user_id: str) -> Users | None:
         """
@@ -79,22 +63,18 @@ class UserRepository:
 
         Returns:
             Users or None: user data or None if user not found 
-        
-        Raises:
-            QueryExecutionError - server side error while execution
         """
-        try:
-            return (
-                self.db
-                    .query(Users)
-                    .filter(
-                        Users.provider_user_id == provider_user_id,
-                        Users.provider == "google"
-                    )
-                    .first()
-            )
-        except SQLAlchemyError as e:
-            raise QueryExecutionError("Failed to retrieve user data") from e
+
+        return (
+            self.db
+                .query(Users)
+                .filter(
+                    Users.provider_user_id == provider_user_id,
+                    Users.provider == "google"
+                )
+                .first()
+        )
+
     def get_user_role(self, user_id: int) -> str | None:
         """
         Get user role
@@ -104,21 +84,15 @@ class UserRepository:
 
         Returns:
             str or None: user role or None if user not found 
-        
-        Raises:
-            QueryExecutionError - server side error while execution
         """
-        
-        try:
-            return (
-                self.db
-                    .query(RoleTypes.name)
-                    .join(UserRoles, RoleTypes.id == UserRoles.role_type_id)
-                    .filter(UserRoles.user_id == user_id)
-                    .scalar()
-            )
-        except SQLAlchemyError as e:
-            raise QueryExecutionError("Failed to get user role") from e
+
+        return (
+            self.db
+                .query(RoleTypes.name)
+                .join(UserRoles, RoleTypes.id == UserRoles.role_type_id)
+                .filter(UserRoles.user_id == user_id)
+                .scalar()
+        )
         
     def add_user_role(self, new_user_role: UserRoles) -> UserRoles:
         """
@@ -132,7 +106,6 @@ class UserRepository:
         
         Raises:
             UserRoleNotAddedError - invalid data (user or role not existing) 
-            CreateExecutionError - server side error while execution
         """
         
         try:
@@ -141,8 +114,6 @@ class UserRepository:
             return new_user_role
         except IntegrityError as e:
             raise UserRoleNotAddedError from e
-        except SQLAlchemyError as e:
-            raise CreateExecutionError("Failed to add user role") from e
     
     def update_user_role(self, user_id: int, role_type_id: int) -> UserRoles:
         """
@@ -157,7 +128,6 @@ class UserRepository:
         
         Raises:
             UserRoleNotUpdatedError - invalid data (user or role not exists)
-            UpdateExecutionError - server side error while execution
         """
         
         try:
@@ -172,8 +142,6 @@ class UserRepository:
             return user_role
         except IntegrityError as e:
             raise UserRoleNotUpdatedError from e
-        except SQLAlchemyError as e:
-            raise UpdateExecutionError("Failed to update user role") from e
             
     def exists_local(self, email: str) -> bool:
         """
@@ -184,21 +152,14 @@ class UserRepository:
 
         Returns:
             bool: returns True if user exists
-        
-        Raises:
-            QueryExecutionError - server side error while execution
         """
-        try:
-            return (
-                self.db
-                    .query(Users)
-                    .filter(Users.email == email)
-                    .first() is not None
-            )
-        except SQLAlchemyError as e:
-            raise QueryExecutionError(
-                "Failed to verify local user existance"
-            ) from e
+
+        return (
+            self.db
+                .query(Users)
+                .filter(Users.email == email)
+                .first() is not None
+        )
         
     def exists_google(self, provider_user_id: str, email: str) -> bool:
         """
@@ -210,35 +171,27 @@ class UserRepository:
 
         Returns:
             bool: returns True if user exists
-        
-        Raises:
-            QueryExecutionError - server side error while execution
         """
         
         # Use exists if found via e-mail or provider_user_id
-        try: 
-            is_provider_user_id = (
-                self.db
-                    .query(Users)
-                    .filter(
-                        Users.provider_user_id == provider_user_id,
-                        Users.provider == "google"
-                    )
-                    .first() is not None
-            )
-            
-            is_email = (
-                self.db
-                    .query(Users)
-                    .filter(Users.email == email)
-                    .first() is not None
-            )
+        is_provider_user_id = (
+            self.db
+                .query(Users)
+                .filter(
+                    Users.provider_user_id == provider_user_id,
+                    Users.provider == "google"
+                )
+                .first() is not None
+        )
         
-            return is_provider_user_id or is_email
-        except SQLAlchemyError as e:
-            raise QueryExecutionError(
-                "Failed to verify google user existance"
-            ) from e
+        is_email = (
+            self.db
+                .query(Users)
+                .filter(Users.email == email)
+                .first() is not None
+        )
+    
+        return is_provider_user_id or is_email
         
     def exists_user(self, user_id: int) -> bool:
         """
@@ -249,21 +202,14 @@ class UserRepository:
 
         Returns:
             bool: returns True if user exists
-        
-        Raises:
-            QueryExecutionError - server side error while execution
         """
-        try:
-            return (
-                self.db
-                    .query(Users)
-                    .filter(Users.id == user_id)
-                    .first() is not None
-            )
-        except SQLAlchemyError as e:
-            raise QueryExecutionError(
-                "Failed to verify user existance"
-            ) from e
+
+        return (
+            self.db
+                .query(Users)
+                .filter(Users.id == user_id)
+                .first() is not None
+        )
     
     def create_user(self, new_user: Users) -> Users:
         """
@@ -277,8 +223,6 @@ class UserRepository:
         
         Raises:
             UserExistsError: User exists in db
-            RegistrationError: something went wrong with
-                registration
         """
         
         try:
@@ -287,8 +231,5 @@ class UserRepository:
             return new_user
         except IntegrityError as e:
             raise UserExistsError from e
-        except SQLAlchemyError as e:
-            raise RegistrationError from e
-        
         
     

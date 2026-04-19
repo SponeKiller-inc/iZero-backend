@@ -1,10 +1,10 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 
 
-class Addresses(Base):
+class AddressModel(Base):
     __tablename__ = "addresses"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

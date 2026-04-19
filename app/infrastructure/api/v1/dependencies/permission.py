@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 import sentry_sdk
 
-from app.domain.services.user import UserService
+from app.domain.entities.user import UserService
 from app.infrastructure.api.v1.dependencies.user import UserDependencies
 from app.infrastructure.utils.config import settings
 from app.domain.exceptions.entity.user import UserNotFoundError

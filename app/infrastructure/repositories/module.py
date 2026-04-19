@@ -1,21 +1,22 @@
 from datetime import datetime
 from typing import Tuple
 
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
-from .base import BaseRepository
-from app.models.user_modules import UserModules
-from app.models.modules import Modules
-from app.models.module_groups import ModuleGroups
-from app.exceptions.repository.module import (
+from app.infrastructure.database.models.module.user_modules import UserModules
+from app.infrastructure.database.models.module.modules import Modules
+from app.infrastructure.database.models.module.module_groups import ModuleGroups
+from app.domain.exceptions.repository.module import (
     UserModuleNotAddedError,
     ModuleGroupNotAddedError,
     ModuleNotAddedError,
 )
-from app.exceptions.infrastucture.repository import QueryExecutionError, CreateExecutionError
 
-class ModuleRepository(BaseRepository):
-    
+class ModuleRepository:
+    def __init__(self, db: Session):
+        self.db = db
+        
     def get_user_modules(self, user_id: int) -> dict[str, list[str]] | None:
         """
         Retrieve available user modules
@@ -25,34 +26,28 @@ class ModuleRepository(BaseRepository):
 
         Returns:
             dict[str, list[str]] or None:  modules or None
-            
-        Raises:
-            QueryExecutionError - server side error while execution
         """
-        try: 
-            rows: list[Tuple[UserModules, Modules, ModuleGroups]] = (
-                self.db
-                    .query(UserModules, Modules, ModuleGroups)
-                    .join(Modules, UserModules.module_id == Modules.id)
-                    .join(ModuleGroups, Modules.module_group_id == ModuleGroups.id)
-                    .filter(
-                        UserModules.user_id == user_id,
-                        UserModules.is_current(),
-                    )
-                    .order_by(Modules.module_group_id.asc())
-                    .all()
-            )
-            
-            if rows:
-                ## Process data to output type
-                data: dict[str, list[str]] = {}
-                for _, module, module_group in rows:
-                    data.setdefault(module_group.name, []).append(module.name)
-            else:
-                data = None
-            return data
-        except SQLAlchemyError as e:
-            raise QueryExecutionError("Failed to retrieve user data") from e
+        rows: list[Tuple[UserModules, Modules, ModuleGroups]] = (
+            self.db
+                .query(UserModules, Modules, ModuleGroups)
+                .join(Modules, UserModules.module_id == Modules.id)
+                .join(ModuleGroups, Modules.module_group_id == ModuleGroups.id)
+                .filter(
+                    UserModules.user_id == user_id,
+                    UserModules.is_current(),
+                )
+                .order_by(Modules.module_group_id.asc())
+                .all()
+        )
+        
+        if rows:
+            ## Process data to output type
+            data: dict[str, list[str]] = {}
+            for _, module, module_group in rows:
+                data.setdefault(module_group.name, []).append(module.name)
+        else:
+            data = None
+        return data
         
     def is_active_user_module(
         self, 
@@ -72,9 +67,6 @@ class ModuleRepository(BaseRepository):
         Returns:
             bool: if active True, inactive False
                 (inactive is consider: exists but not valid or not found)
-            
-        Raises:
-            QueryExecutionError - server side error while execution
         """
         filters = []
         
@@ -113,7 +105,6 @@ class ModuleRepository(BaseRepository):
             
         Raises:
             UserModuleNotAddedError - Invalid data or module not exists
-            CreateExecutionError - server side error while inserting data
         """
         try:
             self.db.add(new_user_module)
@@ -123,10 +114,6 @@ class ModuleRepository(BaseRepository):
             return new_user_module
         except IntegrityError as e:
             raise UserModuleNotAddedError from e
-        except SQLAlchemyError as e:
-            raise CreateExecutionError(
-                "Unable to add user modules"
-            ) from e
             
     def add_module_group(self, new_module_group: ModuleGroups) -> ModuleGroups:
         """
@@ -140,7 +127,6 @@ class ModuleRepository(BaseRepository):
             
         Raises:
             ModuleGroupNotAddedError - Invalid data - module group name empty
-            CreateExecutionError - server side error while inserting data
         """
         
         try:
@@ -151,10 +137,6 @@ class ModuleRepository(BaseRepository):
             return new_module_group
         except IntegrityError as e:
             raise ModuleGroupNotAddedError from e
-        except SQLAlchemyError as e:
-            raise CreateExecutionError(
-                "Unable to add module group"
-            ) from e
             
     def add_module(self, new_module: Modules) -> Modules:
         """
@@ -168,7 +150,6 @@ class ModuleRepository(BaseRepository):
             
         Raises:
             ModuleNotAddedError - Invalid data or module group not exists
-            CreateExecutionError - server side error while inserting data
         """
         
         try:
@@ -179,8 +160,3 @@ class ModuleRepository(BaseRepository):
             return new_module
         except IntegrityError as e:
             raise ModuleNotAddedError from e
-        except SQLAlchemyError as e:
-            raise CreateExecutionError(
-                "Unable to add module"
-            ) from e
-            

@@ -1,11 +1,11 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base
-from app.models.types.identifiers import business_tax_number, registration_number
+from app.infrastructure.database.base import Base
+from app.infrastructure.database.models.types.identifiers import business_tax_number, registration_number
 
 
-class Banks(Base):
+class BankModel(Base):
     __tablename__ = "banks"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

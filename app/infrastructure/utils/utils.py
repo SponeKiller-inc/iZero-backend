@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Request
 from fastapi.security import OAuth2PasswordBearer
 
-from app.utils.config import settings
+from app.infrastructure.utils.config import settings
 
 pwd_context = CryptContext(
     schemes=[settings.pwd_context_scheme],

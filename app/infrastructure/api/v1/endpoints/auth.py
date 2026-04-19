@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 import sentry_sdk
 
 from ..schemas import auth as schema
-from app.domain.services.user import UserService
+from app.domain.entities.user import UserService
 
 from app.infrastructure.api.v1.dependencies.user import UserDependencies
 from app.domain.exceptions.entity.user import (
