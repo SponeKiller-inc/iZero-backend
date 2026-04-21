@@ -3,9 +3,9 @@ from datetime import datetime
 from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 
-class IndividualCustomers(Base):
+class IndividualCustomerModel(Base):
     __tablename__ = "individual_customers"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

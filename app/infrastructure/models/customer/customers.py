@@ -1,8 +1,9 @@
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 
-class Customers(Base):
+class CustomerModel(Base):
     __tablename__ = "customers"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

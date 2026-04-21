@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 
-from app.database.base import Base, ValidityMixin
+from app.infrastructure.database.base import Base, ValidityMixin
 
 class UserTitles(Base, ValidityMixin):
     __tablename__ = "user_titles"

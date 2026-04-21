@@ -5,9 +5,9 @@ from sqlalchemy import (
     event,
 )
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 
-class Users(Base):
+class UserModel(Base):
     __tablename__ = "users"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -27,8 +27,8 @@ class Users(Base):
         ),
     )
 
-@event.listens_for(Users, "before_insert", propagate=True)
-@event.listens_for(Users, "before_update", propagate=True)
-def _lowercase_email(mapper, connection, target: Users) -> None:
+@event.listens_for(UserModel, "before_insert", propagate=True)
+@event.listens_for(UserModel, "before_update", propagate=True)
+def _lowercase_email(mapper, connection, target: UserModel) -> None:
     if target.email:
         target.email = target.email.lower()

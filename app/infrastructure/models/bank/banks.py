@@ -2,7 +2,10 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
-from app.infrastructure.database.models.types.identifiers import business_tax_number, registration_number
+from app.infrastructure.types.identifiers import (
+    business_tax_number,
+    registration_number,
+)
 
 
 class BankModel(Base):

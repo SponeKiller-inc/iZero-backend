@@ -1,9 +1,9 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base, ValidityMixin
+from app.infrastructure.database.base import Base, ValidityMixin
 
-class CustomerAddresses(Base, ValidityMixin):
+class CustomerAddressModel(Base, ValidityMixin):
     __tablename__ = "customer_addresses"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

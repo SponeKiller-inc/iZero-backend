@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 
-class Modules(Base):
+class ModuleModel(Base):
     __tablename__ = "modules"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

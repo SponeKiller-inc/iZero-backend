@@ -1,13 +1,13 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base
-from app.models.types.identifiers import (
+from app.infrastructure.database.base import Base
+from app.infrastructure.types.identifiers import (
     registration_number,
     proprietor_tax_number,
 )
 
-class ProprietorCustomers(Base):
+class ProprietorCustomerModel(Base):
     __tablename__ = "proprietor_customers"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
