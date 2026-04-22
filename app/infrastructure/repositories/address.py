@@ -1,9 +1,6 @@
-from datetime import datetime
-
 from sqlalchemy.orm import Session
 
-from app.utils.utils import get_UTC_current_time
-from app.models.address.addresses import Addresses
+from app.models.address import Addresses
 
 
 

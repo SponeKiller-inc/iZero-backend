@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
-from app.infrastructure.types.identifiers import (
+from app.infrastructure.types.identification import (
     registration_number,
     proprietor_tax_number,
 )

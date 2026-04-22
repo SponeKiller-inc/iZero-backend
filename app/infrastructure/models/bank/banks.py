@@ -2,9 +2,13 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
-from app.infrastructure.types.identifiers import (
-    business_tax_number,
-    registration_number,
+from app.infrastructure.types.identification import (
+    RegistrationNumber,
+    BusinessTaxNumber,
+)
+from app.infrastructure.types.bank_identification import (
+    BankCode,
+    Swift,
 )
 
 
@@ -13,10 +17,10 @@ class BankModel(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column()
-    registration_number: Mapped[registration_number] = mapped_column()
-    tax_number: Mapped[business_tax_number] = mapped_column()
-    code: Mapped[str] = mapped_column(String(4), unique=True)
-    swift_code: Mapped[str] = mapped_column(String(11), unique=True)
+    registration_number: Mapped[RegistrationNumber] = mapped_column()
+    tax_number: Mapped[BusinessTaxNumber] = mapped_column()
+    code: Mapped[BankCode] = mapped_column(unique=True)
+    swift_code: Mapped[Swift] = mapped_column(unique=True)
     
     
     
