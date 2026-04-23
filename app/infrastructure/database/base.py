@@ -1,12 +1,14 @@
 from datetime import datetime, timezone
 from typing import Union
 
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.hybrid import hybrid_method
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.elements import BooleanClauseList
-from sqlalchemy import DateTime, MetaData
+from sqlalchemy import DateTime, MetaData, CheckConstraint
+from sqlalchemy.orm import Mapped, mapped_column
 
-from app.utils.utils import get_UTC_current_time
+from app.infrastructure.utils.utils import get_UTC_current_time
 
 class ValidityMixin:
     """

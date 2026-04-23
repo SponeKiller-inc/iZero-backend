@@ -41,37 +41,6 @@ def verify_hash(password: str, hash: str) -> bool:
     except Exception as e:
         raise ValueError("Invalid hash format") from e
 
-def create_UTC_exp_time(minutes: int) -> datetime:
-    """
-    Create expiration time
-
-    Args:
-        minutes (int): minutes to expiration 
-            (if 0, expiration = now + 100ms)
-    
-    Returns:
-        datetime: time of expiration 
-            (YYYY-MM-DD HH:MM:SS.ffffff±HH:MM)
-    """
-    now = datetime.now(timezone.utc)
-    
-    if minutes == 0:
-        delta = timedelta(milliseconds=100)
-    else:
-        delta = timedelta(minutes=minutes)
-        
-    return now + delta
-
-def get_UTC_current_time() -> datetime:
-    """
-    Returns current utc time
-    
-    Returns:
-        datetime: current time
-            (YYYY-MM-DD HH:MM:SS.ffffff±HH:MM)
-    """
-    return datetime.now(timezone.utc)
-
 async def extract_access_token(request: Request) -> str | None:
     """
     Extract auth token from Request
