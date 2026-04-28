@@ -1,13 +1,10 @@
 from fastapi import HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-import sentry_sdk
-
-from app.domain.entities.user import UserService
+from app.domain.services.user import UserService
 from app.infrastructure.api.v1.dependencies.user import UserDependencies
-from app.infrastructure.utils.config import settings
+from app.infrastructure.config import settings
 from app.domain.exceptions.entity.user import UserNotFoundError
-from app.domain.exceptions.entity.user import UserServiceError
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token/local")
 
@@ -27,7 +24,6 @@ async def verify_and_store_user(
         HTTPException: 
             If token expired or invalid (401) 
             If the user is not found (404)
-            if server side error (500)
     """
     
     try:
@@ -52,17 +48,6 @@ async def verify_and_store_user(
                 detail="User does not exist",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        except UserServiceError as e:
-            sentry_sdk.capture_exception(e)
-            
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=(
-                    "Something went wrong while authorization, "
-                    "please try again later"
-                ),
-                headers={"WWW-Authenticate": "Bearer"},
-            ) 
     except JWTError:
         raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

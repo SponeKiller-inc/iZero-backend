@@ -1,9 +1,8 @@
 from fastapi import Depends, Request, HTTPException, status
 
 from .user import UserDependencies
-from app.domain.entities.user import UserService
-from app.exceptions.domain.user import UserRoleNotFoundError
-from app.exceptions.infrastucture.domain import UserServiceError
+from app.domain.services.user import UserService
+from app.domain.exceptions.entity.user import UserRoleNotFoundError
 
 
 def require_role(allowed_role: str) -> None:
@@ -16,12 +15,11 @@ def require_role(allowed_role: str) -> None:
             ...
     Args:
         allowed_role (str) - which role is allowed to access resources
-    
+
     Raises:
         HTTPException:
             If user does not have required role (403) 
             if user role has not been found (404)
-            if there was an server error while retrieving user role (500)
     """
     async def dependency(
         request: Request,
@@ -33,14 +31,6 @@ def require_role(allowed_role: str) -> None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Access denied, user role not found"
-            )
-        except UserServiceError:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=(
-                    "Something went wrong while checking access role, "
-                    "please try again later."
-                ),
             )
 
         if user_role != allowed_role:

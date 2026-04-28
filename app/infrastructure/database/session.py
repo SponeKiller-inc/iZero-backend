@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.infrastructure.utils.config import settings
+from app.infrastructure.config import settings
 
 DATABASE_URL = (
     f"postgresql://{settings.database_username}:"

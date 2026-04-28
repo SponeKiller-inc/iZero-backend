@@ -2,7 +2,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.session import get_db
-from app.infrastructure.database.repositories.token import TokenRepository
+from app.infrastructure.repositories.token import TokenRepository
 from app.domain.services.token import TokenService
 
 class TokenDependencies(TokenService):

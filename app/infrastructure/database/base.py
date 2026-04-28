@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Union
 
 from sqlalchemy.orm import DeclarativeBase
@@ -8,7 +8,7 @@ from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy import DateTime, MetaData, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.infrastructure.utils.utils import get_UTC_current_time
+from app.infrastructure.services.clock import Clock
 
 class ValidityMixin:
     """
@@ -47,14 +47,14 @@ class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: Clock.now(),
         sort_order=998,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: Clock.now(),
+        onupdate=lambda: Clock.now(),
         sort_order=999,
     )
 
@@ -70,14 +70,14 @@ class CurrentMixin:
 
         Args:
             at (datetime, optional): The point in time to check. If None, uses the
-                current UTC time via get_UTC_current_time().
+                current UTC time via Clock.now().
 
         Returns:
             Union[sqlalchemy.sql.elements.BooleanClauseList, bool]:
                 - In query context: a SQLAlchemy Boolean expression for use in filters.
                 - In instance context: True if valid_from ≤ at ≤ valid_to, else False.
         """
-        now = at or get_UTC_current_time()
+        now = at or Clock.now()
         return (cls.valid_from <= now) & (cls.valid_to >= now)
 
 class Base(TimestampMixin, CurrentMixin, DeclarativeBase):

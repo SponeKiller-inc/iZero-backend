@@ -8,20 +8,22 @@ from app.domain.exceptions.entity.user import (
     LocalUserNotVerifiedError,
     GoogleUserNotVerifiedError
 )
-from app.infrastructure.utils import utils
+from app.domain.services.interfaces.password_hasher import IPasswordHasher
 
 class AuthService:
-    def __init__(
+    def __init__(   
         self, 
         user_repo: IUserRepository,
         token_repo: ITokenRepository,
         token_service: TokenService,
         google_api: GoogleAPI,
+        password_hasher: IPasswordHasher,
     ):
         self.user_repo = user_repo
         self.token_repo = token_repo
         self.token_service = token_service
         self.google_api = google_api
+        self.password_hasher = password_hasher
         
     def authenticate_user_local(self, email: str, password: str) -> int:
         """
@@ -41,7 +43,7 @@ class AuthService:
         if (self.user_repo.exists_local(email)):
             # User exists, verify password
             user: Users = self.user_repo.get_user_local(email)
-            verified = utils.verify_hash(password, user.password)
+            verified = self.password_hasher.verify(password, user.password)
         else:
             # User doesnt exist
             verified = False

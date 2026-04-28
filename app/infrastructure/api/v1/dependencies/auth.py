@@ -2,11 +2,12 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.session import get_db
-from app.infrastructure.database.repositories.user import UserRepository
-from app.infrastructure.database.repositories.token import TokenRepository
+from app.infrastructure.repositories.user import UserRepository
+from app.infrastructure.repositories.token import TokenRepository
 from app.domain.services.auth import AuthService
 from app.domain.services.token import TokenService
 from app.domain.services.google import GoogleAPI
+from app.infrastructure.services.password_hasher import PasswordHasher
 
 class AuthDependencies(AuthService):
     """
@@ -16,11 +17,22 @@ class AuthDependencies(AuthService):
         self,
         session: Session = Depends(get_db),
         google_api: GoogleAPI = Depends(GoogleAPI),
+        password_hasher: PasswordHasher = Depends(PasswordHasher),
     ):
-        #Dependencies
+        """
+        Initializes the AuthDependencies container.
+        
+        Args:
+            session (Session): Database session.
+            google_api (GoogleAPI): Google API client.  
+            password_hasher (PasswordHasher): Password hashing service.
+        """
+        #Repositories
         user_repo = UserRepository(session)
         token_repo = TokenRepository(session)
+        
+        #Services
         token_service = TokenService(token_repo)
         
-        super().__init__(user_repo, token_repo, token_service, google_api)
+        super().__init__(user_repo, token_repo, token_service, google_api, password_hasher)
     

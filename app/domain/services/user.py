@@ -21,15 +21,18 @@ from app.exceptions.infrastucture.repository import (
 )
 from app.exceptions.infrastucture.domain import UserServiceError
 
-from app.utils import utils
+from app.domain.services.interfaces.password_hasher import IPasswordHasher
+
 class UserService:
     def __init__(
         self, 
         repo: IUserRepository, 
-        google_api: GoogleAPI
+        google_api: GoogleAPI,
+        password_hasher: IPasswordHasher
     ):
         self.repo = repo
         self.google_api = google_api
+        self.password_hasher = password_hasher
         
     def register_user_local(
         self, 
@@ -57,7 +60,7 @@ class UserService:
             # Create user
             new_user = Users(
             email=email,
-            password=utils.hash_password(password),
+            password=self.password_hasher.hash(password),
             )
             new_user = self.repo.create_user(new_user)
             

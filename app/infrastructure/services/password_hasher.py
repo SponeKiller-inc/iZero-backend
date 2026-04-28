@@ -1,4 +1,6 @@
 from passlib.context import CryptContext
+
+from app.infrastructure.config import settings
 from app.domain.services.interfaces.password_hasher import IPasswordHasher
 from app.domain.exceptions.services.password_hash import InvalidHashFormatError
 
@@ -8,8 +10,8 @@ class PasswordHasher(IPasswordHasher):
     """
     
     _pwd_context = CryptContext(
-        schemes=["bcrypt"], 
-        deprecated="auto"
+    schemes=[settings.pwd_context_scheme],
+    deprecated="auto"
     )
 
     def hash(self, password: str) -> str:
