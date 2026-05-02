@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.session import SessionRepository
 from app.infrastructure.repositories.token import TokenRepository
-from app.domain.services.session import SessionService
-from app.domain.services.token import TokenService
+from app.domain.entity.session import SessionService
+from app.domain.entity.token import TokenService
 
 class SessionDependencies(SessionService):
     """

@@ -1,10 +1,10 @@
 from passlib.context import CryptContext
 
 from app.infrastructure.config import settings
-from app.domain.services.interfaces.password_hasher import IPasswordHasher
+from app.application.ports.password_hasher import PasswordHasher
 from app.domain.exceptions.services.password_hash import InvalidHashFormatError
 
-class PasswordHasher(IPasswordHasher):
+class PasswordHasher(PasswordHasher):
     """
     Password Hasher using passlib
     """

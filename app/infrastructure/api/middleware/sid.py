@@ -4,8 +4,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 import sentry_sdk
 
 from app.infrastructure.api.middleware.dependency.session import SessionDependencies
-from app.domain.services.session import SessionEventType
-from app.infrastructure.utils.utils import extract_access_token
+from app.domain.entity.session import SessionEventType
+from app.infrastructure.services.token_provider import TokenProvider
 
 from app.domain.exceptions.entity.session import (
     InicializeSessionServiceError, 
@@ -27,7 +27,7 @@ class SIDMiddleware(BaseHTTPMiddleware):
         
         external_id = request.cookies.get("sid")
         user_agent = request.headers.get("user-agent")
-        jwt_token = await extract_access_token(request)
+        jwt_token = await TokenProvider.extract_access_token(request)
         ip_address = request.client.host
         try:
             session_id, external_id = self.session_service.inicialize_session(

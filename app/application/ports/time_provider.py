@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Optional
 
-class IClock(ABC):
+class TimeProvider(ABC):
     """
     Defines contract for working with time,
     independently of the specific implementation.
@@ -16,7 +16,7 @@ class IClock(ABC):
         Returns:
             datetime: current UTC time
         """
-        pass
+        ...
 
     @classmethod
     @abstractmethod
@@ -31,4 +31,4 @@ class IClock(ABC):
         Returns:
             datetime: time of expiration (YYYY-MM-DD HH:MM:SS.ffffff±HH:MM)
         """
-        pass
+        ...

@@ -1,7 +1,7 @@
 from fastapi import Depends, Request, HTTPException, status
 
 from .user import UserDependencies
-from app.domain.services.user import UserService
+from app.domain.entity.user import UserService
 from app.domain.exceptions.entity.user import UserRoleNotFoundError
 
 

@@ -8,7 +8,7 @@ from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy import DateTime, MetaData, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.infrastructure.services.clock import Clock
+from app.infrastructure.services.time_provider import SystemTimeProvider
 
 class ValidityMixin:
     """
@@ -47,14 +47,14 @@ class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: Clock.now(),
+        default=lambda: SystemTimeProvider.now(),
         sort_order=998,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: Clock.now(),
-        onupdate=lambda: Clock.now(),
+        default=lambda: SystemTimeProvider.now(),
+        onupdate=lambda: SystemTimeProvider.now(),
         sort_order=999,
     )
 
@@ -70,14 +70,14 @@ class CurrentMixin:
 
         Args:
             at (datetime, optional): The point in time to check. If None, uses the
-                current UTC time via Clock.now().
+                current UTC time via SystemTimeProvider.now().
 
         Returns:
             Union[sqlalchemy.sql.elements.BooleanClauseList, bool]:
                 - In query context: a SQLAlchemy Boolean expression for use in filters.
                 - In instance context: True if valid_from ≤ at ≤ valid_to, else False.
         """
-        now = at or Clock.now()
+        now = at or SystemTimeProvider.now()
         return (cls.valid_from <= now) & (cls.valid_to >= now)
 
 class Base(TimestampMixin, CurrentMixin, DeclarativeBase):

@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.user import UserRepository
-from app.domain.services.user import UserService
-from app.domain.services.google import GoogleAPI
+from app.domain.entity.user import UserService
+from app.domain.entity.google import GoogleAPI
 from app.infrastructure.services.password_hasher import PasswordHasher
 
 class UserDependencies(UserService):

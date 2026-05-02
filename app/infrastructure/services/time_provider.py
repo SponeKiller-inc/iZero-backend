@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from app.domain.services.interfaces.clock import IClock
+from app.application.ports.time_provider import TimeProvider
 
-class Clock(IClock):
+class SystemTimeProvider(TimeProvider):
     """Utility service for UTC time."""
     
     @staticmethod

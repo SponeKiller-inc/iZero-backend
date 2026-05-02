@@ -1,18 +1,15 @@
 from typing import Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-import sentry_sdk
 
 from app.infrastructure.api.v1.schemas.user import UserModuleIn
-from app.domain.services.module import ModuleService
+from app.domain.entity.module import ModuleService
 from app.infrastructure.api.v1.dependencies.security import verify_user_owns_resource
-
 from app.infrastructure.api.v1.dependencies.module import ModuleDependencies
 from app.domain.exceptions.entity.module import (
     UserModuleNotFoundError,
     UserModuleNotAssignedError
 )
-from app.domain.exceptions.entity.module import ModuleServiceError
 
 router = APIRouter(tags=["user-module"], dependencies=[Depends(verify_user_owns_resource)])
 
@@ -31,15 +28,6 @@ async def get_user_modules(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No user modules found",
-        )
-    except ModuleServiceError as e:
-        sentry_sdk.capture_exception(e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Something went wrong, while retrieving user modules"
-                "please try again later"
-            )
         )
 
 @router.post("/{user_id}/modules", status_code=status.HTTP_201_CREATED)
@@ -61,15 +49,5 @@ async def assign_module_to_user(
             detail=(
                 "Invalid data, module not exists or "
                 "is active in requested period"
-            )
-        )
-    except ModuleServiceError as e:
-        sentry_sdk.capture_exception(e)
-        
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Something went wrong, assigning module to user"
-                "please try again later"
             )
         )

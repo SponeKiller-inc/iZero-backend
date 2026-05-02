@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class IPasswordHasher(ABC):
+class PasswordHasher(ABC):
     """
     Domain Interface (Port).
     Defines contract for working with passwords,
@@ -18,7 +18,7 @@ class IPasswordHasher(ABC):
         Returns:
             str: hash
         """
-        pass
+        ...
 
     @abstractmethod
     def verify(self, password: str, hashed_password: str) -> bool:
@@ -35,4 +35,4 @@ class IPasswordHasher(ABC):
         Raises:
             InvalidHashFormatError: If the hash has an invalid format.
         """
-        pass
+        ...

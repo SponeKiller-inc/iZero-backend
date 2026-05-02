@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.user import UserRepository
 from app.infrastructure.repositories.token import TokenRepository
-from app.domain.services.auth import AuthService
-from app.domain.services.token import TokenService
-from app.domain.services.google import GoogleAPI
+from app.domain.entity.auth2 import AuthService
+from app.domain.entity.token import TokenService
+from app.domain.entity.google import GoogleAPI
 from app.infrastructure.services.password_hasher import PasswordHasher
 
 class AuthDependencies(AuthService):
