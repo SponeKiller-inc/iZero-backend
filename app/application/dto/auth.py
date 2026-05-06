@@ -1,10 +1,7 @@
-from pydantic import BaseModel, EmailStr
+from dataclasses import dataclass
 
-class LocalRegistrationIn(BaseModel):
-    email: EmailStr
-    password: str
-
-class GoogleRegistrationIn(BaseModel):
-    jwt_token: str
-
-   
+@dataclass(frozen=True)
+class RegistrationInfo:
+    """DTO carrying user data from any identity provider."""
+    user_id: str
+    email: str

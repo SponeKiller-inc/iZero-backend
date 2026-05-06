@@ -1,7 +1,8 @@
-from typing import Protocol, Any
+from typing import Protocol
+from app.application.dto.auth import RegistrationInfo
 
 class IdentityProvider(Protocol):
-    def get_registration_info(self, token: str) -> dict[str, Any]:
+    def get_registration_info(self, token: str) -> RegistrationInfo:
         """
         Returns basic registration information from the token.
         
@@ -9,7 +10,7 @@ class IdentityProvider(Protocol):
             token (str): token to verify
         
         Returns:
-            dict[str, Any]: basic registration information
+            RegistrationInfo: basic registration information
         
         Raises:
             IdentityProviderError: If the identity provider has failed.
