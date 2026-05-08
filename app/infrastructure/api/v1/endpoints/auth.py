@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.infrastructure.api.v1.schemas import auth as schema
-from app.domain.entity.user import UserService
+from app.domain.users.entity.user import UserService
 
 from app.infrastructure.api.v1.dependencies.user import UserDependencies
-from app.domain.exceptions.entity.user import (
+from app.domain.users.exceptions.user import (
     LocalUserExistsError,
     GoogleUserExistsError,
     

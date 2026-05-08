@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from app.domain.entity.user import UserService
+from app.domain.users.entity.user import UserService
 from app.infrastructure.api.v1.dependencies.user import UserDependencies
 from app.infrastructure.config import settings
-from app.domain.exceptions.entity.user import UserNotFoundError
+from app.domain.users.exceptions.user import UserNotFoundError
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token/local")
 

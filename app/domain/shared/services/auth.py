@@ -4,7 +4,7 @@ from app.domain.entity.token import TokenService
 from app.domain.entity.google import GoogleAPI
 from app.infrastructure.database.models.user.users import Users
 
-from app.domain.exceptions.entity.user import (
+from app.domain.users.exceptions.user import (
     LocalUserNotVerifiedError,
     GoogleUserNotVerifiedError
 )

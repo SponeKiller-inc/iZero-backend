@@ -10,7 +10,7 @@ from app.domain.entity.session import SessionService
 from app.domain.entity.auth2 import AuthService
 from app.infrastructure.services.token_provider import TokenProvider
 
-from app.domain.exceptions.entity.user import (
+from app.domain.users.exceptions.user import (
     UserNotVerifiedError,
     LocalUserNotVerifiedError,
     GoogleUserNotVerifiedError,

@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.infrastructure.api.v1.schemas.module_group import ModuleGroupIn, ModuleIn
 from app.infrastructure.api.v1.dependencies.role_access import require_role
-from app.domain.entity.module import ModuleService
+from app.domain.entity.module2 import ModuleService
 from app.infrastructure.api.v1.dependencies.module import ModuleDependencies
-from app.domain.exceptions.entity.module import (
+from app.domain.modules.exceptions.module import (
     ModuleGroupNotCreatedError,
     ModuleNotCreatedError,
 )

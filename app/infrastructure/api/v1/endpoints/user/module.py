@@ -3,10 +3,10 @@ from typing import Dict, List
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.infrastructure.api.v1.schemas.user import UserModuleIn
-from app.domain.entity.module import ModuleService
+from app.domain.entity.module2 import ModuleService
 from app.infrastructure.api.v1.dependencies.security import verify_user_owns_resource
 from app.infrastructure.api.v1.dependencies.module import ModuleDependencies
-from app.domain.exceptions.entity.module import (
+from app.domain.modules.exceptions.module import (
     UserModuleNotFoundError,
     UserModuleNotAssignedError
 )

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.module import ModuleRepository
-from app.domain.entity.module import ModuleService
+from app.domain.entity.module2 import ModuleService
 
 class ModuleDependencies(ModuleService):
     """

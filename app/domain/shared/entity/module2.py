@@ -4,7 +4,7 @@ from app.infrastructure.database.models.module.user_modules import UserModules
 from app.infrastructure.database.models.module.module_groups import ModuleGroups
 from app.infrastructure.database.models.module.modules import Modules
 from app.domain.repository.module import IModuleRepository
-from app.domain.exceptions.entity.module import (
+from app.domain.modules.exceptions.module import (
     UserModuleNotFoundError, 
     UserModuleNotAssignedError,
     ModuleGroupNotCreatedError,
