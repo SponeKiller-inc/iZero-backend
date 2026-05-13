@@ -1,9 +1,11 @@
-from typing import List, Optional
+from __future__ import annotations
+from typing import List, Optional, Self
 from datetime import datetime
 import uuid
 
 from app.domain.shared.value_objects.period import ValidityPeriod
 from app.domain.session.constants.session_event import SessionEvent
+from app.domain.session.exceptions.session import SessionExpiredError
 
 class Session:
     def __init__(
@@ -15,7 +17,21 @@ class Session:
         user_agent: str,
         user_id: Optional[int] = None,
         events: Optional[List[SessionEvent]] = None
-    ):
+    ) -> None:
+        """
+        Initializes a new session.
+
+        Args:
+            session_id (int | None): The unique identifier of the session.
+             Optional for new sessions.
+            external_id (uuid.UUID): The external identifier of the session.
+            validity (ValidityPeriod): The validity period of the session.
+            ip_address (str): The IP address from which the session was initiated.
+            user_agent (str): The user agent string.
+            user_id (int | None): The User id associated with the session. 
+                Optional for non-logged in users
+            events (List[SessionEvent] | None): The list of events associated with the session.
+        """
         self.id = session_id
         self.external_id = external_id
         self.validity = validity
@@ -32,8 +48,24 @@ class Session:
         user_agent: str, 
         expire_at: datetime,
         current_time: datetime
-    ) -> "Session":
-        """Factory metoda pro novou session."""
+    ) -> Self:
+        """
+        Create new session
+
+        Args:
+            user_id (int | None): The User ID associated with the session.
+            ip_address (str): The IP address from which the session was initiated.
+            user_agent (str): The user agent string.
+            expire_at (datetime): The expiration time of the session.
+            current_time (datetime): The current time.
+
+        Returns:
+            Session: New session
+
+        Raises:
+            ValueError: If valid_from is after valid_to.
+            
+        """
         validity = ValidityPeriod(valid_from=current_time, valid_to=expire_at)
         session = cls(
             session_id=None,
@@ -47,19 +79,41 @@ class Session:
         return session
 
     def record_event(self, event_type: str, current_time: datetime) -> None:
-        """Přidá událost do historie session."""
+        """
+        Records session event
+        
+        Args:
+            event_type (str): The type of event.
+            current_time (datetime): The current time.
+            
+        Raises:
+            SessionExpiredError: If session is expired
+        """
         if not self.validity.is_active(current_time):
-            # Zde může být doménová výjimka, pokud je session po smrti
-            pass
+            raise SessionExpiredError('Cannot add new event on expired session')
             
         new_event = SessionEvent(event_type, current_time)
         self.events.append(new_event)
 
     def is_expired(self, current_time: datetime) -> bool:
+        """
+        Check if session is expired
+        
+        Args:
+            current_time (datetime): The current time.
+            
+        Returns:
+            bool: True if session is expired, False otherwise
+        """
         return not self.validity.is_active(current_time)
 
     def expire_now(self, current_time: datetime) -> None:
-        """Okamžité ukončení platnosti (např. při logoutu)."""
+        """
+        Expires the session immediately
+        
+        Args:
+            current_time (datetime): The current time.
+        """
         self.validity = ValidityPeriod(
             valid_from=self.validity.valid_from, 
             valid_to=current_time

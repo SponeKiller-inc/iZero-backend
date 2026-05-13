@@ -3,7 +3,16 @@ from datetime import datetime
 
 @dataclass(frozen=True)
 class ValidityPeriod:
-    """Value object for removing duplicates around validity."""
+    """
+    Represents the validity period of a session.
+
+    Attributes:
+        valid_from: The start of the validity period.
+        valid_to: The end of the validity period.
+
+    Raises:
+        ValueError: If valid_from is after valid_to.
+    """
     valid_from: datetime
     valid_to: datetime
 
