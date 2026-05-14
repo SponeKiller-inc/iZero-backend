@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app.application.dto.auth import TokenPayload
 
-class AccessTokenProvider(Protocol):
+class AccessTokenGenerator(Protocol):
     """Interface for access token provider"""
     
     def encode(self, user_id: int, expires_at: datetime) -> str: 
