@@ -11,4 +11,4 @@ class RegistrationInfo:
 class TokenPayload:
     """DTO carrying access token payload"""
     user_id: int
-    exp: datetime
+    expired_at: datetime

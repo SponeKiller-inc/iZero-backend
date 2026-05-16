@@ -1,13 +1,11 @@
-import requests
-
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from google.auth.exceptions import GoogleAuthError
 
 from app.application.dto.auth import RegistrationInfo
-from app.application.exceptions.identity_provider import IdentityProviderError
+from app.application.exceptions.auth import IdentityProviderError
 
-class GoogleIdentityProvider:
+class GoogleIdentityProvider:   
     def __init__(self, client_id: str):
         self.client_id = client_id
 

@@ -32,3 +32,16 @@ class SystemTimeProvider(TimeProvider):
         if minutes is None: return now
         delta = timedelta(minutes=minutes) if minutes > 0 else timedelta(milliseconds=100)
         return now + delta
+    
+    @staticmethod
+    def from_timestamp(ts: float) -> datetime:
+        """
+        Converts timestamp to UTC datetime.
+
+        Args:
+            ts (float): Unix timestamp
+
+        Returns:
+            datetime: UTC datetime
+        """
+        return datetime.fromtimestamp(ts, tz=timezone.utc)
