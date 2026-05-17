@@ -8,7 +8,7 @@ from .endpoints import module_group
 
 
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/api")
 
 # Non - Secure Routes
 router.include_router(auth.router)

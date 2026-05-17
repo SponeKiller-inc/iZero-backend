@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 import sentry_sdk
 
 from app.infrastructure.api.middleware.sid import SIDMiddleware
-from app.infrastructure.api.v1 import routers as routers_v1
-from app.infrastructure.utils.config import settings
+from app.infrastructure.api.router import router
+from app.infrastructure.config import settings
 
 sentry_sdk.init(
     dsn=settings.sentry_dsn,
@@ -35,7 +35,7 @@ app.add_middleware(SIDMiddleware)
 #Routing
 
 ##API v1
-app.include_router(routers_v1.router)
+app.include_router(router)
 
 #Global exceptions
 @app.exception_handler(Exception)
