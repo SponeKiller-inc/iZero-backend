@@ -1,33 +1,7 @@
-from .errors import DomainError
-
-# Base user Error
-class RegistrationError(DomainError):
-    """Reserved for failed registration"""
-    def __init__(self, err: str = ""):
-        super().__init__("Unable to register user at this time" + err)
+from app.domain.shared.exceptions.errors import DomainError
 
 class UserNotFoundError(DomainError):
-    """Reserved for user not found in system"""
-    def __init__(self, err: str = ""):
-        super().__init__("User has not been found" + err)
-
-class UserRoleNotFoundError(DomainError):
-    """Reserved for user role not found in system"""
-    def __init__(self, err: str = ""):
-        super().__init__("User role has not been found" + err)
-
-class UserExistsError(DomainError):
-    """Reserved for user exists in db"""
     pass
-
-class UserNotVerifiedError(DomainError):
-    """Rserved fo"""
-    pass
-class UserVerificationError(DomainError):
-    """we were not able to verify user on our side err"""
-    pass
-
-# Specific user Error
 
 class LocalUserNotFoundError(DomainError):
     """Reserved for login locally, which not exists"""
@@ -54,23 +28,3 @@ class GoogleUserExistsError(DomainError):
             f"Google user with email '{email}' and "
             f"provider_user_id '{provider_user_id}' already exists"
         )
-
-class LocalUserNotVerifiedError(DomainError):
-    """Reserved for login locally"""
-    def __init__(self, err: str = ""):
-        super().__init__("E-mail or password is wrong" + err)
-        
-class GoogleUserNotVerifiedError(DomainError):
-    """Reserved for login via Google api"""
-    def __init__(self, err: str = ""):
-        super().__init__("User does not exist" + err)
-
-class LocalUserVerificationError(DomainError):
-    """Reserved for login locally for err on our side"""
-    def __init__(self, err: str = ""):
-        super().__init__("Unable to verify user, please, try again later" + err)
-
-class GoogleUserVerificationError(DomainError):
-    """Reserved for login via google for err on our side"""
-    def __init__(self, err: str = ""):
-        super().__init__("Unable to verify token, please, try again later" + err)

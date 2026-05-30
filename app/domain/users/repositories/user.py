@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from app.models.users import Users
 from app.models.user_roles import UserRoles
 
-class IUserRepository(ABC):
+class UserRepository(ABC):
     @abstractmethod
     def get_user(self, user_id: str) -> Users | None:
         pass
