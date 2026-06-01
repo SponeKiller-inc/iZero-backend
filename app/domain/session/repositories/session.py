@@ -1,20 +1,17 @@
 from typing import Protocol
 
-from app.models.sessions import Sessions
-from app.models.session_log import SessionLog
+from app.domain.session.entities.session import Session
 
 class SessionRepository(Protocol):
-    def get_last_user_session(self, user_id: int) -> Sessions | None:
+    def get_last_user_session(self, user_id: int) -> Session | None:
         ...
 
-    def get_session(self, external_id: str) -> Sessions | None:
+    def get_by_external_id(self, external_id: str) -> Session | None:
         ...
 
-    def create_session(self, new_session: Sessions) -> Sessions:
+    def insert(self, new_session: Session) -> Session:
         ...
 
-    def expire_session(self, session_id: int) -> None:
+    def update(self, updated_session: Session) -> Session:
         ...
-
-    def create_session_log(self, new_session_log: SessionLog) -> None:
-        ...
+    
