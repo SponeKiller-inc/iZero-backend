@@ -6,6 +6,7 @@ import sentry_sdk
 from app.infrastructure.api.middleware.dependency.session import SessionDependencies
 from app.domain.entity.session import SessionEventType
 from app.infrastructure.services.token_provider import TokenProvider
+from app.infr
 
 from app.domain.exceptions.entity.session import (
     InicializeSessionServiceError, 
@@ -23,8 +24,6 @@ class SIDMiddleware(BaseHTTPMiddleware):
         self.session_service = SessionDependencies()
     
     async def dispatch(self, request: Request, call_next):
-        
-        
         external_id = request.cookies.get("sid")
         user_agent = request.headers.get("user-agent")
         jwt_token = await TokenProvider.extract_access_token(request)

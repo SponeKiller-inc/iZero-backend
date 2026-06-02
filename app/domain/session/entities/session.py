@@ -4,8 +4,10 @@ from datetime import datetime
 import uuid
 
 from app.domain.shared.value_objects.period import ValidityPeriod
+from app.application.ports.time_provider import TimeProvider
 from app.domain.session.constants.session_event import SessionEvent
 from app.domain.session.exceptions.session import SessionExpiredError
+
 
 class Session:
     def __init__(
@@ -95,27 +97,27 @@ class Session:
         new_event = SessionEvent(event_type, current_time)
         self.events.append(new_event)
 
-    def is_expired(self, current_time: datetime) -> bool:
+    def is_expired(self, ref_time: datetime) -> bool:
         """
         Check if session is expired
         
         Args:
-            current_time (datetime): The current time.
+            ref_time (datetime): The reference time.
             
         Returns:
             bool: True if session is expired, False otherwise
         """
-        return not self.validity.is_active(current_time)
+        return not self.validity.is_active(ref_time)
 
-    def expire_now(self, current_time: datetime) -> None:
+    def expire_now(self, time_provider: TimeProvider) -> None:
         """
         Expires the session immediately
         
         Args:
-            current_time (datetime): The current time.
+            time_provider (TimeProvider): The time provider.
         """
         self.validity = ValidityPeriod(
             valid_from=self.validity.valid_from, 
-            valid_to=current_time
+            valid_to=time_provider.now()
         )
-        self.record_event("user_logged_out", current_time)
+        self.record_event("user_logged_out", time_provider.now())

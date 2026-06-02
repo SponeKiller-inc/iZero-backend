@@ -2,7 +2,7 @@ from datetime import datetime
 
 from jose import JWTError, jwt
 
-from app.application.dto.auth import TokenPayload
+from app.application.dto.auth.token import TokenPayload
 from app.application.exceptions.auth import AccessTokenProviderError
 from app.infrastructure.services.time_provider import SystemTimeProvider
 

@@ -1,5 +1,6 @@
 from app.application.ports.time_provider import TimeProvider
 from app.domain.session.entities.session import Session
+from app.application.constants.session import SessionConstants
 from app.domain.session.repositories.session import SessionRepository
 from app.domain.users.repositories.user import UserRepository
 from app.domain.users.exceptions.user import UserNotFoundError
@@ -24,14 +25,14 @@ class InitializeSession:
         self.user_repository = user_repository
         self.time_provider = time_provider
 
-    def execute(self, dto: InitializeSessionIn) -> None:
+    def execute(self, dto: InitializeSessionIn) -> Session:
         """
         Initializes a new session.
 
         Args:
             dto (InitializeSessionIn): The session data.
         """
-        # 1. Zeptame se repository zda uživatel existuje, pokud ne končíme 
+        # 1. Check if user exists
         if dto.user_id > 0:
             user_exists = self.user_repository.exists_user(dto.user_id)
 
@@ -39,28 +40,32 @@ class InitializeSession:
                 raise UserNotFoundError
         
 
-        # 2. Ověříme  zda external_id není nulovéé, pokud není tak  zkusíme test platnosti
-        # pokud projde, vracíme se
-
+        # 2. Check if session is not expired
         if dto.external_id > 0:
             session = self.session_repository.get_by_external_id(dto.external_id)
 
-            if session and not session.is_expired(self.time_provider.now()):
-                return
+            if session and not session.is_expired(self.time_provider):
+                return session
 
-        # 3. Pokud uživatel je nenulový tak zneplatníme všechny aktivní session
+        # 3. Invalidate user last session 
         if dto.user_id > 0:
             last_session = self.session_repository.get_last_user_session(dto.user_id)
+            if last_session is not None:
+                last_session.expire_now(self.time_provider)
+                self.session_repository.update(last_session)
+
+        # 4. Create new a return 
+        session = Session.create_new(
+            dto.user_id,
+            dto.ip_address,
+            dto.user_agent,
+            self.time_provider.get_expiration(
+                SessionConstants.SESSION_EXPIRATION_MINUTES,
+            ),
+            self.time_provider.now(),
+        )
         
-            
-
-        # 4. Vytvoříme instanci nové session
-
-        # 5. uložíme do DB
-
-        # 6. Vracíme se 
-
-
-
-        session = Session.create_new()
+        session = self.session_repository.insert(session)
+        
+        return session
         

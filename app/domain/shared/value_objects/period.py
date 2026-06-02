@@ -20,5 +20,5 @@ class ValidityPeriod:
         if self.valid_from > self.valid_to:
             raise ValueError("valid_from must be before or equal to valid_to")
 
-    def contains(self, current_time: datetime) -> bool:
-        return self.valid_from <= current_time <= self.valid_to
+    def is_active(self, ref_time: datetime) -> bool:
+        return self.valid_from <= ref_time <= self.valid_to
