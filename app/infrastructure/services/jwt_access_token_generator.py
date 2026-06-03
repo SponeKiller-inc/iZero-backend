@@ -50,10 +50,20 @@ class JwtAccessTokenGenerator:
                 self._secret_key, 
                 algorithms=[self._algorithm]
             )
+
+            user_id = payload.get("sub")
+            if not user_id or not str(user_id).isdigit():
+                raise AccessTokenProviderError(
+                    "Invalid token payload: user_id missing or non-numeric"
+                )
+            
+            expired_at = payload.get("exp")
+            if not expired_at:
+                raise AccessTokenProviderError("Invalid token payload: expired_at missing")
             
             return TokenPayload(
-                user_id=int(payload["sub"]),
-                expired_at=SystemTimeProvider.from_timestamp(payload["exp"])
+                user_id=int(user_id),
+                expired_at=SystemTimeProvider.from_timestamp(expired_at)
             )
             
         except JWTError as e:
