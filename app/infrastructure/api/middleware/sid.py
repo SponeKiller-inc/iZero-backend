@@ -1,17 +1,15 @@
-from fastapi import Request, status
-from fastapi.responses import JSONResponse
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-import sentry_sdk
 
-from app.infrastructure.api.middleware.dependency.session import SessionDependencies
-from app.domain.entity.session import SessionEventType
-from app.infrastructure.services.token_provider import TokenProvider
-from app.infr
+from app.application.dto.sessions.initialize_session import InitializeSessionIn
+from app.application.use_cases.sessions.inicialize_session import InicializeSession
+from app.infrastructure.services.time_provider import SystemTimeProvider
+from app.infrastructure.database.session import get_db
+from app.infrastructure.repositories.session import AlchemySessionRepository
+from app.infrastructure.repositories.user import AlchemyUserRepository
 
-from app.domain.exceptions.entity.session import (
-    InicializeSessionServiceError, 
-    LogSessionServiceError,
-)
+
+
 class SIDMiddleware(BaseHTTPMiddleware):
     """
     Middleware that initializes sessions and sets a session ID cookie.
@@ -20,48 +18,40 @@ class SIDMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
 
         super().__init__(app)
-        
-        self.session_service = SessionDependencies()
     
     async def dispatch(self, request: Request, call_next):
         external_id = request.cookies.get("sid")
         user_agent = request.headers.get("user-agent")
-        jwt_token = await TokenProvider.extract_access_token(request)
+        user_id = request.state.user_id
         ip_address = request.client.host
-        try:
-            session_id, external_id = self.session_service.inicialize_session(
-                external_id,
-                jwt_token,
-                ip_address,
-                user_agent
-            )
-            
-            self.session_service.record_session_event(
-                session_id, 
-                SessionEventType.SESSION_INITIALIZED
-            )
-        except (
-            InicializeSessionServiceError,
-            LogSessionServiceError,
-        ) as e:
-            sentry_sdk.capture_exception(e)
-            
-            return JSONResponse(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content = {
-                    "detail":
-                        "Something went wrong while creating session. "
-                        "Please try again later"
-                }
-            )
+
+        # Inicialize application services
+        db = next(get_db())
+        session_repository = AlchemySessionRepository(db)
+        user_repository = AlchemyUserRepository(db)
+        time_provider = SystemTimeProvider()
+        
+        session_service = InicializeSession(
+            session_repository,
+            user_repository,
+            time_provider
+        )
+        
+        session_dto = InitializeSessionIn(
+            external_id=external_id,
+            user_id=user_id,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        session = session_service.execute(session_dto)
+        
         # Store external session id to state
-        # for use in endpoints
-        request.state.sid = external_id
+        request.state.sid = session.external_id
          
         response = await call_next(request)
 
         if request.cookies.get("sid") is None:
             # Set the sid cookie if it didn't exist
-            response.set_cookie(key="sid", value=external_id, httponly=True)
+            response.set_cookie(key="sid", value=session.external_id, httponly=True)
         
         return response

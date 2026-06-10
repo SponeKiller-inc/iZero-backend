@@ -7,7 +7,7 @@ from app.domain.users.exceptions.user import UserNotFoundError
 from app.application.dto.sessions.initialize_session import InitializeSessionIn
 
 
-class InitializeSession:
+class InicializeSession:
 
     def __init__(
         self,

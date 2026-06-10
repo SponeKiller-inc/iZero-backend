@@ -20,6 +20,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         jwt_token = await TokenProvider.extract_access_token(request)
         
         if not jwt_token:
+            # Non-logged in user
             request.state.user_id = None
             return await call_next(request)
 

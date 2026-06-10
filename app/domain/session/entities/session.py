@@ -12,7 +12,7 @@ from app.domain.session.exceptions.session import SessionExpiredError
 class Session:
     def __init__(
         self,
-        session_id: Optional[int],
+        id: Optional[int],
         external_id: uuid.UUID,
         validity: ValidityPeriod,
         ip_address: str,
@@ -34,7 +34,7 @@ class Session:
                 Optional for non-logged in users
             events (List[SessionEvent] | None): The list of events associated with the session.
         """
-        self.id = session_id
+        self.id = id
         self.external_id = external_id
         self.validity = validity
         self.ip_address = ip_address
@@ -70,7 +70,7 @@ class Session:
         """
         validity = ValidityPeriod(valid_from=current_time, valid_to=expire_at)
         session = cls(
-            session_id=None,
+            id=None,
             external_id=uuid.uuid4(),
             validity=validity,
             ip_address=ip_address,

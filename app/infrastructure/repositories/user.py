@@ -14,7 +14,7 @@ from app.exceptions.repository.user import (
 )
 
 
-class UserRepository:
+class AlchemyUserRepository:
     def __init__(self, db: Session):
         self.db = db
         

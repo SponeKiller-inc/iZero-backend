@@ -6,8 +6,9 @@ from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy import DateTime, MetaData, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, composite
 
+from app.domain.shared.value_objects.period import ValidityPeriod
 from app.infrastructure.services.time_provider import SystemTimeProvider
 
 class ValidityMixin:
@@ -23,6 +24,12 @@ class ValidityMixin:
         DateTime(timezone=True), 
         nullable=False,
         sort_order=997,
+    )
+
+    validity: Mapped[ValidityPeriod] = composite(
+        ValidityPeriod, 
+        valid_from, 
+        valid_to
     )
 
     @classmethod

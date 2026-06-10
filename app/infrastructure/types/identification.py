@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.domain.value_objects.identification import (
+from app.domain.shared.value_objects.identification import (
     RegistrationNumber, 
     BusinessTaxNumber, 
     ProprietorTaxNumber

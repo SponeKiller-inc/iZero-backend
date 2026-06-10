@@ -1,21 +1,44 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session as SqlAlchemySession
 from sqlalchemy.exc import IntegrityError
 
-from app.infrastructure.database.models.auth.sessions import Sessions
-from app.infrastructure.database.models.auth.session_log import SessionLog
-from app.infrastructure.utils.utils import create_UTC_exp_time
+from app.domain.session.entities.session import Session
+from app.infrastructure.models.auth.sessions import SessionModel
+from app.domain.session.exceptions.session import SessionSaveError
 
-from app.domain.exceptions.entity.session import (
-    SessionCreationError,
-    SessionUpdateError,
-    SessionLogCreationError,
-)
-
-class SessionRepository:
-    def __init__(self, db: Session):
+class AlchemySessionRepository:
+    def __init__(self, db: SqlAlchemySession):
         self.db = db
+
+    def get(self, session_id: int) -> Session | None:
+        """
+        Retrieve session data
+
+        Args:
+            session_id (int): session id
+                    
+        Returns:
+            Session or None: session data or None if no data present
+        """
+        session_model = (
+            self.db
+                .query(SessionModel)
+                .filter(SessionModel.id == session_id)
+                .first()
+            )
+            
+        if session_model is None:
+            return None
+
+        return Session(
+            id=session_model.id,
+            external_id=session_model.external_id,
+            validity=session_model.validity,
+            user_id=session_model.user_id,
+            ip_address=session_model.ip_address,
+            user_agent=session_model.user_agent 
+        )
     
-    def get_last_user_session(self, user_id: int) -> Sessions | None:
+    def get_last_user_session(self, user_id: int) -> Session | None:
         """
         Retrieve data of user session
 
@@ -23,17 +46,29 @@ class SessionRepository:
             user_id (int): user e-mail
         
         Returns:
-            Sessions or None: session data or None if no data present
+            Session or None: session data or None if no data present
         """
-        return (
+        session = (
             self.db
-                .query(Sessions)
-                .filter(Sessions.user_id == user_id)
-                .order_by(Sessions.id.desc())
+                .query(SessionModel)
+                .filter(SessionModel.user_id == user_id)
+                .order_by(SessionModel.id.desc())
                 .first()
             )
         
-    def get_session(self, external_id: str) -> Sessions | None:
+        if session is None:
+            return None
+
+        return Session(
+            id=session.id,
+            external_id=session.external_id,
+            validity=session.validity,
+            user_id=session.user_id,
+            ip_address=session.ip_address,
+            user_agent=session.user_agent 
+        )
+        
+    def get_by_external_id(self, external_id: str) -> Session | None:
         """
         Retrieve session data
 
@@ -41,75 +76,114 @@ class SessionRepository:
             external_id (str): external session id provided to user
                     
         Returns:
-            Sessions or None: session data or None if no data present
+            Session or None: session data or None if no data present
         """
-        return (
+
+        session = (
             self.db
-                .query(Sessions)
+                .query(SessionModel)
                 .filter(
-                    Sessions.external_id == external_id,
+                    SessionModel.external_id == external_id,
                 )
                 .first()
-            )
+        )
 
-    def create_session(self, new_session: Sessions) -> Sessions:
+        if session is None:
+            return None
+
+        return Session(
+            id=session.id,
+            external_id=session.external_id,
+            validity=session.validity,
+            user_id=session.user_id,
+            ip_address=session.ip_address,
+            user_agent=session.user_agent 
+        )
+    
+    def save(self, session: Session) -> Session:
+        """
+        Create or update session
+
+        Args:
+            session (Session): data to create or update session
+        
+        Returns:
+            Session: data newly created or updated session
+        
+        Raises:
+            SessionSaveError - invalid data or user doesn't exist
+        """
+        try: 
+            if session.id is None:
+                return self._insert(session)
+            else:
+                return self._update(session)
+        except IntegrityError as e:
+            raise SessionSaveError("Invalid data or user doesn't exist") from e
+
+    def _insert(self, session: Session) -> Session:
         """
         Create session
 
         Args:
-            new_session (Sessions) - data tu create session
+            session (Session) - data tu create session
         
         Returns:
-            Sessions: data newly created session
-        
-        Raises:
-            SessionCreationError - invalid data, user doesnt exists
+            Session: data newly created session
         """
-        try:
-            self.db.add(new_session)
-            self.db.commit()
-            self.db.refresh(new_session)
-            return new_session
-        except IntegrityError as e:
-            raise SessionCreationError from e
-    
-    def expire_session(self, session_id: int) -> None:
+               
+        session_model = SessionModel(
+            external_id=session.external_id,
+            validity=session.validity,
+            user_id=session.user_id,
+            ip_address=session.ip_address,
+            user_agent=session.user_agent 
+        )
+        self.db.add(session_model)
+        self.db.commit()
+        self.db.refresh(session_model)
+
+        return Session(
+            id=session_model.id,
+            external_id=session_model.external_id,
+            validity=session_model.validity,
+            user_id=session_model.user_id,
+            ip_address=session_model.ip_address,
+            user_agent=session_model.user_agent 
+        )
+
+    def _update(self, session: Session) -> Session:
         """
-        Expire session
+        Update session
 
         Args:
-            new_session (Sessions) - data to create session
+            session (Session) - data to update session
         
-        Raises:
-            SessionUpdateError - invalid session id
-            UpdateExecutionError - server side error
+        Returns:
+            Session: data updated session
         """
-        try:
-            stmt = (
-                self.db
-                .query(Sessions)
-                .filter(Sessions.id == session_id)
-                .update({"expired_at": create_UTC_exp_time(0)})
-            )
-            self.db.execute(stmt)
-            self.db.commit()
-        except IntegrityError as e:
-            raise SessionUpdateError from e
-    
-    def create_session_log(self, new_session_log: SessionLog) -> None:
-        """
-        Create session log
 
-        Args:
-            new_session_log (SessionLog) - data to create session log
-        
-        Raises:
-            SessionLogCreationError - invalid session id
-            CreateExecutionError - server side error
-        """
-        
-        try:
-            self.db.add(new_session_log)
-            self.db.commit()
-        except IntegrityError as e:
-            raise SessionLogCreationError from e
+        updated_session = (
+            self.db
+                .query(SessionModel)
+                .filter(SessionModel.id == session.id)
+                .first()      
+        )
+
+        updated_session.external_id = session.external_id
+        updated_session.validity = session.validity
+        updated_session.user_id = session.user_id
+        updated_session.ip_address = session.ip_address
+        updated_session.user_agent = session.user_agent
+
+        self.db.commit()
+        self.db.refresh(updated_session)
+
+        return Session(
+            id=updated_session.id,
+            external_id=updated_session.external_id,
+            validity=updated_session.validity,
+            user_id=updated_session.user_id,
+            ip_address=updated_session.ip_address,
+            user_agent=updated_session.user_agent 
+        )
