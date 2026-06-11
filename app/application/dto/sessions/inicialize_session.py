@@ -10,4 +10,10 @@ class InitializeSessionIn:
     ip_address: str
     user_agent: str
     external_id: int
-    
+
+@dataclass
+class InicializeSessionOut:
+    """
+    Output DTO for InitializeSession use-case
+    """
+    external_id: int

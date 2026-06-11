@@ -1,7 +1,6 @@
 from app.domain.shared.exceptions.errors import DomainError
 
-class UserNotFoundError(DomainError):
-    pass
+
 
 class LocalUserNotFoundError(DomainError):
     """Reserved for login locally, which not exists"""

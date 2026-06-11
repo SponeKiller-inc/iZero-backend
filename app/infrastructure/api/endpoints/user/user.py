@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.infrastructure.api.v1.schemas import auth as schema
-from app.domain.users.entity.user import UserService
+from app.application.dto.users.register_local import RegisterLocalIn
+from app.application.dto.users.register_google import RegisterGoogleIn
+
+from app.application.use_cases.users.register_local import RegisterLocal
+from app.application.use_cases.users.register_google import RegisterGoogle
 
 from app.infrastructure.api.v1.dependencies.user import UserDependencies
 from app.domain.users.exceptions.user import (
@@ -10,7 +13,7 @@ from app.domain.users.exceptions.user import (
     
 )
 
-router = APIRouter(prefix="/auth", tags=["authentications"])
+router = APIRouter(prefix="/user", tags=["user"])
 
 @router.post("/local", status_code=status.HTTP_201_CREATED)
 async def register_local(

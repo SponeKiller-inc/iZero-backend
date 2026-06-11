@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 
 from app.domain.session.entities.session import Session
 from app.infrastructure.models.auth.sessions import SessionModel
-from app.domain.session.exceptions.session import SessionSaveError
 
 class AlchemySessionRepository:
     def __init__(self, db: SqlAlchemySession):
@@ -109,17 +108,12 @@ class AlchemySessionRepository:
         
         Returns:
             Session: data newly created or updated session
-        
-        Raises:
-            SessionSaveError - invalid data or user doesn't exist
         """
-        try: 
-            if session.id is None:
-                return self._insert(session)
-            else:
-                return self._update(session)
-        except IntegrityError as e:
-            raise SessionSaveError("Invalid data or user doesn't exist") from e
+         
+        if session.id is None:
+            return self._insert(session)
+        else:
+            return self._update(session)
 
     def _insert(self, session: Session) -> Session:
         """

@@ -1,8 +1,10 @@
+from fastapi.responses import JSONResponse
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.application.dto.sessions.initialize_session import InitializeSessionIn
+from app.application.dto.sessions.inicialize_session import InitializeSessionIn
 from app.application.use_cases.sessions.inicialize_session import InicializeSession
+from app.application.exceptions.user import UserNotFoundError
 from app.infrastructure.services.time_provider import SystemTimeProvider
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.session import AlchemySessionRepository
@@ -43,7 +45,14 @@ class SIDMiddleware(BaseHTTPMiddleware):
             ip_address=ip_address,
             user_agent=user_agent
         )
-        session = session_service.execute(session_dto)
+        
+        try:
+            session = session_service.execute(session_dto)
+        except UserNotFoundError as e:
+            return JSONResponse(
+                content={"message": "User not found"},
+                status_code=400,
+            )
         
         # Store external session id to state
         request.state.sid = session.external_id

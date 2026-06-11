@@ -43,6 +43,6 @@ async def global_fallback_handler(request: Request, exc: Exception):
     sentry_sdk.capture_exception(exc) 
 
     return JSONResponse(
+        content={"message": "Internal server error. Administrators have been notified."},
         status_code=500,
-        content={"detail": "Internal server error. Administrators have been notified."},
     )
