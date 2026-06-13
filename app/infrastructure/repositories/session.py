@@ -1,16 +1,12 @@
-from sqlalchemy.orm import Session as SqlAlchemySession
-from sqlalchemy.exc import IntegrityError
-
 from app.domain.session.entities.session import Session
 from app.infrastructure.models.auth.sessions import SessionModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
 
-class AlchemySessionRepository:
-    def __init__(self, db: SqlAlchemySession):
-        self.db = db
+class AlchemySessionRepository(BaseAlchemyRepository):
 
     def get(self, session_id: int) -> Session | None:
         """
-        Retrieve session data
+        Retrieve session data   
 
         Args:
             session_id (int): session id
