@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.domain.value_objects.period import ValidityPeriod
+from app.domain.shared.value_objects.period import ValidityPeriod
 
 class UserModule:
     """
@@ -18,4 +18,4 @@ class UserModule:
         Returns:
             True if the module is active, False otherwise.
         """
-        return self.validity.contains(current_time)
+        return self.validity.is_active(current_time)

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 @dataclass(frozen=True)
@@ -9,12 +9,13 @@ class ValidityPeriod:
     Attributes:
         valid_from: The start of the validity period.
         valid_to: The end of the validity period.
+         Defaults to 1.1.3000 if not provided
 
     Raises:
         ValueError: If valid_from is after valid_to.
     """
     valid_from: datetime
-    valid_to: datetime
+    valid_to: datetime = field(default_factory=lambda: datetime(3000, 1, 1))
 
     def __post_init__(self):
         if self.valid_from > self.valid_to:

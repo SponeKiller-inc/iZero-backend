@@ -22,6 +22,8 @@ class InicializeSession:
 
         Args:
             session_repository (SessionRepository): The session repository.
+            user_repository (UserRepository): The user repository.
+            time_provider (TimeProvider): The time provider.
         """
         self.session_repository = session_repository
         self.user_repository = user_repository

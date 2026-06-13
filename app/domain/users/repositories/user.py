@@ -1,45 +1,24 @@
-from abc import ABC, abstractmethod
+from typing import Protocol, Optional
+from app.domain.users.entities.user import User
 
-from app.models.users import Users
-from app.models.user_roles import UserRoles
+class UserRepository(Protocol):
+    def get_user(self, user_id: str) -> Optional[User]:
+        ...
 
-class UserRepository(ABC):
-    @abstractmethod
-    def get_user(self, user_id: str) -> Users | None:
-        pass
+    def get_user_local(self, email: str) -> Optional[User]:
+        ...
 
-    @abstractmethod
-    def get_user_local(self, email: str) -> Users | None:
-        pass
+    def get_user_google(self, provider_user_id: str) -> Optional[User]:
+        ...
 
-    @abstractmethod
-    def get_user_google(self, provider_user_id: str) -> Users | None:
-        pass
-
-    @abstractmethod
-    def get_user_role(self, user_id: int) -> str | None:
-        pass
-
-    @abstractmethod
-    def add_user_role(self, new_user_role: UserRoles) -> UserRoles:
-        pass
-
-    @abstractmethod
-    def update_user_role(self, user_id: int, role_type_id: int) -> UserRoles:
-        pass
-
-    @abstractmethod
     def exists_local(self, email: str) -> bool:
-        pass
+        ...
 
-    @abstractmethod
     def exists_google(self, provider_user_id: str, email: str) -> bool:
-        pass
+        ...
 
-    @abstractmethod
     def exists_user(self, user_id: int) -> bool:
-        pass
+        ...
 
-    @abstractmethod
-    def create_user(self, new_user: Users) -> Users:
-        pass
+    def save(self, new_user: User) -> User:
+        ...
