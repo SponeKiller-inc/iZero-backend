@@ -1,12 +1,11 @@
-from app.application.ports import time_provider
+from app.application.ports.identity_provider import IdentityProvider
 from app.application.ports.time_provider import TimeProvider
-from app.application.ports.password_hasher import PasswordHasher
-from app.application.dto.user.registration import RegistrationLocalIn
-from app.application.exceptions.user import RegisterLocalError
+from app.application.dto.user.registration import RegistrationOauthIn
+from app.application.exceptions.user import RegisterOauthError
 from app.domain.users.repositories.user import UserRepository
+from app.domain.users.repositories.user_role import UserRoleRepository
 from app.domain.users.entities.user import User
 from app.domain.users.entities.user_role import UserRole
-from app.domain.users.exceptions.user import UserValidationError
 
 class RegisterOauth:
 
@@ -14,7 +13,7 @@ class RegisterOauth:
         self,
         user_repository: UserRepository,
         user_role_repository: UserRoleRepository,
-        password_hasher: PasswordHasher,
+        identity_provider: IdentityProvider,
         time_provider: TimeProvider,
     ) -> None:
         """
@@ -23,35 +22,35 @@ class RegisterOauth:
         Args:
             user_repository: User repository
             user_role_repository: User role repository
-            password_hasher: Password hasher
+            identity_provider: Identity provider
             time_provider: Time provider
         """
         self.user_repository = user_repository
         self.user_role_repository = user_role_repository
-        self.password_hasher = password_hasher
+        self.identity_provider = identity_provider
         self.time_provider = time_provider
 
-    def execute(self, dto: RegistrationLocalIn) -> None:
+    def execute(self, dto: RegistrationOauthIn) -> None:
         """
         
         Args:
             dto: DTO carrying user data from any identity provider.
         
         Raises:
-            RegisterLocalError: If user already exists or not valid data
+            RegisterOauthError: If user already exists
+            IdentityProviderError: If identity provider has failed
         """
-        
-        if self.user_repository.exists_local(dto.email):
-            raise RegisterLocalError("User already exists")
 
-        try:
-            user = User.create(
-                email=dto.email,
-                provider="local",
-                password=self.password_hasher.hash(dto.password)
-            )
-        except UserValidationError as e:
-            raise RegisterLocalError("User data is not valid") from e
+        user_data = self.identity_provider.get_user_info(dto.token)
+        
+        if self.user_repository.exists_oauth_user(user_data.id):
+            raise RegisterOauthError("User already exists")
+
+      
+        user = User.create_oauth(
+            email=user_data.email,
+            provider_user_id=user_data.id,
+        )
 
         user = self.user_repository.save(user)
 
@@ -60,5 +59,5 @@ class RegisterOauth:
             current_time=self.time_provider.now()
         )
         
-        self.user_repository.save_role(user_role)
+        self.user_role_repository.save(user_role)
         

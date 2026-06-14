@@ -2,14 +2,14 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from google.auth.exceptions import GoogleAuthError
 
-from app.application.dto.auth import RegistrationInfo
+from app.application.dto.auth.identity_provider import IdentityProviderOut
 from app.application.exceptions.auth import IdentityProviderError
 
 class GoogleIdentityProvider:   
     def __init__(self, client_id: str):
         self.client_id = client_id
 
-    def get_registration_info(self, token: str) -> RegistrationInfo:
+    def get_user_info(self, token: str) -> IdentityProviderOut:
         """
         Get user registration info from Google
 
@@ -17,7 +17,7 @@ class GoogleIdentityProvider:
             token (str): JWT token from Google
 
         Returns:
-            RegistrationInfo: User registration info
+            IdentityProviderOut: User registration info
 
         Raises:
             IdentityProviderError: If invalid token or something else goes wrong
@@ -31,8 +31,8 @@ class GoogleIdentityProvider:
                 self.client_id
             )
             
-            return RegistrationInfo(
-                user_id=response["sub"],
+            return IdentityProviderOut(
+                id=response["sub"],
                 email=response["email"]
             )
         except ValueError as e:

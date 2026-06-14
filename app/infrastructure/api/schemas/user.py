@@ -2,11 +2,11 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
-class LocalRegistrationIn(BaseModel):
+class RegistrationLocalIn(BaseModel):
     email: EmailStr
     password: str
 
-class GoogleRegistrationIn(BaseModel):
+class RegistrationOauthIn(BaseModel):
     jwt_token: str
 
 class UserModuleIn(BaseModel):

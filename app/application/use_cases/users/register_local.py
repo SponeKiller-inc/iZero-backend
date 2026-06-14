@@ -38,20 +38,16 @@ class RegisterLocal:
             dto: DTO carrying user data from any identity provider.
         
         Raises:
-            RegisterLocalError: If user already exists or not valid data
+            RegisterLocalError: If user already exists
         """
         
         if self.user_repository.exists_local(dto.email):
             raise RegisterLocalError("User already exists")
 
-        try:
-            user = User.create(
-                email=dto.email,
-                provider="local",
-                password=self.password_hasher.hash(dto.password)
-            )
-        except UserValidationError as e:
-            raise RegisterLocalError("User data is not valid") from e
+        user = User.create_local(
+            email=dto.email,
+            password=self.password_hasher.hash(dto.password)
+        )
 
         user = self.user_repository.save(user)
 

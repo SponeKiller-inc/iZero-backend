@@ -1,16 +1,16 @@
 from typing import Protocol
-from app.application.dto.auth import RegistrationInfo
+from app.application.dto.auth.identity_provider import IdentityProviderOut
 
 class IdentityProvider(Protocol):
-    def get_registration_info(self, token: str) -> RegistrationInfo:
+    def get_user_info(self, token: str) -> IdentityProviderOut:
         """
-        Returns basic registration information from the token.
+        Returns basic user information from the token.
         
         Args:
             token (str): token to verify
         
         Returns:
-            RegistrationInfo: basic registration information
+            IdentityProviderOut: basic user information
         
         Raises:
             IdentityProviderError: If the identity provider has failed.

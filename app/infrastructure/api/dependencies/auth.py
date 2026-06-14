@@ -7,7 +7,7 @@ from app.infrastructure.repositories.token import TokenRepository
 from app.domain.entity.auth2 import AuthService
 from app.domain.entity.token import TokenService
 from app.domain.entity.google import GoogleAPI
-from app.infrastructure.services.password_hasher import PasswordHasher
+from app.infrastructure.services.passlib_password_hasher import PasswordHasher
 
 class AuthDependencies(AuthService):
     """

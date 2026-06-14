@@ -131,7 +131,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
     
     def save(self, user: User) -> User:
         """
-        Create or update session
+        Create or update User
 
         Args:
             user (User): data to create or update user

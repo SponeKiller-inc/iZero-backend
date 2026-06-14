@@ -3,7 +3,7 @@ from sqlalchemy import ForeignKey
 
 from app.infrastructure.database.base import Base, ValidityMixin
 
-class UserTitles(Base, ValidityMixin):
+class UserTitleModel(Base, ValidityMixin):
     __tablename__ = "user_titles"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

@@ -7,3 +7,7 @@ class IdentityProviderError(ApplicationError):
 class AccessTokenProviderError(ApplicationError):
     """Specific error indicating that the access token provider has failed."""
     pass
+
+class InvalidHashFormatError(ApplicationError):
+    """Specific error indicating that the hash has an invalid format."""
+    pass

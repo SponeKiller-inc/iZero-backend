@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import Self, Optional
 
+from app.domain.users.value_objects.registration_source import RegistrationSource
+from app.domain.users.constants.registration_source_type import RegistrationSourceType
+
 class User:
     """
     Represents a user.
@@ -17,7 +20,7 @@ class User:
         self,   
         id: int, 
         email: str,
-        provider: str,
+        provider: RegistrationSource,
         password: Optional[str] = None, 
         provider_user_id: Optional[str] = None,        
     ):
@@ -28,29 +31,33 @@ class User:
         self.provider = provider
 
     @classmethod
-    def create(
+    def create_local(
         cls,
         email: str,
-        provider: str,
-        password: Optional[str] = None,
-        provider_user_id: Optional[str] = None,
+        password: str
     ) -> Self:
         """
-        Creates a new user instance with validation rules.
+        Creates a new user locally.
         """
-        if provider == "local" and not password:
-            raise ValueError("password must be not empty")
-
-        if provider != "local":
-            if not provider_user_id:
-                raise ValueError("provider_user_id must be not empty")
-            if password:
-                raise ValueError("password must be empty")
-
         return cls(
             id=0,
             email=email,
-            provider=provider,
+            provider=RegistrationSource(RegistrationSourceType.LOCAL),
             password=password,
+        )
+    
+    @classmethod
+    def create_oauth(
+        cls,
+        email: str,
+        provider_user_id: str
+    ) -> Self:
+        """
+        Creates a new user via oauth provider.
+        """
+        return cls(
+            id=0,
+            email=email,
+            provider=RegistrationSource(RegistrationSourceType.OAUTH),
             provider_user_id=provider_user_id,
         )

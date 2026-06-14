@@ -1,10 +1,9 @@
 from passlib.context import CryptContext
 
 from app.infrastructure.config import settings
-from app.application.ports.password_hasher import PasswordHasher
-from app.domain.exceptions.auth.password import InvalidHashFormatError
+from app.application.exceptions.auth import InvalidHashFormatError
 
-class PasswordHasher(PasswordHasher):
+class PasslibPasswordHasher:
     """
     Password Hasher using passlib
     """
@@ -42,5 +41,5 @@ class PasswordHasher(PasswordHasher):
         """
         try:
             return self._pwd_context.verify(password, hashed_password)
-        except Exception as e:
-            raise InvalidHashFormatError from e
+        except ValueError as e:
+            raise InvalidHashFormatError("Invalid hash format") from e

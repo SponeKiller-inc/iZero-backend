@@ -1,13 +1,10 @@
-from abc import ABC, abstractmethod
+from typing import Protocol
 
-class PasswordHasher(ABC):
+class PasswordHasher(Protocol):
     """
-    Domain Interface (Port).
-    Defines contract for working with passwords,
-    independently of the specific library.
+    Interface for working with passwords.
     """
 
-    @abstractmethod
     def hash(self, password: str) -> str:
         """
         Creates a secure hash from a text password.
@@ -20,7 +17,6 @@ class PasswordHasher(ABC):
         """
         ...
 
-    @abstractmethod
     def verify(self, password: str, hashed_password: str) -> bool:
         """
         Verifies that the password matches the stored hash.
