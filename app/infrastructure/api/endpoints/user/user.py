@@ -20,14 +20,14 @@ from app.infrastructure.config import settings
 
 
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter()
 
 @router.post("/local", status_code=status.HTTP_201_CREATED)
 async def register_local(
     user: schema.RegistrationLocalIn,
     db: Session = Depends(get_db)
 ):
-    # Inicialize registration local
+    # Initialize registration local
     user_repository = AlchemyUserRepository(db)
     user_role_repository = AlchemyUserRepository(db)
     password_hasher = PasslibPasswordHasher()
@@ -59,7 +59,7 @@ async def register_google(
     user: schema.RegistrationOauthIn,
     db: Session = Depends(get_db)
 ):
-    # Inicialize registration oauth
+    # Initialize registration oauth
     user_repository = AlchemyUserRepository(db)
     user_role_repository = AlchemyUserRepository(db)
     identity_provider = GoogleIdentityProvider(

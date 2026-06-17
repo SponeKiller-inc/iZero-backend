@@ -12,7 +12,7 @@ class InitializeSessionIn:
     external_id: int
 
 @dataclass
-class InicializeSessionOut:
+class InitializeSessionOut:
     """
     Output DTO for InitializeSession use-case
     """

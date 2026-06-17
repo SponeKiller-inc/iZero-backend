@@ -1,15 +1,15 @@
 from app.application.ports.time_provider import TimeProvider
 from app.application.constants.session import SessionConstants
-from app.application.dto.sessions.inicialize_session import (
+from app.application.dto.sessions.initialize_session import (
     InitializeSessionIn,
-    InicializeSessionOut,
+    InitializeSessionOut,
 )
 from app.application.exceptions.user import UserNotFoundError
 from app.domain.session.entities.session import Session
 from app.domain.session.repositories.session import SessionRepository
 from app.domain.users.repositories.user import UserRepository
 
-class InicializeSession:
+class InitializeSession:
 
     def __init__(
         self,
@@ -29,7 +29,7 @@ class InicializeSession:
         self.user_repository = user_repository
         self.time_provider = time_provider
 
-    def execute(self, dto: InitializeSessionIn) -> InicializeSessionOut:
+    def execute(self, dto: InitializeSessionIn) -> InitializeSessionOut:
         """
         Initializes a new session.
 
@@ -77,5 +77,5 @@ class InicializeSession:
         
         session = self.session_repository.save(session)
         
-        return InicializeSessionOut(session.external_id)
+        return InitializeSessionOut(session.external_id)
         

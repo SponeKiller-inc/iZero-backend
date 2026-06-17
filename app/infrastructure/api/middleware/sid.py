@@ -2,8 +2,8 @@ from fastapi.responses import JSONResponse
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.application.dto.sessions.inicialize_session import InitializeSessionIn
-from app.application.use_cases.sessions.inicialize_session import InicializeSession
+from app.application.dto.sessions.initialize_session import InitializeSessionIn
+from app.application.use_cases.sessions.initialize_session import InitializeSession
 from app.application.exceptions.user import UserNotFoundError
 from app.infrastructure.services.time_provider import SystemTimeProvider
 from app.infrastructure.database.session import get_db
@@ -27,13 +27,13 @@ class SIDMiddleware(BaseHTTPMiddleware):
         user_id = request.state.user_id
         ip_address = request.client.host
 
-        # Inicialize application services
+        # Initialize application services
         db = next(get_db())
         session_repository = AlchemySessionRepository(db)
         user_repository = AlchemyUserRepository(db)
         time_provider = SystemTimeProvider()
         
-        session_service = InicializeSession(
+        session_service = InitializeSession(
             session_repository,
             user_repository,
             time_provider

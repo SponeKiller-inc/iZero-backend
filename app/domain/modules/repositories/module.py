@@ -1,33 +1,40 @@
-from abc import ABC, abstractmethod
-from datetime import datetime
+from typing import Protocol, Optional
 
-from app.models.user_modules import UserModules
-from app.models.modules import Modules
-from app.models.module_groups import ModuleGroups
+from app.domain.modules.entities.module import Module
 
-class IModuleRepository(ABC):
-    @abstractmethod
-    def get_user_modules(self, user_id: int) -> dict[str, list[str]] | None:
-        pass
+class ModuleRepository(Protocol):
+    def get(self, module_id: int) -> Optional[Module]:
+        """
+        Get module by id
 
-    @abstractmethod
-    def is_active_user_module(
-        self, 
-        user_id: int, 
-        module_id: int,
-        valid_from: datetime,
-        valid_to: datetime,
-    ) -> bool:
-        pass
+        Args:
+            module_id: Module id
+        
+        Returns:
+            Module if found
+        """
+        ...
 
-    @abstractmethod
-    def add_user_module(self, new_user_module: UserModules) -> UserModules:
-        pass
+    def get_user_modules(self, user_id: int) -> list[Module]:
+        """
+        Get user modules
 
-    @abstractmethod
-    def add_module_group(self, new_module_group: ModuleGroups) -> ModuleGroups:
-        pass
+        Args:
+            user_id: User id
 
-    @abstractmethod
-    def add_module(self, new_module: Modules) -> Modules:
-        pass
+        Returns:
+            List of modules
+        """
+        ...
+
+    def save(self, module: Module) -> Module:
+        """
+        Save new or existing module
+
+        Args:
+            module: Module to save
+
+        Returns:
+            Updated or new module
+        """
+        ...

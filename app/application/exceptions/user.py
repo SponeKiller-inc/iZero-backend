@@ -9,3 +9,6 @@ class RegisterOauthError(ApplicationError):
 
 class UserNotFoundError(ApplicationError):
     pass
+
+class UserModuleNotAssignedError(ApplicationError):
+    pass

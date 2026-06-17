@@ -5,7 +5,6 @@ from app.application.exceptions.user import RegisterLocalError
 from app.domain.users.repositories.user import UserRepository
 from app.domain.users.entities.user import User
 from app.domain.users.entities.user_role import UserRole
-from app.domain.users.exceptions.user import UserValidationError
 from app.domain.users.repositories.user_role import UserRoleRepository
 
 class RegisterLocal:
