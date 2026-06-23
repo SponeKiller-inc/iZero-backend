@@ -17,21 +17,25 @@ class SystemTimeProvider(TimeProvider):
         return datetime.now(timezone.utc)
 
     @classmethod
-    def get_expiration(cls, minutes: Optional[int] = None) -> datetime:
+    def get_expiration(
+        cls,
+        minutes: Optional[int] = None,
+        days: Optional[int] = None,
+    ) -> datetime:
         """
         Calculates expiration using the class's own 'now' method
+        (if no minutes and no days, returns now + 100ms)
 
         Args:
-            minutes (int): minutes to expiration (if 0, 
-             expiration = now + 100ms)
-    
+            minutes (int): minutes to expiration
+            days (int): days to expiration
         Returns:
             datetime: time of expiration (YYYY-MM-DD HH:MM:SS.ffffff±HH:MM)
         """
-        now = cls.now()
-        if minutes is None: return now
-        delta = timedelta(minutes=minutes) if minutes > 0 else timedelta(milliseconds=100)
-        return now + delta
+        base = cls.now()
+        if not minutes and not days:
+            return base + timedelta(milliseconds=100)
+        return base + timedelta(minutes=minutes or 0, days=days or 0)
     
     @staticmethod
     def from_timestamp(ts: float) -> datetime:

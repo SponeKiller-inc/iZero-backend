@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Self
 
 @dataclass(frozen=True)
 class ValidityPeriod:
@@ -23,3 +24,9 @@ class ValidityPeriod:
 
     def is_active(self, ref_time: datetime) -> bool:
         return self.valid_from <= ref_time <= self.valid_to
+    
+    def overlaps_with(self, other: Self) -> bool:
+        """
+        Checks if this validity period overlaps with another validity period.
+        """
+        return self.valid_from <= other.valid_to and self.valid_to >= other.valid_from

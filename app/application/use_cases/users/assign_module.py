@@ -1,21 +1,15 @@
-from app.domain.users.entities.user_module import UserModule
 from app.application.exceptions.user import UserModuleNotAssignedError
 from app.domain.users.repositories.user_module import UserModuleRepository
-from app.application.ports import time_provider
 from app.application.ports.time_provider import TimeProvider
-from app.application.ports.password_hasher import PasswordHasher
 from app.application.dto.user.assign_module import AssignModuleIn
-from app.application.exceptions.user import RegisterLocalError
-from app.domain.users.repositories.user import UserRepository
-from app.domain.users.entities.user import User
-from app.domain.users.exceptions.user import UserValidationError
 from app.domain.modules.repositories.module import ModuleRepository
+from app.domain.users.entities.user_module import UserModule
+from app.domain.shared.value_objects.period import ValidityPeriod
 
 class AssignModule:
 
     def __init__(
         self,
-        user_repository: UserRepository,
         module_repository: ModuleRepository,
         user_module_repository: UserModuleRepository,
         time_provider: TimeProvider
@@ -24,12 +18,10 @@ class AssignModule:
         Initialize use-case
 
         Args:
-            user_repository: User repository
             module_repository: Module repository
             user_module_repository: User module repository
             time_provider: Time provider
         """
-        self.user_repository = user_repository
         self.module_repository = module_repository
         self.user_module_repository = user_module_repository
         self.time_provider = time_provider
@@ -44,18 +36,37 @@ class AssignModule:
         Raises:
             UserModuleNotAssignedError: If user already exists
         """
-        # 1. Ověříme že modul existuje
+        # Validation
         module = self.module_repository.get(dto.module_id)
 
-        # 2. Zkontroluje zda je aktivní modul
         if not module.is_active(self.time_provider.now()):
             raise UserModuleNotAssignedError("Module is not active")
 
-        # 3. Vytvoříme entitu user_module
-        user_module = UserModule(
-            user_id=dto.user_id,
-            module_id=dto.module_id,
-            assigned_at=self.time_provider.now()
+        if not module.is_active(
+            self.time_provider.get_expiration(days=dto.duration_days)
+        ):
+            raise UserModuleNotAssignedError(
+                "Module will not be valid at the end of the validity period"
+            )
+
+        user_modules = self.user_module_repository.get(dto.user_id)
+        
+        validity = ValidityPeriod(
+            valid_from=self.time_provider.now(),
+            valid_to=self.time_provider.get_expiration(days=dto.duration_days)
         )
 
-        # 4. Uložíme do databáze 
+        for user_module in user_modules:
+            if validity.overlaps_with(user_module.validity):
+                raise UserModuleNotAssignedError(
+                    "Module already assigned to user in overlapping period"
+                )
+
+        # Assigning module to suer
+        user_module = UserModule.assign(
+            user_id=dto.user_id,
+            module_id=dto.module_id,
+            validity=validity
+        )
+
+        self.user_module_repository.save(user_module)

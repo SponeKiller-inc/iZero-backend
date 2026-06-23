@@ -20,7 +20,11 @@ class TimeProvider(ABC):
 
     @classmethod
     @abstractmethod
-    def get_expiration(cls, minutes: Optional[int] = None) -> datetime:
+    def get_expiration(
+        cls,
+        minutes: Optional[int] = None,
+        days: Optional[int] = None,
+    ) -> datetime:
         """
         Calculates expiration using the class's own 'now' method
 
