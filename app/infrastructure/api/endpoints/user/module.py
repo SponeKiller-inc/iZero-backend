@@ -2,16 +2,11 @@ from typing import Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.infrastructure.api.v1.schemas.user import UserModuleIn
-from app.domain.entity.module2 import ModuleService
-from app.infrastructure.api.v1.dependencies.security import verify_user_owns_resource
-from app.infrastructure.api.v1.dependencies.module import ModuleDependencies
-from app.domain.modules.exceptions.module import (
-    UserModuleNotFoundError,
-    UserModuleNotAssignedError
-)
+from app.infrastructure.api.dependencies.security import verify_user_owns_resource
 
-router = APIRouter(tags=["user-module"], dependencies=[Depends(verify_user_owns_resource)])
+
+router = APIRouter(tags=["user-module"])
+
 
 @router.get(
     "/{user_id}/modules", 

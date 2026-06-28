@@ -17,7 +17,7 @@ class ModuleRepository:
     def __init__(self, db: Session):
         self.db = db
         
-    def get_user_modules(self, user_id: int) -> dict[str, list[str]] | None:
+    def get_modules(self, user_id: int) -> dict[str, list[str]] | None:
         """
         Retrieve available user modules
 

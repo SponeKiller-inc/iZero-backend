@@ -1,7 +1,8 @@
+from contextvars import ContextVar
+
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-import sentry_sdk
 
 from app.application.exceptions.auth import AccessTokenProviderError
 from app.infrastructure.services.token_provider import TokenProvider
@@ -15,13 +16,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next):
+        caller_user_id = ContextVar("caller_user_id", default=None)
         
         # 1. Extraction from RQ
         jwt_token = await TokenProvider.extract_access_token(request)
         
         if not jwt_token:
-            # Non-logged in user
-            request.state.user_id = None
             return await call_next(request)
 
         # 2. decode jwt token
@@ -33,6 +33,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 content={"detail": "Invalid or expired token"}
             )
             
-        request.state.user_id = payload.user_id
+        caller_user_id.set(payload.user_id)
          
         return await call_next(request)

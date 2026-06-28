@@ -1,19 +1,34 @@
-from typing import Optional
+from datetime import datetime
 from typing import Protocol
 from app.domain.users.entities.user_module import UserModule
 
 class UserModuleRepository(Protocol):
-    def get_user_module(
+    def get(self, user_id: int, ref_date: datetime) -> list[UserModule]:
+        """
+        Get all user modules by user ID
+        
+        Args:
+            user_id: User ID
+            ref_date: Reference date
+        
+        Returns:
+            List of user modules
+        """
+        ...
+    
+    def get_module(
         self, 
         user_id: int, 
-        module_id: int
-    ) -> Optional[UserModule]:
+        module_id: int,
+        ref_date: datetime,
+    ) -> UserModule | None:
         """
         Get user module
         
         Args:
             user_id: User ID
             module_id: Module ID
+            ref_date: Reference date
         
         Returns:
             User module entity
