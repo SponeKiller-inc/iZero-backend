@@ -1,9 +1,8 @@
-from contextvars import ContextVar
-
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.application.security.auth_context import AuthContext
 from app.application.exceptions.auth import AccessTokenProviderError
 from app.infrastructure.services.token_provider import TokenProvider
 from app.infrastructure.services.jwt_access_token_generator import JwtAccessTokenGenerator
@@ -15,9 +14,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
 
-    async def dispatch(self, request: Request, call_next):
-        caller_user_id = ContextVar("caller_user_id", default=None)
-        
+    async def dispatch(self, request: Request, call_next):        
         # 1. Extraction from RQ
         jwt_token = await TokenProvider.extract_access_token(request)
         
@@ -33,6 +30,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 content={"detail": "Invalid or expired token"}
             )
             
-        caller_user_id.set(payload.user_id)
+        AuthContext.set(payload.user_id)
          
         return await call_next(request)

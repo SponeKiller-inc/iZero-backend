@@ -1,14 +1,17 @@
 from app.domain.modules.entities.module import Module
+from app.domain.shared.value_objects.period import ValidityPeriod
 
 class ModuleGroup:
     def __init__(
         self, 
-        group_id: int, 
+        id: int, 
         name: str, 
+        validity: ValidityPeriod,
         modules: list[Module] | None = None
     ):
-        self.id = group_id
+        self.id = id
         self.name = name
+        self.validity = validity
         self.modules = modules or []
 
     def create_module(

@@ -1,18 +1,34 @@
 from contextvars import ContextVar
-from typing import Optional
 
 class AuthContext:
-    def __init__(self):
-        self._id_ctx: ContextVar[Optional[int]] = ContextVar("current_user_id", default=None)
+    _id_ctx: ContextVar[int | None] = ContextVar(
+        "current_user_id",
+        default=None
+    )
 
-    def set(self, user_id: int) -> None:
-        self._id_ctx.set(user_id)
+    @classmethod
+    def set(cls, user_id: int) -> None:
+        """
+        Set auth context for current request
+        
+        Args:
+            user_id: user id for request
+        """
+        cls._id_ctx.set(user_id)
 
-    def get(self) -> int:
-        user_id = self._id_ctx.get()
-        if user_id is None:
-            return 0
-        return user_id
+    @classmethod
+    def get(cls) -> int | None:
+        """
+        Get user id from auth context
 
-    def clear(self) -> None:
-        self._id_ctx.set(None)
+        Returns:
+            user_id or None if not set
+        """
+        return cls._id_ctx.get()  
+
+    @classmethod
+    def clear(cls) -> None:
+        """
+        Clear auth context
+        """
+        cls._id_ctx.set(None)

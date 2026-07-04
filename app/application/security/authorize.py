@@ -1,7 +1,7 @@
 from app.application.exceptions.auth import UserNotAuthorizedError
 import inspect
 from functools import wraps
-from app.security.context import current_user_id
+from app.application.security.auth_context import AuthContext
 
 def authorize(func):
 
@@ -9,7 +9,7 @@ def authorize(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        caller_id = current_user_id.get()
+        caller_id = AuthContext.get()
         target_user_id = None
 
         # 1. Check in args for user_id 

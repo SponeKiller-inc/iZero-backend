@@ -1,3 +1,4 @@
+from app.application.exceptions.auth import UserNotAuthorizedError
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -38,6 +39,13 @@ app.add_middleware(SIDMiddleware)
 app.include_router(router)
 
 #Global exceptions
+@app.exception_handler(UserNotAuthorizedError)
+async def user_not_authorized_handler(request: Request, exc: UserNotAuthorizedError):
+    return JSONResponse(
+        status_code=403,
+        content={"message": str(exc)}
+    )
+
 @app.exception_handler(Exception)
 async def global_fallback_handler(request: Request, exc: Exception):
     sentry_sdk.capture_exception(exc) 

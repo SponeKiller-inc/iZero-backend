@@ -3,6 +3,7 @@ from app.application.dto.user.retrieve_modules import RetrieveModulesOut, Module
 from app.domain.users.repositories.user_module import UserModuleRepository
 from app.domain.modules.repositories.module import ModuleRepository
 from app.domain.modules.repositories.module_group import ModuleGroupRepository
+from app.application.security.authorize import authorize
 
 class RetrieveModules:
 
@@ -27,6 +28,7 @@ class RetrieveModules:
         self.module_group_repository = module_group_repository
         self.time_provider = time_provider
         
+    @authorize
     def execute(self, user_id: int) -> list[RetrieveModulesOut]:
         """
         Retrieve modules for user

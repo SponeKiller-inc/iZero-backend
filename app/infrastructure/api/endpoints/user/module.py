@@ -1,8 +1,15 @@
+from sqlalchemy.orm import Session
 from typing import Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.infrastructure.api.dependencies.security import verify_user_owns_resource
+from app.application.use_cases.users.retrieve_modules import RetrieveModules
+from app.application.exceptions.user import UserModuleNotFoundError
+from app.infrastructure.database.session import get_db
+from app.infrastructure.repositories.module.module import AlchemyModuleRepository
+from app.infrastructure.repositories.module_group.module_group import AlchemyModuleGroupRepository
+from app.infrastructure.repositories.user.user_module import AlchemyUserModuleRepository
+from app.infrastructure.services.time_provider import SystemTimeProvider
 
 
 router = APIRouter(tags=["user-module"])
@@ -15,10 +22,23 @@ router = APIRouter(tags=["user-module"])
 )
 async def get_user_modules(
     user_id: int,
-    module_service: ModuleService = Depends(ModuleDependencies)
+    db: Session = Depends(get_db)
 ):
+    # Initialize retrieve modules
+    user_module_repository = AlchemyUserModuleRepository(db)
+    module_repository = AlchemyModuleRepository(db)
+    module_group_repository = AlchemyModuleGroupRepository(db)
+    time_provider = SystemTimeProvider()
+
+    retrieve_modules = RetrieveModules(
+        user_module_repository,
+        module_repository,
+        module_group_repository,
+        time_provider,
+    )
+
     try:
-        return module_service.retrieve_user_modules(user_id)
+        return retrieve_modules.execute(user_id)
     except UserModuleNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

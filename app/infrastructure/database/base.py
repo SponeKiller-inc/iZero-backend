@@ -1,10 +1,7 @@
 from datetime import datetime
-from typing import Union
 
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy import DateTime, MetaData, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, composite
 
@@ -65,29 +62,7 @@ class TimestampMixin:
         sort_order=999,
     )
 
-class CurrentMixin:
-    @hybrid_method
-    def is_current(cls, at: datetime = None) -> Union[BooleanClauseList, bool]:
-        """
-        Determine if this record is valid at a given point in time.
-
-        When used on the model class in a query context, returns a SQL expression
-        filtering rows whose valid_from ≤ at ≤ valid_to. When called on an
-        instance, returns a Python bool indicating whether that instance is currently valid.
-
-        Args:
-            at (datetime, optional): The point in time to check. If None, uses the
-                current UTC time via SystemTimeProvider.now().
-
-        Returns:
-            Union[sqlalchemy.sql.elements.BooleanClauseList, bool]:
-                - In query context: a SQLAlchemy Boolean expression for use in filters.
-                - In instance context: True if valid_from ≤ at ≤ valid_to, else False.
-        """
-        now = at or SystemTimeProvider.now()
-        return (cls.valid_from <= now) & (cls.valid_to >= now)
-
-class Base(TimestampMixin, CurrentMixin, DeclarativeBase):
+class Base(TimestampMixin, DeclarativeBase):
     """
     Base class for all ORM models, combining timestamp fields and shared metadata.
 
