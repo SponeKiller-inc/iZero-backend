@@ -12,6 +12,6 @@ class InvalidHashFormatError(ApplicationError):
     """Specific error indicating that the hash has an invalid format."""
     pass
 
-class UserNotAuthorizedError(ApplicationError):
-    """Specific error indicating that the user is not authorized."""
+class AuthHashVerificationError(ApplicationError):
+    """Specific error indicating that the auth hash verification has failed."""
     pass

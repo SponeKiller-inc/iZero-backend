@@ -29,27 +29,6 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
         if not module_group_model:
             return None
 
-        module_model = (
-            self.db
-                .query(ModuleModel)
-                .filter(
-                    ModuleModel.module_group_id == module_group_id,
-                    ModuleModel.valid_at(ref_date)
-                ).all()
-        )
-
-        modules = [
-            Module(
-                id=module.id,
-                name=module.name,
-                module_group_id=module.module_group_id,
-                validity=ValidityPeriod(
-                    valid_from=module.valid_from,
-                    valid_to=module.valid_to,
-                ),
-            ) for module in module_model
-        ]
-
         return ModuleGroup(
             id=module_group_model.id,
             name=module_group_model.name,
@@ -57,7 +36,6 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
                 valid_from=module_group_model.valid_from,
                 valid_to=module_group_model.valid_to,
             ),
-            modules=modules,
         )
 
     def save(self, module_group: ModuleGroup) -> ModuleGroup:

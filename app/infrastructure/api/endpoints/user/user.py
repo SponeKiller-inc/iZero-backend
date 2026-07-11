@@ -11,7 +11,7 @@ from app.application.exceptions.user import (
     
 )
 from app.infrastructure.database.session import get_db
-from app.infrastructure.api.schemas import user as schema
+from app.infrastructure.api.schemas.user import user as schema
 from app.infrastructure.services.passlib_password_hasher import PasslibPasswordHasher
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
 from app.infrastructure.services.time_provider import SystemTimeProvider
