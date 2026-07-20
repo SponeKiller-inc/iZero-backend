@@ -1,3 +1,4 @@
+from app.application.security import authorize
 from app.application.exceptions.user import UserModuleNotAssignedError
 from app.domain.users.repositories.user_module import UserModuleRepository
 from app.application.ports.time_provider import TimeProvider
@@ -25,7 +26,7 @@ class AssignModule:
         self.module_repository = module_repository
         self.user_module_repository = user_module_repository
         self.time_provider = time_provider
-        
+    @authorize('user:module:create')
     def execute(self, dto: AssignModuleIn) -> None:
         """
         Assign module to user

@@ -5,34 +5,44 @@ class AuthHash:
     def __init__(self, secret: str):
         self.secret = secret.encode("utf-8")
 
-    def generate(self, current_user_id: int, secret_message: str) -> str:
+    def generate(self, current_user_id: int, secret_message: str, entities_methods: list[tuple[str, str]]) -> list[str]:
         """
-        Generate hash for user
+        Generate list of hashes for user
         
         Args:
             current_user_id (int): currently logged in user id
-            secret_message (str): secret message from hash
+            secret_message (str): secret message for hash (To make sure
+                it will be used only for single request from user)
             
         Returns:
-            str: token
+            list[str]: list of hashes
         """
-        data_to_sign = f"{current_user_id}:{secret_message}".encode("utf-8")
-        signature = hmac.new(self.secret, data_to_sign, hashlib.sha256).hexdigest()
-        
-        return signature
+        signatures = []
+        for entity, method in entities_methods:
+            data_to_sign = f"{current_user_id}:{secret_message}:{entity}:{method}".encode("utf-8")
+            signature = hmac.new(self.secret, data_to_sign, hashlib.sha256).hexdigest()
+            signatures.append(signature)
+            
+        return signatures
 
-    def verify(self, token: str, current_user_id: int, secret_message: str) -> bool:
+    def verify(self, tokens: list[str], current_user_id: int, secret_message: str, entity: str, method: str) -> bool:
         """
-        Verify hash for user
+        Verify list of hashes for user
         
         Args:
-            token (str): token to verify
+            tokens (list[str]): list of hashes to verify
             current_user_id (int): currently logged in user id
             secret_message (str): secret message from hash
+            entity (str): entity for which hash is generated
+            method (str): method for which hash is generated
             
         Returns:
             bool: True if hash is valid, False otherwise
         """
-        expected_token = self.generate(current_user_id, secret_message)
+        expected_tokens = self.generate(current_user_id, secret_message, [(entity, method)])
         
-        return hmac.compare_digest(expected_token, token)
+        for token in tokens:
+            if hmac.compare_digest(expected_tokens[0], token):
+                return True
+                
+        return False

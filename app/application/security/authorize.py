@@ -1,4 +1,5 @@
 from functools import wraps
+from pathlib import Path
 
 from app.application.security.auth_hash import AuthHash
 from app.application.exceptions.auth import AuthHashVerificationError
@@ -14,9 +15,11 @@ def authorize(func):
         caller_id = AuthContext.get()
         hash_val = HashContext.get()
         secret_message = SecretMessageContext.get()
-
+        entity = Path(func.__globals__["__file__"]).parent.name
+        methon = Path(func.__globals__["__file__"]).name
         auth_hash = AuthHash(SecurityConstants.AUTH_SECRET)
-        if not auth_hash.verify(hash_val, caller_id, secret_message):
+        
+        if not auth_hash.verify(hash_val, caller_id, secret_message, entity, methon):
             raise AuthHashVerificationError("Auth hash verification failed")
 
         return func(*args, **kwargs)

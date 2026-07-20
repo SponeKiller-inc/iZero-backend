@@ -15,3 +15,7 @@ class InvalidHashFormatError(ApplicationError):
 class AuthHashVerificationError(ApplicationError):
     """Specific error indicating that the auth hash verification has failed."""
     pass
+
+class UnauthenticatedUserError(ApplicationError):
+    """Specific error indicating that user is not authenticated."""
+    pass
