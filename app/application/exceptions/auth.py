@@ -19,3 +19,7 @@ class AuthHashVerificationError(ApplicationError):
 class UnauthenticatedUserError(ApplicationError):
     """Specific error indicating that user is not authenticated."""
     pass
+
+class AssignRolePermissionError(ApplicationError):
+    """Specific error indicating that the role permission assignment has failed."""
+    pass
