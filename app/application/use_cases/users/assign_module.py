@@ -26,7 +26,7 @@ class AssignModule:
         self.module_repository = module_repository
         self.user_module_repository = user_module_repository
         self.time_provider = time_provider
-    @authorize('user:module:create')
+    @authorize
     def execute(self, dto: AssignModuleIn) -> None:
         """
         Assign module to user
