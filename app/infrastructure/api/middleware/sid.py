@@ -8,7 +8,7 @@ from app.application.exceptions.user import UserNotFoundError
 from app.infrastructure.services.time_provider import SystemTimeProvider
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.session import AlchemySessionRepository
-from app.infrastructure.repositories.user import AlchemyUserRepository
+from app.infrastructure.repositories.user.user import AlchemyUserRepository
 
 
 

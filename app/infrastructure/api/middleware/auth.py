@@ -9,7 +9,7 @@ from app.infrastructure.services.jwt_access_token_generator import JwtAccessToke
 
 class AuthMiddleware(BaseHTTPMiddleware):
     """
-    Middleware for authentication user
+    Middleware for authorization user
     """
     def __init__(self, app):
         super().__init__(app)

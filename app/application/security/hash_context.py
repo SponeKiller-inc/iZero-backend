@@ -1,13 +1,13 @@
 from contextvars import ContextVar
 
 class HashContext:
-    _hash_ctx: ContextVar[str | None] = ContextVar(
+    _hash_ctx: ContextVar[list[str]] = ContextVar(
         "hash",
-        default=None
+        default=[]
     )
 
     @classmethod
-    def set(cls, hash_val: str) -> None:
+    def set(cls, hash_val: list[str]) -> None:
         """
         Set hash context for current request
         
@@ -17,12 +17,12 @@ class HashContext:
         cls._hash_ctx.set(hash_val)
 
     @classmethod
-    def get(cls) -> str | None:
+    def get(cls) -> list[str]:
         """
         Get hash from hash context
 
         Returns:
-            hash or None if not set
+            hash or empty list if not set
         """
         return cls._hash_ctx.get()  
 
@@ -31,4 +31,4 @@ class HashContext:
         """
         Clear hash context
         """
-        cls._hash_ctx.set(None)
+        cls._hash_ctx.set([])

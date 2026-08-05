@@ -1,30 +1,33 @@
-from app.infrastructure.models.user.users import UserModel
+from datetime import datetime
+
 from app.domain.users.entities.user_role import UserRole
-from app.domain.shared.constants.role_type import RoleType
 from app.infrastructure.models.user.user_roles import UserRoleModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 
 class AlchemyUserRoleRepository(BaseAlchemyRepository):
-    def get_user_role(self, user_id: int, role: RoleType) -> UserRole | None:
+    def get(self, user_id: int, ref_date: datetime) -> list[UserRole]:
 
-        user_role_model = (
+        user_role_models = (
             self.db
                 .query(UserRoleModel)
                 .filter(
                     UserRoleModel.user_id == user_id,
-                    UserRoleModel.role == role,
+                    UserRoleModel.valid_at(ref_date)
                 )
-                .first()
+                .all()
         )
 
-        if user_role_model is None:
-            return None
+        if not user_role_models:
+            return []
         
-        return UserRole(
-            id=user_role_model.id,
-            user_id=user_role_model.user_id,
-            role=user_role_model.role,
-        )   
+        return [
+            UserRole(
+                id=user_role.id,
+                user_id=user_role.user_id,
+                role=user_role.role,
+            )
+            for user_role in user_role_models
+        ]
     
     def save(self, user_role: UserRole) -> UserRole:
         """
