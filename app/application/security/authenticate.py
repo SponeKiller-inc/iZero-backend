@@ -37,17 +37,14 @@ class Authenticate:
         Authenticate user and set hash context
 
         Args:
-            user_id: User ID of who is accessing resource
+            user_id: User id
+        
+        Raises:
+            UnauthenticatedUserError: If user is not authenticated
         """
-        current_user_id = AuthContext.get()
 
-        if current_user_id is None:
+        if user_id is None:
             raise UnauthenticatedUserError("You are not authenticated")
-
-        if current_user_id != user_id:
-            raise UnauthenticatedUserError(
-                "You dont have permission to access this user"
-            )
 
         auth_hash = AuthHash(SecurityConstants.AUTH_SECRET)
         entities_methods: list[tuple[str, str]] = []
