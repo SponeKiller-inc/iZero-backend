@@ -24,7 +24,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
             UserRole(
                 id=user_role.id,
                 user_id=user_role.user_id,
-                role=user_role.role,
+                role_id=user_role.role_id,
             )
             for user_role in user_role_models
         ]
@@ -58,7 +58,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
                
         user_model = UserRoleModel(
             user_id=user_role.user_id,
-            role=user_role.role,
+            role_id=user_role.role_id,
         )
         self.db.add(user_model)
         self.db.commit()
@@ -67,7 +67,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         return UserRole(
             id=user_model.id,
             user_id=user_model.user_id,
-            role=user_model.role,
+            role_id=user_model.role_id,
         )
 
     def _update(self, user_role: UserRole) -> UserRole:
@@ -89,7 +89,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         )
 
         updated_user_role.user_id = user_role.user_id
-        updated_user_role.role = user_role.role
+        updated_user_role.role_id = user_role.role_id
 
         self.db.commit()
         self.db.refresh(updated_user_role)
@@ -97,5 +97,5 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         return UserRole(
             id=updated_user_role.id,
             user_id=updated_user_role.user_id,
-            role=updated_user_role.role, 
+            role_id=updated_user_role.role_id, 
         )

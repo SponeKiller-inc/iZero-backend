@@ -2,15 +2,14 @@ from datetime import datetime
 from typing import Protocol
 
 from app.domain.auth.entities.role_permission import RolePermission
-from app.domain.shared.value_objects.role import Role
 
 class RolePermissionRepository(Protocol):
-    def get(self, role: Role, ref_date: datetime) -> list[RolePermission]:
+    def get(self, role_id: int, ref_date: datetime) -> list[RolePermission]:
         """
         Get role permissions by role and reference date
 
         Args:
-            role: Role
+            role_id: role ide 
             ref_date: Reference date
         
         Returns:

@@ -1,18 +1,17 @@
 from app.domain.shared.value_objects.period import ValidityPeriod
 from datetime import datetime
 from app.domain.auth.entities.role_permission import RolePermission
-from app.domain.shared.value_objects.role import Role
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 from app.infrastructure.models.auth.role_permission import RolePermissionModel
 
 class AlchemyRolePermissionRepository(BaseAlchemyRepository):
-    def get(self, role: Role, ref_date: datetime) -> list[RolePermission]:
+    def get(self, role_id: int, ref_date: datetime) -> list[RolePermission]:
 
         role_permission_models = (
             self.db
                 .query(RolePermissionModel)
                 .filter(
-                    RolePermissionModel.role_type == role.type,
+                    RolePermissionModel.role_id == role_id,
                     RolePermissionModel.valid_at(ref_date),
                 )
                 .all()
@@ -24,7 +23,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
         return [
             RolePermission(
                 id=role_permission.id,
-                role=role_permission.role,
+                role_id=role_permission.role_id,
                 permission_code=role_permission.permission_code,
                 validity=ValidityPeriod(
                     role_permission.valid_from,
@@ -60,7 +59,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
             RolePermission: newly created role permission
         """
         role_permission_model = RolePermissionModel(
-            role_type=role_permission.role.type,
+            role_id=role_permission.role_id,
             entity_type=role_permission.permission_code.entity.type,
             method=role_permission.permission_code.method,
             valid_from=role_permission.validity.valid_from,
@@ -72,7 +71,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
 
         return RolePermission(
             id=role_permission_model.id,
-            role=role_permission.role,
+            role_id=role_permission.role_id,
             permission_code=role_permission.permission_code,
             validity=role_permission.validity,
         )
@@ -94,7 +93,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
                 .first()      
         )
 
-        updated_model.role_type = role_permission.role.type
+        updated_model.role_id = role_permission.role_id
         updated_model.entity_type = role_permission.permission_code.entity.type
         updated_model.method = role_permission.permission_code.method
         updated_model.valid_from = role_permission.validity.valid_from
@@ -105,7 +104,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
 
         return RolePermission(
             id=updated_model.id,
-            role=role_permission.role,
+            role_id=role_permission.role_id,
             permission_code=role_permission.permission_code,
             validity=role_permission.validity,
         )

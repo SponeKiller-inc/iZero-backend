@@ -2,10 +2,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
-from app.infrastructure.types.identification import (
-    RegistrationNumber,
-    BusinessTaxNumber,
-)
+from sqlalchemy import String
 
 class BusinessCustomerModel(Base):
     __tablename__ = "business_customers"
@@ -16,8 +13,8 @@ class BusinessCustomerModel(Base):
         unique=True,
     )
     name: Mapped[str] = mapped_column()
-    registration_number: Mapped[RegistrationNumber] = mapped_column()
-    tax_number: Mapped[BusinessTaxNumber] = mapped_column()
+    registration_number: Mapped[str] = mapped_column(String(50))
+    tax_number: Mapped[str] = mapped_column(String(50))
     is_vat_payer: Mapped[bool] = mapped_column(default=False)
     phone_id: Mapped[int] = mapped_column(ForeignKey("phones.id"))
     email_id: Mapped[int] = mapped_column(ForeignKey("emails.id"))

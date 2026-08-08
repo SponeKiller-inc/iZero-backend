@@ -23,11 +23,13 @@ class ValidityMixin:
         sort_order=997,
     )
 
-    validity: Mapped[ValidityPeriod] = composite(
-        ValidityPeriod, 
-        valid_from, 
-        valid_to
-    )
+    @declared_attr
+    def validity(cls) -> Mapped[ValidityPeriod]:
+        return composite(
+            ValidityPeriod, 
+            cls.valid_from, 
+            cls.valid_to
+        )
 
     @classmethod
     def valid_at(cls, ref_date: datetime):

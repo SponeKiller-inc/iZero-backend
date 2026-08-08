@@ -2,9 +2,8 @@ from __future__ import annotations
 from typing import Self
 from datetime import datetime
 
-from app.domain.shared.value_objects.role import Role
+from app.domain.shared.entities.role import Role
 from app.domain.shared.value_objects.period import ValidityPeriod
-from app.domain.shared.constants.role_type import RoleType
 
 class UserRole:
     """
@@ -20,12 +19,12 @@ class UserRole:
         self,
         id: int,
         user_id: int,
-        role: Role,
+        role_id: int,
         validity: ValidityPeriod
     ):
         self.id = id
         self.user_id = user_id
-        self.role = role
+        self.role_id = role_id
         self.validity = validity
 
     @classmethod
@@ -48,7 +47,7 @@ class UserRole:
         return cls(
             id=0,
             user_id=user_id,
-            role=Role(RoleType.REGULAR),
+            role_id=1,
             validity=ValidityPeriod(current_time)
         )
     

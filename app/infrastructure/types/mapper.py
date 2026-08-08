@@ -3,6 +3,7 @@ from sqlalchemy import String, Integer
 from sqlalchemy.types import TypeDecorator
 
 class ValueObjectType(TypeDecorator):
+    impl = String  # Dummy impl to satisfy SQLAlchemy's class-level check
     cache_ok = True
 
     def __init__(self, cls: Type[Any], *args: Any, **kwargs: Any):

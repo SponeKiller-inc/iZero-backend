@@ -4,11 +4,11 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-from app.database.base import Base
+from app.infrastructure.database.base import Base
 # F401 -> tag for lint test, import is used
-import app.models # noqa: F401
+import app.infrastructure.models # noqa: F401
 
-from app.utils.config import settings
+from app.infrastructure.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

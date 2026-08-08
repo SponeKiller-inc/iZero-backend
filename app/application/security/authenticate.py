@@ -57,7 +57,7 @@ class Authenticate:
         # Generate hashes for every use-case, that user can access
         for user_role in user_roles:
             role_permissions = self.role_permission_repository.get(
-                user_role.role,
+                user_role.role_id,
                 self.time_provider.now(),
             )
             for role_permission in role_permissions:

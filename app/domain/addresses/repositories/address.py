@@ -1,12 +1,36 @@
-from abc import ABC, abstractmethod
+from typing import Protocol, Optional
+from app.domain.addresses.entities.address import Address
 
-from app.domain.entity.address import Address
+class AddressRepository(Protocol):
+    def get(self, address_id: int) -> Optional[Address]:
+        """
+        Get address by ID
+        
+        Args:
+            address_id: Address ID
+            
+        Returns:
+            Address entity if found, else None
+        """
+        ...
 
-class IAddressRepository(ABC):
-    @abstractmethod
-    def get_address(self, address_id: int) -> Address | None:
-        pass
-
-    @abstractmethod
-    def get_all_addresses(self) -> list[Address] | list:
-        pass
+    def get_all(self) -> list[Address]:
+        """
+        Get all addresses
+        
+        Returns:
+            List of Address entities
+        """
+        ...
+        
+    def save(self, address: Address) -> Address:
+        """
+        Save new or existing address
+        
+        Args:
+            address: Address entity to save
+            
+        Returns:
+            Saved address entity
+        """
+        ...

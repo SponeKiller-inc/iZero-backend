@@ -1,20 +1,40 @@
-from abc import ABC, abstractmethod
+from typing import Protocol, Optional
+from app.domain.customers.entities.customer import Customer
 
-from app.models.user_roles import UserRoles
+class CustomerRepository(Protocol):
+    def get(self, user_id: int, customer_id: int) -> Optional[list[Customer]]:
+        """
+        Get customer by user ID and customer ID
+        
+        Args:
+            user_id: User ID
+            customer_id: Customer ID
+            
+        Returns:
+            Customer if found, else None
+        """
+        ...
 
-class ICustomerRepository(ABC):
-    @abstractmethod
-    def get(self, user_id: int, customer_id: int) -> list['Customers'] | None: # type: ignore
-        pass
+    def get_all(self, user_id: int) -> Optional[str]:
+        """
+        Get all customers by user ID
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            Customer data if found
+        """
+        ...
 
-    @abstractmethod
-    def get_all(self, user_id: int) -> str | None:
-        pass
-
-    @abstractmethod
-    def add(self, new_customer: 'Customers') -> 'Customers': # type: ignore
-        pass
-
-    @abstractmethod
-    def update(self, user_id: int, role_type_id: int) -> UserRoles:
-        pass
+    def save(self, customer: Customer) -> Customer:
+        """
+        Save new or existing customer
+        
+        Args:
+            customer: Customer entity to save
+            
+        Returns:
+            Saved customer entity
+        """
+        ...

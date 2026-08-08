@@ -1,7 +1,7 @@
 from typing import Self
 from datetime import datetime
 
-from app.domain.shared.value_objects.role import Role
+from app.domain.shared.entities.role import Role
 from app.domain.auth.value_object.permission_code import PermissionCode
 from app.domain.shared.value_objects.period import ValidityPeriod
 
@@ -12,7 +12,7 @@ class RolePermission:
     
     Attributes:
         id: The role permission ID.
-        role: The role.
+        role_id: The role id.
         permission_code: The permission code.
         validity: The validity period.
     """
@@ -20,19 +20,19 @@ class RolePermission:
     def __init__(
         self,   
         id: int, 
-        role: Role,
+        role_id: int,
         permission_code: PermissionCode,
         validity: ValidityPeriod       
     ):
         self.id = id
-        self.role = role
+        self.role_id = role_id
         self.permission_code = permission_code
         self.validity = validity
 
     @classmethod
     def create_permission(
         cls,
-        role: Role,
+        role_id: int,
         permission_code: PermissionCode,
         current_time: datetime
     ) -> Self:
@@ -40,7 +40,7 @@ class RolePermission:
         Creates a new role permission.
 
         Args:
-            role: The role.
+            role_id: The role id.
             permission_code: The permission code.
             current_time: The current time.
         
@@ -49,7 +49,7 @@ class RolePermission:
         """
         return cls(
             id=0,
-            role=role,
+            role_id=role_id,
             permission_code=permission_code,
             validity=ValidityPeriod(valid_from=current_time)
         )

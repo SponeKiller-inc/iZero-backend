@@ -5,17 +5,18 @@ from app.application.constants.use_case import UseCase
 from app.application.exceptions.auth import AssignRolePermissionError
 from app.domain.auth.value_object.permission_code import PermissionCode
 from app.domain.shared.constants.entity_type import EntityType
-from app.domain.shared.constants.role_type import RoleType
-from app.domain.shared.value_objects.role import Role
+from app.domain.shared.entities.role import Role
 from app.domain.shared.value_objects.entity import Entity
 from app.domain.auth.entities.role_permission import RolePermission
 from app.domain.auth.repositories.role_permission import RolePermissionRepository
+from app.domain.shared.repositories.role import RoleRepository
 
 class AssignRolePermission:
 
     def __init__(
         self,
         role_permission_repository: RolePermissionRepository,
+        role_repository: RoleRepository,
         time_provider: TimeProvider
     ) -> None:
         """
@@ -23,9 +24,11 @@ class AssignRolePermission:
 
         Args:
             role_permission_repository: Role permission repository
+            role_repository: Role repository
             time_provider: Time provider
         """
         self.role_permission_repository = role_permission_repository
+        self.role_repository = role_repository
         self.time_provider = time_provider
 
     @authorize
@@ -44,14 +47,14 @@ class AssignRolePermission:
         if not EntityType.has_member(dto.entity.upper()):
             raise AssignRolePermissionError('Entity dos not exists')
         
-        if not RoleType.has_member(dto.role.upper()):
-            raise AssignRolePermissionError('Role dos not exists')
+        role = self.role_repository.get(dto.role_id)
+        if not role:
+            raise AssignRolePermissionError('Role does not exist')
 
-        role = Role(RoleType[dto.role])
         entity = Entity(EntityType[dto.entity])
 
         permission_role = RolePermission.create_permission(
-            role=role,
+            role_id=dto.role_id,
             permission_code=PermissionCode(
                 entity=entity,
                 method=UseCase.get_member(use_case_name)

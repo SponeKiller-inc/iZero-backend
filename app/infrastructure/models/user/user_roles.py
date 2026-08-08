@@ -8,5 +8,4 @@ class UserRoleModel(Base, ValidityMixin):
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    role_type_id: Mapped[int] = mapped_column(ForeignKey("role_types.id", ondelete="CASCADE"))
-    
+    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
