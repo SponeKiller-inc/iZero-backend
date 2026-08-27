@@ -15,6 +15,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next):        
+        request.state.user_id = None
+
         # 1. Extraction from RQ
         jwt_token = await TokenProvider.extract_access_token(request)
         
@@ -31,5 +33,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
             )
             
         AuthContext.set(payload.user_id)
-         
+        request.state.user_id = payload.user_id
+
         return await call_next(request)

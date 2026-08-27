@@ -16,14 +16,14 @@ class Module:
         module_group_id (int): Module group ID.
         validity (ValidityPeriod): Validity period of the module.
     """
-    id: int
+    id: int | None
     name: str
     module_group_id: int
     validity: ValidityPeriod
 
     @classmethod
     def create(
-        self, 
+        cls, 
         name: str, 
         module_group_id: int,
         valid_from: datetime,
@@ -39,7 +39,7 @@ class Module:
         Returns:
             New module
         """
-        return Module(0, name, module_group_id, ValidityPeriod(valid_from))
+        return cls(None, name, module_group_id, ValidityPeriod(valid_from))
 
     def is_active(self, current_time: datetime) -> bool:
         """

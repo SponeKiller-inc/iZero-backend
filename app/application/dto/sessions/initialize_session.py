@@ -9,11 +9,11 @@ class InitializeSessionIn:
     user_id: Optional[int]
     ip_address: str
     user_agent: str
-    external_id: int
+    external_id: Optional[str]
 
 @dataclass
 class InitializeSessionOut:
     """
     Output DTO for InitializeSession use-case
     """
-    external_id: int
+    external_id: str

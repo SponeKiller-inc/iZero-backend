@@ -14,6 +14,7 @@ from app.infrastructure.database.session import get_db
 from app.infrastructure.api.schemas.user import user as schema
 from app.infrastructure.services.passlib_password_hasher import PasslibPasswordHasher
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
+from app.infrastructure.repositories.user.user_role import AlchemyUserRoleRepository
 from app.infrastructure.services.time_provider import SystemTimeProvider
 from app.infrastructure.providers.auth_google import GoogleIdentityProvider
 from app.infrastructure.config import settings
@@ -29,7 +30,7 @@ async def register_local(
 ):
     # Initialize registration local
     user_repository = AlchemyUserRepository(db)
-    user_role_repository = AlchemyUserRepository(db)
+    user_role_repository = AlchemyUserRoleRepository(db)
     password_hasher = PasslibPasswordHasher()
     time_provider = SystemTimeProvider()
 
@@ -61,7 +62,7 @@ async def register_google(
 ):
     # Initialize registration oauth
     user_repository = AlchemyUserRepository(db)
-    user_role_repository = AlchemyUserRepository(db)
+    user_role_repository = AlchemyUserRoleRepository(db)
     identity_provider = GoogleIdentityProvider(
         client_id=settings.GOOGLE_CLIENT_ID
     )

@@ -1,7 +1,6 @@
 from typing import Self
 from datetime import datetime
 
-from app.domain.shared.entities.role import Role
 from app.domain.auth.value_object.permission_code import PermissionCode
 from app.domain.shared.value_objects.period import ValidityPeriod
 
@@ -19,7 +18,7 @@ class RolePermission:
     
     def __init__(
         self,   
-        id: int, 
+        id: int | None, 
         role_id: int,
         permission_code: PermissionCode,
         validity: ValidityPeriod       
@@ -48,7 +47,7 @@ class RolePermission:
             The new role permission.
         """
         return cls(
-            id=0,
+            id=None,
             role_id=role_id,
             permission_code=permission_code,
             validity=ValidityPeriod(valid_from=current_time)
@@ -61,4 +60,7 @@ class RolePermission:
         Args:
             current_time: The current time.
         """
-        self.validity.set_valid_to(current_time)
+        self.validity = ValidityPeriod(
+            valid_from=self.validity.valid_from,
+            valid_to=current_time
+        )

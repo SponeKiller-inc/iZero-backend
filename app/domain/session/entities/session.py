@@ -5,7 +5,7 @@ import uuid
 
 from app.domain.shared.value_objects.period import ValidityPeriod
 from app.application.ports.time_provider import TimeProvider
-from app.domain.session.constants.session_event import SessionEvent
+from app.domain.session.value_objects.session_event import SessionEvent
 from app.domain.session.exceptions.session import SessionExpiredError
 
 
@@ -116,8 +116,9 @@ class Session:
         Args:
             time_provider (TimeProvider): The time provider.
         """
+        now = time_provider.now()
         self.validity = ValidityPeriod(
             valid_from=self.validity.valid_from, 
-            valid_to=time_provider.now()
+            valid_to=now
         )
-        self.record_event("user_logged_out", time_provider.now())
+        self.record_event("user_logged_out", now)

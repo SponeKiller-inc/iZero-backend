@@ -18,7 +18,7 @@ class User:
     
     def __init__(
         self,   
-        id: int, 
+        id: int | None, 
         email: str,
         provider: RegistrationSource,
         password: Optional[str] = None, 
@@ -40,7 +40,7 @@ class User:
         Creates a new user locally.
         """
         return cls(
-            id=0,
+            id=None,
             email=email,
             provider=RegistrationSource(RegistrationSourceType.LOCAL),
             password=password,
@@ -56,7 +56,7 @@ class User:
         Creates a new user via oauth provider.
         """
         return cls(
-            id=0,
+            id=None,
             email=email,
             provider=RegistrationSource(RegistrationSourceType.OAUTH),
             provider_user_id=provider_user_id,

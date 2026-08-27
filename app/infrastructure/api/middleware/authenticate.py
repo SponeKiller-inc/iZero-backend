@@ -1,10 +1,9 @@
 from app.infrastructure.api.schemas.message_id import MessageId
-from app.infrastructure.api.schemas.base import ResponseContainer
+from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
 from app.application.security.auth_context import AuthContext
 from app.application.exceptions.auth import UnauthenticatedUserError
 from app.infrastructure.services.time_provider import SystemTimeProvider
 from fastapi import Request, status
-from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.application.security.authenticate import Authenticate
@@ -21,6 +20,9 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         
+        if AuthContext.get() is None:
+            return await call_next(request)
+
         db = next(get_db())
         user_role_repository = AlchemyUserRoleRepository(db)
         role_permission_repository = AlchemyRolePermissionRepository(db)
@@ -36,10 +38,10 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
             authenticate.execute(AuthContext.get())
         except UnauthenticatedUserError as e:
             return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
                 content=ResponseContainer(
                     message_id=MessageId.AUTH_NOT_AUTHENTICATED,
                 ),
+                status_code=status.HTTP_401_UNAUTHORIZED,
             )
          
         return await call_next(request)

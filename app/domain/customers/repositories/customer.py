@@ -1,8 +1,8 @@
-from typing import Protocol, Optional
+from typing import Protocol
 from app.domain.customers.entities.customer import Customer
 
 class CustomerRepository(Protocol):
-    def get(self, user_id: int, customer_id: int) -> Optional[list[Customer]]:
+    def get(self, user_id: int, customer_id: int) -> Customer | None:
         """
         Get customer by user ID and customer ID
         
@@ -15,7 +15,7 @@ class CustomerRepository(Protocol):
         """
         ...
 
-    def get_all(self, user_id: int) -> Optional[str]:
+    def get_all(self, user_id: int) -> list[Customer]:
         """
         Get all customers by user ID
         
@@ -23,7 +23,7 @@ class CustomerRepository(Protocol):
             user_id: User ID
             
         Returns:
-            Customer data if found
+            List of customers, empty if none found
         """
         ...
 

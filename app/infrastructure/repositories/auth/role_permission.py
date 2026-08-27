@@ -43,7 +43,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
         Returns:
             RolePermission: newly created or updated role permission
         """
-        if not role_permission.id:
+        if role_permission.id is None:
             return self._insert(role_permission)
         else:
             return self._update(role_permission)

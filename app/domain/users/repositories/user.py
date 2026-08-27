@@ -1,8 +1,8 @@
-from typing import Protocol, Optional
+from typing import Protocol
 from app.domain.users.entities.user import User
 
 class UserRepository(Protocol):
-    def get(self, user_id: str) -> Optional[User]:
+    def get(self, user_id: int) -> User | None:
         """
         Get user by ID
         
@@ -14,7 +14,7 @@ class UserRepository(Protocol):
         """
         ...
 
-    def get_local(self, email: str) -> Optional[User]:
+    def get_local(self, email: str) -> User | None:
         """
         Get local user by email
         
@@ -26,7 +26,7 @@ class UserRepository(Protocol):
         """
         ...
 
-    def get_oauth_user(self, provider_user_id: str) -> Optional[User]:
+    def get_oauth_user(self, provider_user_id: str) -> User | None:
         """
         Get OAuth user by provider user ID
         

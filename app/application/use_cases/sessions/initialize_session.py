@@ -43,26 +43,26 @@ class InitializeSession:
             UserNotFoundError: user with such id doesn't exist
         """
         # 1. Check if user exists
-        if dto.user_id > 0:
-            user_exists = self.user_repository.exists_user(dto.user_id)
+        if dto.user_id is not None and dto.user_id > 0:
+            user = self.user_repository.get(dto.user_id)
 
-            if not user_exists:
+            if user is None:
                 raise UserNotFoundError
         
 
         # 2. Check if session is not expired
-        if dto.external_id > 0:
+        if dto.external_id:
             session = self.session_repository.get_by_external_id(dto.external_id)
 
-            if session and not session.is_expired(self.time_provider):
+            if session and not session.is_expired(self.time_provider.now()):
                 return session
 
         # 3. Invalidate user last session 
-        if dto.user_id > 0:
+        if dto.user_id is not None and dto.user_id > 0:
             last_session = self.session_repository.get_last_user_session(dto.user_id)
             if last_session is not None:
                 last_session.expire_now(self.time_provider)
-                self.session_repository.update(last_session)
+                self.session_repository.save(last_session)
 
         # 4. Create new a return 
         session = Session.create_new(

@@ -6,7 +6,7 @@ class UserModule:
     """
     Represents a module assigned to a user.
     """
-    def __init__(self, id: int, user_id: int, module_id: int, validity: ValidityPeriod):
+    def __init__(self, id: int | None, user_id: int, module_id: int, validity: ValidityPeriod):
         self.id = id
         self.user_id = user_id
         self.module_id = module_id
@@ -16,7 +16,7 @@ class UserModule:
     def assign(cls, user_id: int, module_id: int, validity: ValidityPeriod) -> 'UserModule':
         """Assign module to user"""
         return cls(
-            id=0,
+            id=None,
             user_id=user_id,
             module_id=module_id,
             validity=validity

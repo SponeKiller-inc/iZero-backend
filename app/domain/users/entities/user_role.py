@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import Self
 from datetime import datetime
 
-from app.domain.shared.entities.role import Role
 from app.domain.shared.value_objects.period import ValidityPeriod
+from app.domain.shared.constants.role_type import REGULAR_ROLE_ID
 
 class UserRole:
     """
@@ -17,7 +17,7 @@ class UserRole:
     """
     def __init__(
         self,
-        id: int,
+        id: int | None,
         user_id: int,
         role_id: int,
         validity: ValidityPeriod
@@ -45,9 +45,9 @@ class UserRole:
             UserRole: The newly created user role.
         """
         return cls(
-            id=0,
+            id=None,
             user_id=user_id,
-            role_id=1,
+            role_id=REGULAR_ROLE_ID,
             validity=ValidityPeriod(current_time)
         )
     

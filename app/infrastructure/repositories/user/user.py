@@ -1,11 +1,13 @@
 from sqlalchemy.orm import Session
 
 from app.domain.users.entities.user import User
+from app.domain.users.value_objects.registration_source import RegistrationSource
+from app.domain.users.constants.registration_source_type import RegistrationSourceType
 from app.infrastructure.models.user.users import UserModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 
 class AlchemyUserRepository(BaseAlchemyRepository):
-    def get(self, user_id: str) -> User | None:
+    def get(self, user_id: int) -> User | None:
         """
         Retrieve user data by id
 
@@ -29,7 +31,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         return User(
             id=user_model.id,
             email=user_model.email,
-            provider=user_model.provider,
+            provider=RegistrationSource(RegistrationSourceType(user_model.provider)),
             password=user_model.password,
             provider_user_id=user_model.provider_user_id,
         )
@@ -58,7 +60,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         return User(
             id=user_model.id,
             email=user_model.email,
-            provider=user_model.provider,
+            provider=RegistrationSource(RegistrationSourceType(user_model.provider)),
             password=user_model.password,
             provider_user_id=user_model.provider_user_id,
         )
@@ -87,7 +89,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         return User(
             id=user_model.id,
             email=user_model.email,
-            provider=user_model.provider,
+            provider=RegistrationSource(RegistrationSourceType(user_model.provider)),
             password=user_model.password,
             provider_user_id=user_model.provider_user_id,
         )
@@ -159,7 +161,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
                
         user_model = UserModel(
             email=user.email,
-            provider=user.provider,
+            provider=user.provider.value.value,
             password=user.password,
             provider_user_id=user.provider_user_id,
         )
@@ -170,7 +172,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         return User(
             id=user_model.id,
             email=user_model.email,
-            provider=user_model.provider,
+            provider=RegistrationSource(RegistrationSourceType(user_model.provider)),
             password=user_model.password,
             provider_user_id=user_model.provider_user_id, 
         )
@@ -194,7 +196,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         )
 
         updated_user.email = user.email
-        updated_user.provider = user.provider
+        updated_user.provider = user.provider.value.value
         updated_user.password = user.password
         updated_user.provider_user_id = user.provider_user_id
 
@@ -204,7 +206,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         return User(
             id=updated_user.id,
             email=updated_user.email,
-            provider=updated_user.provider,
+            provider=RegistrationSource(RegistrationSourceType(updated_user.provider)),
             password=updated_user.password,
             provider_user_id=updated_user.provider_user_id, 
         )

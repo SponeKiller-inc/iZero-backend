@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Self
 
 @dataclass(frozen=True)
@@ -16,7 +16,9 @@ class ValidityPeriod:
         ValueError: If valid_from is after valid_to.
     """
     valid_from: datetime
-    valid_to: datetime = field(default_factory=lambda: datetime(3000, 1, 1))
+    valid_to: datetime = field(
+        default_factory=lambda: datetime(3000, 1, 1, tzinfo=timezone.utc)
+    )
 
     def __post_init__(self):
         if self.valid_from > self.valid_to:

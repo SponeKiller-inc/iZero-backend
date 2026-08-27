@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from app.domain.users.entities.user_role import UserRole
+from app.domain.shared.value_objects.period import ValidityPeriod
 from app.infrastructure.models.user.user_roles import UserRoleModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 
@@ -25,6 +26,10 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
                 id=user_role.id,
                 user_id=user_role.user_id,
                 role_id=user_role.role_id,
+                validity=ValidityPeriod(
+                    valid_from=user_role.valid_from,
+                    valid_to=user_role.valid_to,
+                ),
             )
             for user_role in user_role_models
         ]
@@ -59,6 +64,8 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         user_model = UserRoleModel(
             user_id=user_role.user_id,
             role_id=user_role.role_id,
+            valid_from=user_role.validity.valid_from,
+            valid_to=user_role.validity.valid_to,
         )
         self.db.add(user_model)
         self.db.commit()
@@ -68,6 +75,10 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
             id=user_model.id,
             user_id=user_model.user_id,
             role_id=user_model.role_id,
+            validity=ValidityPeriod(
+                valid_from=user_model.valid_from,
+                valid_to=user_model.valid_to,
+            ),
         )
 
     def _update(self, user_role: UserRole) -> UserRole:
@@ -90,6 +101,8 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
 
         updated_user_role.user_id = user_role.user_id
         updated_user_role.role_id = user_role.role_id
+        updated_user_role.valid_from = user_role.validity.valid_from
+        updated_user_role.valid_to = user_role.validity.valid_to
 
         self.db.commit()
         self.db.refresh(updated_user_role)
@@ -97,5 +110,9 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         return UserRole(
             id=updated_user_role.id,
             user_id=updated_user_role.user_id,
-            role_id=updated_user_role.role_id, 
+            role_id=updated_user_role.role_id,
+            validity=ValidityPeriod(
+                valid_from=updated_user_role.valid_from,
+                valid_to=updated_user_role.valid_to,
+            ),
         )
