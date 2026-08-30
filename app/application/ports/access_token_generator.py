@@ -1,7 +1,7 @@
 from typing import Protocol
 from datetime import datetime
 
-from app.application.dto.auth import TokenPayload
+from app.application.dto.auth.token import TokenPayload
 
 class AccessTokenGenerator(Protocol):
     """Interface for access token provider"""

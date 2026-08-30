@@ -4,6 +4,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.application.security.auth_context import AuthContext
 from app.application.exceptions.auth import AccessTokenProviderError
+from app.infrastructure.config import settings
 from app.infrastructure.services.token_provider import TokenProvider
 from app.infrastructure.services.jwt_access_token_generator import JwtAccessTokenGenerator
 
@@ -13,6 +14,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
     """
     def __init__(self, app):
         super().__init__(app)
+        self._access_token_generator = JwtAccessTokenGenerator(
+            secret_key=settings.secret_key,
+            algorithm=settings.algorithm,
+        )
 
     async def dispatch(self, request: Request, call_next):        
         request.state.user_id = None
@@ -25,7 +30,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         # 2. decode jwt token
         try:
-            payload = JwtAccessTokenGenerator.decode(jwt_token) 
+            payload = self._access_token_generator.decode(jwt_token)
         except AccessTokenProviderError:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,

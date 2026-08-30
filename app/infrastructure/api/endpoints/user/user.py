@@ -64,7 +64,7 @@ async def register_google(
     user_repository = AlchemyUserRepository(db)
     user_role_repository = AlchemyUserRoleRepository(db)
     identity_provider = GoogleIdentityProvider(
-        client_id=settings.GOOGLE_CLIENT_ID
+        client_id=settings.google_oauth_client_id
     )
     time_provider = SystemTimeProvider()
 

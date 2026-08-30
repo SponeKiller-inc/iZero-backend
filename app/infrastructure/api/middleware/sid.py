@@ -61,6 +61,12 @@ class SIDMiddleware(BaseHTTPMiddleware):
 
         if request.cookies.get("sid") is None:
             # Set the sid cookie if it didn't exist
-            response.set_cookie(key="sid", value=session.external_id, httponly=True)
+            response.set_cookie(
+                key="sid",
+                value=session.external_id,
+                httponly=True,
+                secure=True,
+                samesite="lax",
+            )
         
         return response

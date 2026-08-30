@@ -1,4 +1,3 @@
-from app.domain.users.entities import user_role
 from app.domain.shared.value_objects.period import ValidityPeriod
 from datetime import datetime
 from app.infrastructure.repositories.base import BaseAlchemyRepository
@@ -30,15 +29,7 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
         )
 
         return [
-            UserModule(
-                id=user_module.id,
-                user_id=user_module.user_id,
-                module_id=user_module.module_id,
-                validity=ValidityPeriod(
-                    valid_from=user_module.valid_from,
-                    valid_to=user_module.valid_to,
-                )
-            )
+            self._to_entity(user_module)
             for user_module in user_module_model
         ]
 
@@ -74,15 +65,7 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
         if not user_module_model:
             return None
 
-        return UserModule(
-            id=user_module_model.id,
-            user_id=user_module_model.user_id,
-            module_id=user_module_model.module_id,
-            validity=ValidityPeriod(
-                valid_from=user_module_model.valid_from,
-                valid_to=user_module_model.valid_to,
-            )
-        )
+        return self._to_entity(user_module_model)
 
     def save(self, user_module: UserModule) -> UserModule:
         """
@@ -112,7 +95,6 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
         """
 
         user_module_model = UserModuleModel(
-            id=user_module.id,
             user_id=user_module.user_id,
             module_id=user_module.module_id,
             valid_from=user_module.validity.valid_from,
@@ -123,15 +105,7 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(user_module_model)
 
-        return UserModule(
-            id=user_module_model.id,
-            user_id=user_module_model.user_id,
-            module_id=user_module_model.module_id,
-            validity=ValidityPeriod(
-                valid_from=user_module_model.valid_from,
-                valid_to=user_module_model.valid_to,
-            )
-        )
+        return self._to_entity(user_module_model)
 
     def _update(self, user_module: UserModule) -> UserModule:
         """
@@ -159,6 +133,10 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(user_module_model)
 
+        return self._to_entity(user_module_model)
+
+    @staticmethod
+    def _to_entity(user_module_model: UserModuleModel) -> UserModule:
         return UserModule(
             id=user_module_model.id,
             user_id=user_module_model.user_id,
@@ -166,5 +144,5 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
             validity=ValidityPeriod(
                 valid_from=user_module_model.valid_from,
                 valid_to=user_module_model.valid_to,
-            )
+            ),
         )

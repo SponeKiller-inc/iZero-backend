@@ -1,10 +1,8 @@
 from datetime import datetime
 from app.domain.modules.entities.module_group import ModuleGroup
-from app.domain.modules.entities.module import Module
 from app.domain.shared.value_objects.period import ValidityPeriod
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 from app.infrastructure.models.module.module_group import ModuleGroupModel
-from app.infrastructure.models.module.module import ModuleModel
 
 class AlchemyModuleGroupRepository(BaseAlchemyRepository):
     def get(self, module_group_id: int, ref_date: datetime) -> list[ModuleGroup]:
@@ -29,14 +27,7 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
         if not module_group_model:
             return None
 
-        return ModuleGroup(
-            id=module_group_model.id,
-            name=module_group_model.name,
-            validity=ValidityPeriod(
-                valid_from=module_group_model.valid_from,
-                valid_to=module_group_model.valid_to,
-            ),
-        )
+        return self._to_entity(module_group_model)
 
     def save(self, module_group: ModuleGroup) -> ModuleGroup:
         """
@@ -73,14 +64,7 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(module_group_model)
 
-        return ModuleGroup(
-            id=module_group_model.id,
-            name=module_group_model.name,
-            validity=ValidityPeriod(
-                valid_from=module_group_model.valid_from,
-                valid_to=module_group_model.valid_to,
-            )
-        )
+        return self._to_entity(module_group_model)
     
     def _update(self, module_group: ModuleGroup) -> ModuleGroup:
         """
@@ -107,11 +91,15 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(module_group_model)
 
+        return self._to_entity(module_group_model)
+
+    @staticmethod
+    def _to_entity(module_group_model: ModuleGroupModel) -> ModuleGroup:
         return ModuleGroup(
             id=module_group_model.id,
             name=module_group_model.name,
             validity=ValidityPeriod(
                 valid_from=module_group_model.valid_from,
                 valid_to=module_group_model.valid_to,
-            )
+            ),
         )

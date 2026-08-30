@@ -14,8 +14,9 @@ from app.application.exceptions.auth import AuthHashVerificationError
 
 sentry_sdk.init(
     dsn=settings.sentry_dsn,
-    traces_sample_rate=1.0,
-    send_default_pii=True
+    environment=settings.sentry_environment,
+    traces_sample_rate=settings.sentry_traces_sample_rate,
+    send_default_pii=settings.sentry_send_default_pii,
 )
 
 app = FastAPI()
@@ -25,10 +26,10 @@ app = FastAPI()
 ##CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_allow_origins.split(","),
+    allow_origins=settings.cors_allow_origins,
     allow_credentials=True,
-    allow_methods=settings.cors_allow_methods.split(","),
-    allow_headers=settings.cors_allow_headers.split(","),
+    allow_methods=settings.cors_allow_methods,
+    allow_headers=settings.cors_allow_headers,
 )
 
 ##HTTP

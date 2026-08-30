@@ -1,6 +1,9 @@
 from app.domain.shared.value_objects.period import ValidityPeriod
 from datetime import datetime
 from app.domain.auth.entities.role_permission import RolePermission
+from app.domain.auth.value_object.permission_code import PermissionCode
+from app.domain.shared.value_objects.entity import Entity
+from app.domain.shared.constants.entity_type import EntityType
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 from app.infrastructure.models.auth.role_permission import RolePermissionModel
 
@@ -21,15 +24,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
             return []
 
         return [
-            RolePermission(
-                id=role_permission.id,
-                role_id=role_permission.role_id,
-                permission_code=role_permission.permission_code,
-                validity=ValidityPeriod(
-                    role_permission.valid_from,
-                    role_permission.valid_to,
-                )
-            )
+            self._to_entity(role_permission)
             for role_permission in role_permission_models
         ]
 
@@ -69,12 +64,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(role_permission_model)
 
-        return RolePermission(
-            id=role_permission_model.id,
-            role_id=role_permission.role_id,
-            permission_code=role_permission.permission_code,
-            validity=role_permission.validity,
-        )
+        return self._to_entity(role_permission_model)
 
     def _update(self, role_permission: RolePermission) -> RolePermission:
         """
@@ -102,9 +92,19 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(updated_model)
 
+        return self._to_entity(updated_model)
+
+    @staticmethod
+    def _to_entity(role_permission_model: RolePermissionModel) -> RolePermission:
         return RolePermission(
-            id=updated_model.id,
-            role_id=role_permission.role_id,
-            permission_code=role_permission.permission_code,
-            validity=role_permission.validity,
+            id=role_permission_model.id,
+            role_id=role_permission_model.role_id,
+            permission_code=PermissionCode(
+                entity=Entity(EntityType(role_permission_model.entity_type)),
+                method=role_permission_model.method,
+            ),
+            validity=ValidityPeriod(
+                role_permission_model.valid_from,
+                role_permission_model.valid_to,
+            ),
         )

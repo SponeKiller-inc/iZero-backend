@@ -24,14 +24,7 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         if session_model is None:
             return None
 
-        return Session(
-            id=session_model.id,
-            external_id=session_model.external_id,
-            validity=session_model.validity,
-            user_id=session_model.user_id,
-            ip_address=session_model.ip_address,
-            user_agent=session_model.user_agent 
-        )
+        return self._to_entity(session_model)
     
     def get_last_user_session(self, user_id: int) -> Session | None:
         """
@@ -54,14 +47,7 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         if session is None:
             return None
 
-        return Session(
-            id=session.id,
-            external_id=session.external_id,
-            validity=session.validity,
-            user_id=session.user_id,
-            ip_address=session.ip_address,
-            user_agent=session.user_agent 
-        )
+        return self._to_entity(session)
         
     def get_by_external_id(self, external_id: str) -> Session | None:
         """
@@ -86,14 +72,7 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         if session is None:
             return None
 
-        return Session(
-            id=session.id,
-            external_id=session.external_id,
-            validity=session.validity,
-            user_id=session.user_id,
-            ip_address=session.ip_address,
-            user_agent=session.user_agent 
-        )
+        return self._to_entity(session)
     
     def save(self, session: Session) -> Session:
         """
@@ -133,14 +112,7 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(session_model)
 
-        return Session(
-            id=session_model.id,
-            external_id=session_model.external_id,
-            validity=session_model.validity,
-            user_id=session_model.user_id,
-            ip_address=session_model.ip_address,
-            user_agent=session_model.user_agent 
-        )
+        return self._to_entity(session_model)
 
     def _update(self, session: Session) -> Session:
         """
@@ -169,11 +141,15 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(updated_session)
 
+        return self._to_entity(updated_session)
+
+    @staticmethod
+    def _to_entity(session_model: SessionModel) -> Session:
         return Session(
-            id=updated_session.id,
-            external_id=updated_session.external_id,
-            validity=updated_session.validity,
-            user_id=updated_session.user_id,
-            ip_address=updated_session.ip_address,
-            user_agent=updated_session.user_agent 
+            id=session_model.id,
+            external_id=session_model.external_id,
+            validity=session_model.validity,
+            user_id=session_model.user_id,
+            ip_address=session_model.ip_address,
+            user_agent=session_model.user_agent,
         )

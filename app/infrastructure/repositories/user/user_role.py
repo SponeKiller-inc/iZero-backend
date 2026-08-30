@@ -22,15 +22,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
             return []
         
         return [
-            UserRole(
-                id=user_role.id,
-                user_id=user_role.user_id,
-                role_id=user_role.role_id,
-                validity=ValidityPeriod(
-                    valid_from=user_role.valid_from,
-                    valid_to=user_role.valid_to,
-                ),
-            )
+            self._to_entity(user_role)
             for user_role in user_role_models
         ]
     
@@ -71,15 +63,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(user_model)
 
-        return UserRole(
-            id=user_model.id,
-            user_id=user_model.user_id,
-            role_id=user_model.role_id,
-            validity=ValidityPeriod(
-                valid_from=user_model.valid_from,
-                valid_to=user_model.valid_to,
-            ),
-        )
+        return self._to_entity(user_model)
 
     def _update(self, user_role: UserRole) -> UserRole:
         """
@@ -107,12 +91,16 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         self.db.commit()
         self.db.refresh(updated_user_role)
 
+        return self._to_entity(updated_user_role)
+
+    @staticmethod
+    def _to_entity(user_role_model: UserRoleModel) -> UserRole:
         return UserRole(
-            id=updated_user_role.id,
-            user_id=updated_user_role.user_id,
-            role_id=updated_user_role.role_id,
+            id=user_role_model.id,
+            user_id=user_role_model.user_id,
+            role_id=user_role_model.role_id,
             validity=ValidityPeriod(
-                valid_from=updated_user_role.valid_from,
-                valid_to=updated_user_role.valid_to,
+                valid_from=user_role_model.valid_from,
+                valid_to=user_role_model.valid_to,
             ),
         )

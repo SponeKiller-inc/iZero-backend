@@ -3,9 +3,11 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse as _JSONResponse
 from pydantic import BaseModel
 
+from app.infrastructure.api.schemas.message_id import MessageId
+
 
 class ResponseContainer[T](BaseModel):
-    message_id: Optional[str] = None
+    message_id: Optional[MessageId] = None
     message: Optional[str] = None
     data: Optional[T] = None
 
