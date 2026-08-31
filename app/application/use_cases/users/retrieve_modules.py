@@ -4,6 +4,8 @@ from app.domain.users.repositories.user_module import UserModuleRepository
 from app.domain.modules.repositories.module import ModuleRepository
 from app.domain.modules.repositories.module_group import ModuleGroupRepository
 from app.application.security.authorize import authorize
+from app.application.constants.use_case import UseCase
+from app.domain.shared.constants.entity_type import EntityType
 
 class RetrieveModules:
 
@@ -28,7 +30,7 @@ class RetrieveModules:
         self.module_group_repository = module_group_repository
         self.time_provider = time_provider
         
-    @authorize
+    @authorize(EntityType.USERS, UseCase.USERS_RETRIEVE_MODULE)
     def execute(self, user_id: int) -> list[RetrieveModulesOut]:
         """
         Retrieve modules for user
@@ -42,11 +44,12 @@ class RetrieveModules:
 
         result: list[RetrieveModulesOut] = []
 
-        user_modules = self.user_module_repository.get(user_id, self.time_provider.now())       
+        now = self.time_provider.now()
+        user_modules = self.user_module_repository.get(user_id, now)
 
         for user_module in user_modules:
-            module = self.module_repository.get(user_module.module_id)
-            module_group = self.module_group_repository.get(module.module_group_id)
+            module = self.module_repository.get(user_module.module_id, now)
+            module_group = self.module_group_repository.get(module.module_group_id, now)
 
             for module_group in result:
                 if module_group.module_group_id == module.module_group_id:

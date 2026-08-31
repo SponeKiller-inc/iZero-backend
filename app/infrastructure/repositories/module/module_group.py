@@ -5,7 +5,7 @@ from app.infrastructure.repositories.base import BaseAlchemyRepository
 from app.infrastructure.models.module.module_group import ModuleGroupModel
 
 class AlchemyModuleGroupRepository(BaseAlchemyRepository):
-    def get(self, module_group_id: int, ref_date: datetime) -> list[ModuleGroup]:
+    def get(self, module_group_id: int, ref_date: datetime) -> ModuleGroup | None:
         """
         Get module group by id
         

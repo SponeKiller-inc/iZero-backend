@@ -4,7 +4,7 @@ from typing import Protocol
 from app.domain.modules.entities.module import Module
 
 class ModuleRepository(Protocol):
-    def get(self, module_id: int, ref_date: datetime) -> list[Module]:
+    def get(self, module_id: int, ref_date: datetime) -> Module | None:
         """
         Get module by id
 

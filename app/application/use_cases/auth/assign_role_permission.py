@@ -1,4 +1,4 @@
-from app.application.security import authorize
+from app.application.security.authorize import authorize
 from app.application.ports.time_provider import TimeProvider
 from app.application.dto.auth.role_permission import AssignRolePermissionIn
 from app.application.constants.use_case import UseCase
@@ -31,7 +31,7 @@ class AssignRolePermission:
         self.role_repository = role_repository
         self.time_provider = time_provider
 
-    @authorize
+    @authorize(EntityType.AUTH, UseCase.AUTH_ASSIGN_ROLE_PERMISSION)
     def execute(self, dto: AssignRolePermissionIn) -> None:
         """
         Assign permission to role.
@@ -51,7 +51,7 @@ class AssignRolePermission:
         if not role:
             raise AssignRolePermissionError('Role does not exist')
 
-        entity = Entity(EntityType[dto.entity])
+        entity = Entity(EntityType[dto.entity.upper()])
 
         permission_role = RolePermission.create_permission(
             role_id=dto.role_id,

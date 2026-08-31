@@ -1,4 +1,4 @@
-from app.application.security import authorize
+from app.application.security.authorize import authorize
 from app.application.exceptions.user import UserModuleNotAssignedError
 from app.domain.users.repositories.user_module import UserModuleRepository
 from app.application.ports.time_provider import TimeProvider
@@ -6,6 +6,8 @@ from app.application.dto.user.assign_module import AssignModuleIn
 from app.domain.modules.repositories.module import ModuleRepository
 from app.domain.users.entities.user_module import UserModule
 from app.domain.shared.value_objects.period import ValidityPeriod
+from app.application.constants.use_case import UseCase
+from app.domain.shared.constants.entity_type import EntityType
 
 class AssignModule:
 
@@ -26,7 +28,8 @@ class AssignModule:
         self.module_repository = module_repository
         self.user_module_repository = user_module_repository
         self.time_provider = time_provider
-    @authorize
+
+    @authorize(EntityType.USERS, UseCase.USERS_ASSIGN_MODULE)
     def execute(self, dto: AssignModuleIn) -> None:
         """
         Assign module to user
@@ -38,23 +41,23 @@ class AssignModule:
             UserModuleNotAssignedError: If user already exists
         """
         # Validation
-        module = self.module_repository.get(dto.module_id)
+        now = self.time_provider.now()
+        expiration = self.time_provider.get_expiration(days=dto.duration_days)
+        module = self.module_repository.get(dto.module_id, now)
 
-        if not module.is_active(self.time_provider.now()):
+        if not module.is_active(now):
             raise UserModuleNotAssignedError("Module is not active")
 
-        if not module.is_active(
-            self.time_provider.get_expiration(days=dto.duration_days)
-        ):
+        if not module.is_active(expiration):
             raise UserModuleNotAssignedError(
                 "Module will not be valid at the end of the validity period"
             )
 
-        user_modules = self.user_module_repository.get(dto.user_id)
+        user_modules = self.user_module_repository.get(dto.user_id, now)
         
         validity = ValidityPeriod(
-            valid_from=self.time_provider.now(),
-            valid_to=self.time_provider.get_expiration(days=dto.duration_days)
+            valid_from=now,
+            valid_to=expiration
         )
 
         for user_module in user_modules:

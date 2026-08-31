@@ -3,8 +3,8 @@ from typing import Self
 
 
 class UseCase(str, Enum):
-    USER_ASSIGN_MODULE = "assign_module"
-    USER_RETRIEVE_MODULE = "retrieve_module"
+    USERS_ASSIGN_MODULE = "assign_module"
+    USERS_RETRIEVE_MODULE = "retrieve_module"
     AUTH_ASSIGN_ROLE_PERMISSION = "assign_role_permission"
 
     @classmethod
