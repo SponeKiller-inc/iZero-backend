@@ -9,7 +9,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.application.security.authenticate import Authenticate
 from app.infrastructure.repositories.user.user_role import AlchemyUserRoleRepository
 from app.infrastructure.repositories.auth.role_permission import AlchemyRolePermissionRepository
-from app.infrastructure.database.session import get_db
+from app.infrastructure.database.session import session_local
 
 class AuthenticateMiddleware(BaseHTTPMiddleware):
     """
@@ -23,25 +23,25 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
         if AuthContext.get() is None:
             return await call_next(request)
 
-        db = next(get_db())
-        user_role_repository = AlchemyUserRoleRepository(db)
-        role_permission_repository = AlchemyRolePermissionRepository(db)
-        time_provider = SystemTimeProvider()      
-        
-        authenticate = Authenticate(
-            user_role_repository,
-            role_permission_repository,
-            time_provider
-        )
-
-        try:
-            authenticate.execute(AuthContext.get())
-        except UnauthenticatedUserError as e:
-            return JSONResponse(
-                content=ResponseContainer(
-                    message_id=MessageId.AUTH_NOT_AUTHENTICATED,
-                ),
-                status_code=status.HTTP_401_UNAUTHORIZED,
+        with session_local() as db:
+            user_role_repository = AlchemyUserRoleRepository(db)
+            role_permission_repository = AlchemyRolePermissionRepository(db)
+            time_provider = SystemTimeProvider()      
+            
+            authenticate = Authenticate(
+                user_role_repository,
+                role_permission_repository,
+                time_provider
             )
+
+            try:
+                authenticate.execute(AuthContext.get())
+            except UnauthenticatedUserError as e:
+                return JSONResponse(
+                    content=ResponseContainer(
+                        message_id=MessageId.AUTH_NOT_AUTHENTICATED,
+                    ),
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                )
          
         return await call_next(request)

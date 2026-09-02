@@ -6,7 +6,7 @@ from app.application.dto.sessions.initialize_session import InitializeSessionIn
 from app.application.use_cases.sessions.initialize_session import InitializeSession
 from app.application.exceptions.user import UserNotFoundError
 from app.infrastructure.services.time_provider import SystemTimeProvider
-from app.infrastructure.database.session import get_db
+from app.infrastructure.database.session import session_local
 from app.infrastructure.repositories.session import AlchemySessionRepository
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
 
@@ -28,31 +28,31 @@ class SIDMiddleware(BaseHTTPMiddleware):
         ip_address = request.client.host
 
         # Initialize application services
-        db = next(get_db())
-        session_repository = AlchemySessionRepository(db)
-        user_repository = AlchemyUserRepository(db)
-        time_provider = SystemTimeProvider()
-        
-        session_service = InitializeSession(
-            session_repository,
-            user_repository,
-            time_provider
-        )
-        
-        session_dto = InitializeSessionIn(
-            external_id=external_id,
-            user_id=user_id,
-            ip_address=ip_address,
-            user_agent=user_agent
-        )
-        
-        try:
-            session = session_service.execute(session_dto)
-        except UserNotFoundError as e:
-            return JSONResponse(
-                content={"message": "User not found"},
-                status_code=400,
+        with session_local() as db:
+            session_repository = AlchemySessionRepository(db)
+            user_repository = AlchemyUserRepository(db)
+            time_provider = SystemTimeProvider()
+            
+            session_service = InitializeSession(
+                session_repository,
+                user_repository,
+                time_provider
             )
+            
+            session_dto = InitializeSessionIn(
+                external_id=external_id,
+                user_id=user_id,
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
+            
+            try:
+                session = session_service.execute(session_dto)
+            except UserNotFoundError as e:
+                return JSONResponse(
+                    content={"message": "User not found"},
+                    status_code=400,
+                )
         
         # Store external session id to state
         request.state.sid = session.external_id

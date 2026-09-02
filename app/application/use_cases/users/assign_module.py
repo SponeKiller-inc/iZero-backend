@@ -1,5 +1,6 @@
 from app.application.security.authorize import authorize
 from app.application.exceptions.user import UserModuleNotAssignedError
+from app.application.exceptions.module import ModuleNotFoundError
 from app.domain.users.repositories.user_module import UserModuleRepository
 from app.application.ports.time_provider import TimeProvider
 from app.application.dto.user.assign_module import AssignModuleIn
@@ -44,6 +45,9 @@ class AssignModule:
         now = self.time_provider.now()
         expiration = self.time_provider.get_expiration(days=dto.duration_days)
         module = self.module_repository.get(dto.module_id, now)
+
+        if module is None:
+            raise ModuleNotFoundError("Module does not exist")
 
         if not module.is_active(now):
             raise UserModuleNotAssignedError("Module is not active")

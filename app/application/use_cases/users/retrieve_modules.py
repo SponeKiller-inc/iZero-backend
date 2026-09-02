@@ -6,6 +6,7 @@ from app.domain.modules.repositories.module_group import ModuleGroupRepository
 from app.application.security.authorize import authorize
 from app.application.constants.use_case import UseCase
 from app.domain.shared.constants.entity_type import EntityType
+from app.application.exceptions.module import ModuleNotFoundError, ModuleGroupNotFoundError
 
 class RetrieveModules:
 
@@ -49,11 +50,18 @@ class RetrieveModules:
 
         for user_module in user_modules:
             module = self.module_repository.get(user_module.module_id, now)
+
+            if module is None:
+                raise ModuleNotFoundError("Module does not exist")
+
             module_group = self.module_group_repository.get(module.module_group_id, now)
 
-            for module_group in result:
-                if module_group.module_group_id == module.module_group_id:
-                    module_group.modules.append(ModuleDto(
+            if module_group is None:
+                raise ModuleGroupNotFoundError("Module group does not exist")
+
+            for group_out in result:
+                if group_out.module_group_id == module_group.id:
+                    group_out.modules.append(ModuleDto(
                         id=user_module.module_id,
                         name=module.name,
                     ))

@@ -1,5 +1,6 @@
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict 
+from sqlalchemy import URL
 
 
 class Settings(BaseSettings):
@@ -42,6 +43,18 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
+
+    @property
+    def database_url(self) -> URL:
+        """Postgres DSN with credentials escaped (safe against special characters)."""
+        return URL.create(
+            drivername="postgresql",
+            username=self.database_username,
+            password=self.database_password,
+            host=self.database_hostname,
+            port=self.database_port,
+            database=self.database_name,
+        )
 
         
 settings = Settings()
