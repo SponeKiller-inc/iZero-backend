@@ -61,7 +61,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
             valid_to=role_permission.validity.valid_to,
         )
         self.db.add(role_permission_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(role_permission_model)
 
         return self._to_entity(role_permission_model)
@@ -89,7 +89,7 @@ class AlchemyRolePermissionRepository(BaseAlchemyRepository):
         updated_model.valid_from = role_permission.validity.valid_from
         updated_model.valid_to = role_permission.validity.valid_to
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(updated_model)
 
         return self._to_entity(updated_model)

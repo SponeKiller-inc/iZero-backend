@@ -109,7 +109,7 @@ class AlchemySessionRepository(BaseAlchemyRepository):
             user_agent=session.user_agent 
         )
         self.db.add(session_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(session_model)
 
         return self._to_entity(session_model)
@@ -138,7 +138,7 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         updated_session.ip_address = session.ip_address
         updated_session.user_agent = session.user_agent
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(updated_session)
 
         return self._to_entity(updated_session)

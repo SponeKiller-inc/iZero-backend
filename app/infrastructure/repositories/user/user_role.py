@@ -60,7 +60,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
             valid_to=user_role.validity.valid_to,
         )
         self.db.add(user_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(user_model)
 
         return self._to_entity(user_model)
@@ -88,7 +88,7 @@ class AlchemyUserRoleRepository(BaseAlchemyRepository):
         updated_user_role.valid_from = user_role.validity.valid_from
         updated_user_role.valid_to = user_role.validity.valid_to
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(updated_user_role)
 
         return self._to_entity(updated_user_role)

@@ -7,8 +7,8 @@ class SessionModel(Base, ValidityMixin):
     __tablename__ = "sessions"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    external_id: Mapped[str] = mapped_column(nullable=False)
-    user_id: Mapped[int] = mapped_column(
+    external_id: Mapped[str] = mapped_column(nullable=False, unique=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), 
         nullable=True
     )

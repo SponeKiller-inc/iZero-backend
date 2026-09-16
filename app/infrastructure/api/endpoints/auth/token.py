@@ -16,8 +16,7 @@ from app.domain.users.exceptions.user import (
     GoogleUserNotVerifiedError,
 )
 
-router = APIRouter(prefix="/token",
-                   tags=["authentications"])
+router = APIRouter(prefix="/token", tags=["authentications"])
 
 @router.post("/local", response_model=TokenOut)
 async def local_login(
@@ -117,7 +116,7 @@ async def me(
 ) -> None:
     try:
         auth_service.authenticate_user_token(token)
-    except UserNotVerifiedError as e:  
+    except UserNotVerifiedError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid access token",

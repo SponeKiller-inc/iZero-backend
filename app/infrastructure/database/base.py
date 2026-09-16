@@ -8,6 +8,15 @@ from sqlalchemy.orm import Mapped, mapped_column, composite
 from app.domain.shared.value_objects.period import ValidityPeriod
 from app.infrastructure.services.time_provider import SystemTimeProvider
 
+# Deterministic constraint names so alembic --autogenerate can match them across environments.
+NAMING_CONVENTION = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
+
 class ValidityMixin:
     """
     Mixin for adding validity fields to models
@@ -75,6 +84,6 @@ class Base(TimestampMixin, DeclarativeBase):
     Attributes:
         metadata (MetaData): SQLAlchemy MetaData object for defining table schemas.
     """
-    metadata = MetaData()
+    metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 

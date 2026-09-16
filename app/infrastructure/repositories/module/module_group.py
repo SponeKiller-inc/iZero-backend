@@ -61,7 +61,7 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
             valid_to=module_group.validity.valid_to,
         )
         self.db.add(module_group_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(module_group_model)
 
         return self._to_entity(module_group_model)
@@ -88,7 +88,7 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
         module_group_model.valid_to = module_group.validity.valid_to
 
         self.db.add(module_group_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(module_group_model)
 
         return self._to_entity(module_group_model)

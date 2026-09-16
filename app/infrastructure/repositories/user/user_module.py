@@ -102,7 +102,7 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
         )
 
         self.db.add(user_module_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(user_module_model)
 
         return self._to_entity(user_module_model)
@@ -130,7 +130,7 @@ class AlchemyUserModuleRepository(BaseAlchemyRepository):
         user_module_model.valid_from = user_module.validity.valid_from
         user_module_model.valid_to = user_module.validity.valid_to
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(user_module_model)
 
         return self._to_entity(user_module_model)

@@ -69,7 +69,7 @@ class AlchemyModuleRepository(BaseAlchemyRepository):
         )
 
         self.db.add(module_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(module_model)
 
         return self._to_entity(module_model)
@@ -97,7 +97,7 @@ class AlchemyModuleRepository(BaseAlchemyRepository):
         module_model.valid_from = module.validity.valid_from
         module_model.valid_to = module.validity.valid_to
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(module_model)
 
         return self._to_entity(module_model)

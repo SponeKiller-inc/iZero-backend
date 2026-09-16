@@ -148,7 +148,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
             provider_user_id=user.provider_user_id,
         )
         self.db.add(user_model)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(user_model)
 
         return self._to_entity(user_model)
@@ -176,7 +176,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         updated_user.password = user.password
         updated_user.provider_user_id = user.provider_user_id
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(updated_user)
 
         return self._to_entity(updated_user)
