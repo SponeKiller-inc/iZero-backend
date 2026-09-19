@@ -9,13 +9,6 @@ class Settings(BaseSettings):
     database_password: str
     database_name: str
     database_username: str
-    secret_key: str
-    algorithm: str
-    access_token_expire_minutes: int
-    refresh_token_expire_minutes: int
-    session_expire_minutes: int
-    refresh_token_length: int
-    csrf_token_length: int
     pwd_context_scheme: str
     user_module_expire_minutes: int
     cors_allow_origins: list[str]

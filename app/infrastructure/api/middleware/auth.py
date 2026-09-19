@@ -4,7 +4,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.application.security.auth_context import AuthContext
 from app.application.exceptions.auth import AccessTokenProviderError
-from app.infrastructure.config import settings
+from app.application.constants.security import SecurityConstants
 from app.infrastructure.services.token_provider import TokenProvider
 from app.infrastructure.services.jwt_access_token_generator import JwtAccessTokenGenerator
 
@@ -15,8 +15,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
         self._access_token_generator = JwtAccessTokenGenerator(
-            secret_key=settings.secret_key,
-            algorithm=settings.algorithm,
+            secret_key=SecurityConstants.ACCESS_TOKEN_SECRET_KEY,
+            algorithm=SecurityConstants.ACCESS_TOKEN_ALGORITHM,
         )
 
     async def dispatch(self, request: Request, call_next):        

@@ -10,5 +10,8 @@ done
 # Migrate database tables
 alembic upgrade head
 
+# Seed default configuration data (idempotent)
+python -m app.infrastructure.seed.run
+
 # start Uvicorn
 exec "$@"

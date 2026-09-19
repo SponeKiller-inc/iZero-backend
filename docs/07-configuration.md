@@ -18,13 +18,6 @@ All variables are **required** — the application will not start without them.
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `SECRET_KEY` | str | JWT signing key (secret) |
-| `ALGORITHM` | str | JWT signing algorithm, e.g. `HS256` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | int | Access token lifetime |
-| `REFRESH_TOKEN_EXPIRE_MINUTES` | int | Refresh token lifetime |
-| `REFRESH_TOKEN_LENGTH` | int | Length of the generated refresh token |
-| `CSRF_TOKEN_LENGTH` | int | Length of the generated CSRF token |
-| `SESSION_EXPIRE_MINUTES` | int | Session lifetime |
 | `PWD_CONTEXT_SCHEME` | str | Password hashing scheme for passlib |
 | `GOOGLE_OAUTH_CLIENT_ID` | str | Client ID used to verify the Google id_token |
 

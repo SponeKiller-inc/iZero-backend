@@ -54,7 +54,8 @@ class SIDMiddleware(BaseHTTPMiddleware):
                 status_code=400,
             )
 
-        # Store external session id to state
+        # Store session id and external session id to state
+        request.state.session_id = session.id
         request.state.sid = session.external_id
          
         response = await call_next(request)

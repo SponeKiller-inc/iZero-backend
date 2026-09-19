@@ -14,9 +14,26 @@ On startup [entrypoint.sh](../entrypoint.sh):
 
 1. Waits for PostgreSQL to become available (`pg_isready`)
 2. Runs `alembic upgrade head`
-3. Hands over to `CMD` (uvicorn)
+3. Runs `python -m app.infrastructure.seed.run` (seeds default configuration data, see below)
+4. Hands over to `CMD` (uvicorn)
 
 > Migrations therefore run automatically on container startup. With multiple replicas you must ensure only one instance performs the migration. TODO: decide on a strategy.
+
+## Default data seed
+
+[app/infrastructure/seed/run.py](../app/infrastructure/seed/run.py) seeds fixed reference data required for the app to work out of the box. It runs on every container start right after migrations and is idempotent (checks by fixed ID before inserting, so it's safe to re-run).
+
+| Use case | What it seeds | Fixed ID(s) |
+|----------|----------------|-------------|
+| `SeedDefaultRoles` ([seed_default_roles.py](../app/application/use_cases/seed/seed_default_roles.py)) | `roles` row `"user"` — the role assigned to every newly registered user (`REGULAR_ROLE_ID`) | `1` |
+| `SeedDefaultTitles` ([seed_default_titles.py](../app/application/use_cases/seed/seed_default_titles.py)) | `titles` rows `"prefix"` / `"suffix"`, referenced by `prefix_titles`/`suffix_titles` | `1`, `2` |
+| `SeedDefaultRolePermissions` ([seed_default_role_permissions.py](../app/application/use_cases/seed/seed_default_role_permissions.py)) | `role_permission` rows granting the `"user"` role `USERS_ASSIGN_MODULE` and `USERS_RETRIEVE_MODULE` — without this, `@authorize`-protected use-cases reject every regular user | — |
+
+Order matters: roles are seeded before role permissions (FK dependency).
+
+Not seeded yet (deliberately, no canonical values exist in code — needs a product decision before implementing):
+- `entity_types` (customer type — individual/business/proprietor/...)
+- `module_groups` / `modules` — created dynamically via `MODULES_CREATE_GROUP` / `MODULES_CREATE` use-cases, not fixed reference data
 
 ## Build and run
 

@@ -15,3 +15,15 @@ class RoleRepository(Protocol):
             The Role entity if found, None otherwise.
         """
         ...
+
+    def save(self, role: Role) -> Role:
+        """
+        Create a new role. If role.id is set, it is persisted as-is (used for seeding fixed IDs).
+
+        Args:
+            role: The role to create.
+
+        Returns:
+            The created Role entity.
+        """
+        ...

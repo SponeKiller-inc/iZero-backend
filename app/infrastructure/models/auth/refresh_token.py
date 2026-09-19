@@ -1,31 +1,15 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from datetime import datetime
-from sqlalchemy import (
-    ForeignKey, 
-    DateTime,
-    CheckConstraint,
-    func,
-)
+from sqlalchemy import ForeignKey
 
-from app.infrastructure.database.base import Base
+from app.infrastructure.database.base import Base, ValidityMixin
 
-class RefreshTokenModel(Base):
+class RefreshTokenModel(Base, ValidityMixin):
     __tablename__ = "refresh_token"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     session_id: Mapped[int] = mapped_column(
         ForeignKey("sessions.id", ondelete="CASCADE"), 
-        nullable=False
+        nullable=False,
+        index=True,
     )
     token: Mapped[str] = mapped_column(nullable=False)
-    expired_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), 
-        nullable=False
-    )
-    
-    __table_args__ = (
-        CheckConstraint(
-            expired_at > func.now(),
-            name="ck_expired_at_in_future"
-        ),
-    )

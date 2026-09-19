@@ -1,29 +1,42 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
 
-from app.infrastructure.api.v1.schemas.module_group import ModuleGroupIn, ModuleIn
-from app.infrastructure.api.v1.dependencies.role_access import require_role
-from app.domain.entity.module2 import ModuleService
-from app.infrastructure.api.v1.dependencies.module import ModuleDependencies
-from app.domain.modules.exceptions.module import (
-    ModuleGroupNotCreatedError,
-    ModuleNotCreatedError,
-)
+from app.application.use_cases.modules.create_module_group import CreateModuleGroup
+from app.application.dto.module.create_module_group import CreateModuleGroupIn
+from app.infrastructure.database.session import get_db
+from app.infrastructure.repositories.module.module_group import AlchemyModuleGroupRepository
+from app.infrastructure.services.time_provider import SystemTimeProvider
+from app.infrastructure.api.schemas.base import ResponseContainer
+from app.infrastructure.api.schemas.module.module_group import ModuleGroupIn, ModuleGroupOut
 
-router = APIRouter(prefix="/module_groups", tags=["module_group"])
+
+router = APIRouter(tags=["module-group"])
+
 
 @router.post(
-    "", 
-    status_code=status.HTTP_201_CREATED, 
-    dependencies=[require_role("admin")]
+    "/groups",
+    response_model=ResponseContainer[ModuleGroupOut],
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_module_group(
     module_group: ModuleGroupIn,
-    module_service: ModuleService = Depends(ModuleDependencies)
+    db: Session = Depends(get_db),
 ):
-    try:
-        module_service.create_module_group(module_group.name)
-    except ModuleGroupNotCreatedError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid data"
+    module_group_repository = AlchemyModuleGroupRepository(db)
+    time_provider = SystemTimeProvider()
+
+    module_group_creator = CreateModuleGroup(module_group_repository, time_provider)
+
+    result = module_group_creator.execute(
+        CreateModuleGroupIn(
+            name=module_group.name,
+            valid_from=module_group.valid_from,
         )
+    )
+
+    return ResponseContainer(data=ModuleGroupOut(
+        id=result.id,
+        name=result.name,
+        valid_from=result.valid_from,
+        valid_to=result.valid_to,
+    ))

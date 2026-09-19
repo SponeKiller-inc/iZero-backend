@@ -3,7 +3,7 @@ import importlib
 from pathlib import Path
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/module", tags=["module"])
+router = APIRouter(prefix="/modules", tags=["module"])
 
 package_dir = Path(__file__).parent
 

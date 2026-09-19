@@ -51,6 +51,8 @@ app/
 - ORM models are named `<Entity>Model` (e.g. `UserRoleModel`).
 - Repository implementations are named `Alchemy<Entity>Repository` and inherit from `BaseAlchemyRepository`.
 - A domain entity never shares its name with an ORM model — mapping happens inside the repository.
+- Repository methods follow a fixed contract: `get` always looks up by the entity's key (id or, for owned/child entities, the parent id that identifies it, e.g. `session_id`), `delete` always takes that same id, and `save` always takes the domain entity/model itself (handles both insert and update).
+- Any lookup that is not by that key gets a `_by_<field>` suffix (e.g. `get_by_external_id`, `get_last_user_session`), so a bare `get`/`delete` always means "by key".
 
 ## HTTP request flow
 

@@ -34,7 +34,7 @@ sequenceDiagram
     C->>API: requests with Authorization: Bearer <access_token>
 ```
 
-JWT payload: `sub` (user_id), `exp`. Signed with the algorithm from `ALGORITHM` using the `SECRET_KEY`.
+JWT payload: `sub` (user_id), `exp`. Signed with `SecurityConstants.ACCESS_TOKEN_ALGORITHM` using `SecurityConstants.ACCESS_TOKEN_SECRET_KEY` ([constants/security.py](../app/application/constants/security.py)).
 
 TODO: describe access token renewal via the refresh token and logout (session invalidation).
 
@@ -99,8 +99,8 @@ Internal error details are never returned to the client.
 
 ## Security checklist
 
-- [ ] Secrets live only in `.env` / a secret store, never in the repository
-- [ ] `SECRET_KEY` has sufficient entropy and can be rotated
+- [ ] Secrets live only in `.env` / a secret store, never in the repository — currently violated: `SecurityConstants.AUTH_SECRET` and `SecurityConstants.ACCESS_TOKEN_SECRET_KEY` are hardcoded in source
+- [ ] `ACCESS_TOKEN_SECRET_KEY` has sufficient entropy and can be rotated without a deploy
 - [ ] CORS origin is an explicit list, not a wildcard
 - [ ] Passwords are never logged or returned in a response
 - [ ] Brute-force protection on login endpoints — TODO

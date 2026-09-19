@@ -20,6 +20,10 @@ class UnauthenticatedUserError(ApplicationError):
     """Specific error indicating that user is not authenticated."""
     pass
 
+class InvalidCredentialsError(ApplicationError):
+    """Specific error indicating that provided credentials are invalid."""
+    pass
+
 class AssignRolePermissionError(ApplicationError):
     """Specific error indicating that the role permission assignment has failed."""
     pass
