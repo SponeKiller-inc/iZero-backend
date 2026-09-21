@@ -16,4 +16,5 @@ class InitializeSessionOut:
     """
     Output DTO for InitializeSession use-case
     """
+    id: int
     external_id: str

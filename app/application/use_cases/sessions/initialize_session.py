@@ -55,7 +55,7 @@ class InitializeSession:
             session = self.session_repository.get_by_external_id(dto.external_id)
 
             if session and not session.is_expired(self.time_provider.now()):
-                return session
+                return InitializeSessionOut(session.id, session.external_id)
 
         # 3. Invalidate user last session 
         if dto.user_id is not None and dto.user_id > 0:
@@ -77,5 +77,5 @@ class InitializeSession:
         
         session = self.session_repository.save(session)
         
-        return InitializeSessionOut(session.external_id)
+        return InitializeSessionOut(session.id, session.external_id)
         

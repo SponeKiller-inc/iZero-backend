@@ -17,7 +17,7 @@ router = APIRouter(tags=["module"])
 
 
 @router.post(
-    "",
+    "/",
     response_model=ResponseContainer[ModuleOut],
     status_code=status.HTTP_201_CREATED,
 )
