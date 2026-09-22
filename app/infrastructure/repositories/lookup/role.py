@@ -1,12 +1,14 @@
-from typing import Optional
+
 from sqlalchemy import func, select
-from app.infrastructure.repositories.base import BaseAlchemyRepository
-from app.domain.shared.repositories.role import RoleRepository
+
 from app.domain.shared.entities.role import Role
+from app.domain.shared.repositories.role import RoleRepository
 from app.infrastructure.models.lookup.role import RoleModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
+
 
 class AlchemyRoleRepository(BaseAlchemyRepository, RoleRepository):
-    def get(self, role_id: int) -> Optional[Role]:
+    def get(self, role_id: int) -> Role | None:
         """
         Get a role by its ID
 

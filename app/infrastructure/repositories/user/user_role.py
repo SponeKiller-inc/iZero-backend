@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from app.domain.users.entities.user_role import UserRole
 from app.domain.shared.value_objects.period import ValidityPeriod
+from app.domain.users.entities.user_role import UserRole
 from app.infrastructure.models.user.user_roles import UserRoleModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
+
 
 class AlchemyUserRoleRepository(BaseAlchemyRepository):
     def get(self, user_id: int, ref_date: datetime) -> list[UserRole]:

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Optional
+
 
 class TimeProvider(ABC):
     """
@@ -22,8 +22,8 @@ class TimeProvider(ABC):
     @abstractmethod
     def get_expiration(
         cls,
-        minutes: Optional[int] = None,
-        days: Optional[int] = None,
+        minutes: int | None = None,
+        days: int | None = None,
     ) -> datetime:
         """
         Calculates expiration using the class's own 'now' method

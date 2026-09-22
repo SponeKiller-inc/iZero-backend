@@ -1,11 +1,12 @@
-from app.application.ports.time_provider import TimeProvider
-from app.application.ports.password_hasher import PasswordHasher
 from app.application.dto.user.registration import RegistrationLocalIn
 from app.application.exceptions.user import RegisterLocalError
-from app.domain.users.repositories.user import UserRepository
+from app.application.ports.password_hasher import PasswordHasher
+from app.application.ports.time_provider import TimeProvider
 from app.domain.users.entities.user import User
 from app.domain.users.entities.user_role import UserRole
+from app.domain.users.repositories.user import UserRepository
 from app.domain.users.repositories.user_role import UserRoleRepository
+
 
 class RegisterLocal:
 

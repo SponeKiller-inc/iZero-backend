@@ -1,7 +1,8 @@
 from passlib.context import CryptContext
 
-from app.infrastructure.config import settings
 from app.application.exceptions.auth import InvalidHashFormatError
+from app.infrastructure.config import settings
+
 
 class PasslibPasswordHasher:
     """

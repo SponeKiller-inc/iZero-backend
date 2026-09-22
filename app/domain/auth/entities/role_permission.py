@@ -1,5 +1,5 @@
-from typing import Self
 from datetime import datetime
+from typing import Self
 
 from app.domain.auth.value_object.permission_code import PermissionCode
 from app.domain.shared.value_objects.period import ValidityPeriod

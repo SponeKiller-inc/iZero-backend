@@ -1,5 +1,6 @@
 import secrets
 
+
 class RefreshTokenGenerator:
     def generate(self, length: int = 32) -> str:
         """

@@ -1,15 +1,15 @@
-from app.application.security.authorize import authorize
-from app.application.ports.time_provider import TimeProvider
-from app.application.dto.auth.role_permission import AssignRolePermissionIn
 from app.application.constants.use_case import UseCase
+from app.application.dto.auth.role_permission import AssignRolePermissionIn
 from app.application.exceptions.auth import AssignRolePermissionError
-from app.domain.auth.value_object.permission_code import PermissionCode
-from app.domain.shared.constants.entity_type import EntityType
-from app.domain.shared.entities.role import Role
-from app.domain.shared.value_objects.entity import Entity
+from app.application.ports.time_provider import TimeProvider
+from app.application.security.authorize import authorize
 from app.domain.auth.entities.role_permission import RolePermission
 from app.domain.auth.repositories.role_permission import RolePermissionRepository
+from app.domain.auth.value_object.permission_code import PermissionCode
+from app.domain.shared.constants.entity_type import EntityType
 from app.domain.shared.repositories.role import RoleRepository
+from app.domain.shared.value_objects.entity import Entity
+
 
 class AssignRolePermission:
 

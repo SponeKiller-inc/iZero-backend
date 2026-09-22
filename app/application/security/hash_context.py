@@ -1,10 +1,8 @@
 from contextvars import ContextVar
 
+
 class HashContext:
-    _hash_ctx: ContextVar[list[str]] = ContextVar(
-        "hash",
-        default=[]
-    )
+    _hash_ctx: ContextVar[tuple[str, ...]] = ContextVar("hash", default=())
 
     @classmethod
     def set(cls, hash_val: list[str]) -> None:
@@ -14,7 +12,7 @@ class HashContext:
         Args:
             hash_val: hash for request
         """
-        cls._hash_ctx.set(hash_val)
+        cls._hash_ctx.set(tuple(hash_val))
 
     @classmethod
     def get(cls) -> list[str]:
@@ -24,11 +22,11 @@ class HashContext:
         Returns:
             hash or empty list if not set
         """
-        return cls._hash_ctx.get()  
+        return list(cls._hash_ctx.get())
 
     @classmethod
     def clear(cls) -> None:
         """
         Clear hash context
         """
-        cls._hash_ctx.set([])
+        cls._hash_ctx.set(())

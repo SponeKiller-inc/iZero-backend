@@ -1,11 +1,13 @@
-from app.domain.shared.value_objects.period import ValidityPeriod
 from datetime import datetime
+
 from app.domain.auth.entities.role_permission import RolePermission
 from app.domain.auth.value_object.permission_code import PermissionCode
-from app.domain.shared.value_objects.entity import Entity
 from app.domain.shared.constants.entity_type import EntityType
-from app.infrastructure.repositories.base import BaseAlchemyRepository
+from app.domain.shared.value_objects.entity import Entity
+from app.domain.shared.value_objects.period import ValidityPeriod
 from app.infrastructure.models.auth.role_permission import RolePermissionModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
+
 
 class AlchemyRolePermissionRepository(BaseAlchemyRepository):
     def get(self, role_id: int, ref_date: datetime) -> list[RolePermission]:

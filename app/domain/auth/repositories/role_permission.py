@@ -3,6 +3,7 @@ from typing import Protocol
 
 from app.domain.auth.entities.role_permission import RolePermission
 
+
 class RolePermissionRepository(Protocol):
     def get(self, role_id: int, ref_date: datetime) -> list[RolePermission]:
         """

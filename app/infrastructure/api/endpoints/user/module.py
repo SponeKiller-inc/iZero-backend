@@ -1,25 +1,25 @@
-from typing import List
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.application.use_cases.users.retrieve_modules import RetrieveModules
+from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
+from app.infrastructure.api.schemas.message_id import MessageId
+from app.infrastructure.api.schemas.user.module import RetrieveModulesOut
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.module.module import AlchemyModuleRepository
-from app.infrastructure.repositories.module.module_group import AlchemyModuleGroupRepository
+from app.infrastructure.repositories.module.module_group import (
+    AlchemyModuleGroupRepository,
+)
 from app.infrastructure.repositories.user.user_module import AlchemyUserModuleRepository
 from app.infrastructure.services.time_provider import SystemTimeProvider
-from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
-from app.infrastructure.api.schemas.user.module import RetrieveModulesOut
-from app.infrastructure.api.schemas.message_id import MessageId
-
 
 router = APIRouter(tags=["user-module"])
 
 
 @router.get(
     "/{user_id}/modules", 
-    response_model=ResponseContainer[List[RetrieveModulesOut]], 
+    response_model=ResponseContainer[list[RetrieveModulesOut]], 
     status_code=status.HTTP_200_OK
 )
 async def get_user_modules(

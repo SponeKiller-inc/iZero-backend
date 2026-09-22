@@ -1,14 +1,18 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.application.use_cases.modules.create_module_group import CreateModuleGroup
 from app.application.dto.module.create_module_group import CreateModuleGroupIn
-from app.infrastructure.database.session import get_db
-from app.infrastructure.repositories.module.module_group import AlchemyModuleGroupRepository
-from app.infrastructure.services.time_provider import SystemTimeProvider
+from app.application.use_cases.modules.create_module_group import CreateModuleGroup
 from app.infrastructure.api.schemas.base import ResponseContainer
-from app.infrastructure.api.schemas.module.module_group import ModuleGroupIn, ModuleGroupOut
-
+from app.infrastructure.api.schemas.module.module_group import (
+    ModuleGroupIn,
+    ModuleGroupOut,
+)
+from app.infrastructure.database.session import get_db
+from app.infrastructure.repositories.module.module_group import (
+    AlchemyModuleGroupRepository,
+)
+from app.infrastructure.services.time_provider import SystemTimeProvider
 
 router = APIRouter(tags=["module-group"])
 

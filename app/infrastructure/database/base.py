@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import CheckConstraint, DateTime, MetaData
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import DateTime, MetaData, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column, composite
+from sqlalchemy.orm import DeclarativeBase, Mapped, composite, mapped_column
 
 from app.domain.shared.value_objects.period import ValidityPeriod
 from app.infrastructure.services.time_provider import SystemTimeProvider

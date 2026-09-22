@@ -1,5 +1,6 @@
 from typing import Protocol
 
+
 class PasswordHasher(Protocol):
     """
     Interface for working with passwords.

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class RegistrationLocalIn:
     """DTO carrying user data from any identity provider."""

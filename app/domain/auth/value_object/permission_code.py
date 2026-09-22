@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
-from app.domain.shared.value_objects.entity import Entity
 from app.domain.auth.exceptions.permission_code import PermissionCodeError
+from app.domain.shared.value_objects.entity import Entity
+
 
 @dataclass(frozen=True)
 class PermissionCode:

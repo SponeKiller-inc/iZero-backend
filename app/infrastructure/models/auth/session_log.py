@@ -1,9 +1,10 @@
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import (
     ForeignKey,
 )
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
+
 
 class SessionLogModel(Base):
     __tablename__ = "session_log"

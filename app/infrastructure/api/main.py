@@ -1,16 +1,15 @@
-from fastapi import status
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 import sentry_sdk
+from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 
+from app.application.exceptions.auth import AuthHashVerificationError
 from app.infrastructure.api.middleware.auth import AuthMiddleware
 from app.infrastructure.api.middleware.authenticate import AuthenticateMiddleware
 from app.infrastructure.api.middleware.sid import SIDMiddleware
-from app.infrastructure.api.schemas.message_id import MessageId
-from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
 from app.infrastructure.api.router import router
+from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
+from app.infrastructure.api.schemas.message_id import MessageId
 from app.infrastructure.config import settings
-from app.application.exceptions.auth import AuthHashVerificationError
 
 sentry_sdk.init(
     dsn=settings.sentry_dsn,

@@ -1,12 +1,16 @@
+from app.application.constants.use_case import UseCase
+from app.application.dto.user.retrieve_modules import ModuleDto, RetrieveModulesOut
+from app.application.exceptions.module import (
+    ModuleGroupNotFoundError,
+    ModuleNotFoundError,
+)
 from app.application.ports.time_provider import TimeProvider
-from app.application.dto.user.retrieve_modules import RetrieveModulesOut, ModuleDto
-from app.domain.users.repositories.user_module import UserModuleRepository
+from app.application.security.authorize import authorize
 from app.domain.modules.repositories.module import ModuleRepository
 from app.domain.modules.repositories.module_group import ModuleGroupRepository
-from app.application.security.authorize import authorize
-from app.application.constants.use_case import UseCase
 from app.domain.shared.constants.entity_type import EntityType
-from app.application.exceptions.module import ModuleNotFoundError, ModuleGroupNotFoundError
+from app.domain.users.repositories.user_module import UserModuleRepository
+
 
 class RetrieveModules:
 

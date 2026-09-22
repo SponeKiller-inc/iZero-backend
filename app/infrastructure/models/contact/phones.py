@@ -2,6 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
 
+
 class PhoneModel(Base):
     __tablename__ = "phones"
     

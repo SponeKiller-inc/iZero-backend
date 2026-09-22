@@ -1,24 +1,25 @@
 from __future__ import annotations
-from typing import List, Optional, Self
-from datetime import datetime
-import uuid
 
-from app.domain.shared.value_objects.period import ValidityPeriod
+import uuid
+from datetime import datetime
+from typing import Self
+
 from app.application.ports.time_provider import TimeProvider
-from app.domain.session.value_objects.session_event import SessionEvent
 from app.domain.session.exceptions.session import SessionExpiredError
+from app.domain.session.value_objects.session_event import SessionEvent
+from app.domain.shared.value_objects.period import ValidityPeriod
 
 
 class Session:
     def __init__(
         self,
-        id: Optional[int],
+        id: int | None,
         external_id: uuid.UUID,
         validity: ValidityPeriod,
         ip_address: str,
         user_agent: str,
-        user_id: Optional[int] = None,
-        events: Optional[List[SessionEvent]] = None
+        user_id: int | None = None,
+        events: list[SessionEvent] | None = None
     ) -> None:
         """
         Initializes a new session.
@@ -45,7 +46,7 @@ class Session:
     @classmethod
     def create_new(
         cls, 
-        user_id: Optional[int], 
+        user_id: int | None, 
         ip_address: str, 
         user_agent: str, 
         expire_at: datetime,

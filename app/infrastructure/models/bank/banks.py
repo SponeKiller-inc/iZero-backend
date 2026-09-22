@@ -1,7 +1,7 @@
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
-from sqlalchemy import String
 
 
 class BankModel(Base):

@@ -1,5 +1,6 @@
 from contextvars import ContextVar
 
+
 class AuthContext:
     _id_ctx: ContextVar[int | None] = ContextVar(
         "current_user_id",

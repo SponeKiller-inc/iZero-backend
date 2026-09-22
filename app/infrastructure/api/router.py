@@ -1,8 +1,6 @@
 from fastapi import APIRouter
 
-from .endpoints import user, auth, module
-
-
+from .endpoints import auth, module, user
 
 router = APIRouter(prefix="/api")
 

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from app.domain.shared.value_objects.period import ValidityPeriod
 
+
 class UserModule:
     """
     Represents a module assigned to a user.

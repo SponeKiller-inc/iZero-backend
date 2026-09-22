@@ -2,6 +2,7 @@ from app.domain.session.entities.session import Session
 from app.infrastructure.models.auth.sessions import SessionModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 
+
 class AlchemySessionRepository(BaseAlchemyRepository):
 
     def get(self, session_id: int) -> Session | None:

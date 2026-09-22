@@ -1,5 +1,6 @@
 import secrets
 
+
 class CsrfTokenGenerator:
     def generate(self, length: int = 32) -> str:
         """

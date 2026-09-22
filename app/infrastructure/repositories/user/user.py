@@ -1,8 +1,7 @@
-from sqlalchemy.orm import Session
 
+from app.domain.users.constants.registration_source_type import RegistrationSourceType
 from app.domain.users.entities.user import User
 from app.domain.users.value_objects.registration_source import RegistrationSource
-from app.domain.users.constants.registration_source_type import RegistrationSourceType
 from app.infrastructure.models.user.users import UserModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 

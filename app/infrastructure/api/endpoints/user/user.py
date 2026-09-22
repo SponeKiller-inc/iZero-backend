@@ -1,25 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.application.use_cases.users.register_local import RegisterLocal
-from app.application.use_cases.users.register_oauth import RegisterOauth
-from app.application.dto.user.registration import RegistrationLocalIn, RegistrationOauthIn
+from app.application.dto.user.registration import (
+    RegistrationLocalIn,
+    RegistrationOauthIn,
+)
 from app.application.exceptions.auth import IdentityProviderError
 from app.application.exceptions.user import (
     RegisterLocalError,
     RegisterOauthError,
-    
 )
-from app.infrastructure.database.session import get_db
+from app.application.use_cases.users.register_local import RegisterLocal
+from app.application.use_cases.users.register_oauth import RegisterOauth
 from app.infrastructure.api.schemas.user import user as schema
-from app.infrastructure.services.passlib_password_hasher import PasslibPasswordHasher
+from app.infrastructure.config import settings
+from app.infrastructure.database.session import get_db
+from app.infrastructure.providers.auth_google import GoogleIdentityProvider
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
 from app.infrastructure.repositories.user.user_role import AlchemyUserRoleRepository
+from app.infrastructure.services.passlib_password_hasher import PasslibPasswordHasher
 from app.infrastructure.services.time_provider import SystemTimeProvider
-from app.infrastructure.providers.auth_google import GoogleIdentityProvider
-from app.infrastructure.config import settings
-
-
 
 router = APIRouter()
 
@@ -49,7 +49,7 @@ async def register_local(
     # registration
     try:
         register.execute(dto)
-    except RegisterLocalError as e:
+    except RegisterLocalError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists"
@@ -82,12 +82,12 @@ async def register_google(
     # registration
     try:
         register.execute(dto)
-    except RegisterOauthError as e:
+    except RegisterOauthError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists"
         )
-    except IdentityProviderError as e:
+    except IdentityProviderError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Google authentication failed"

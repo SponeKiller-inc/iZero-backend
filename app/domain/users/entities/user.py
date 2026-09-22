@@ -1,8 +1,10 @@
 from __future__ import annotations
-from typing import Self, Optional
 
-from app.domain.users.value_objects.registration_source import RegistrationSource
+from typing import Self
+
 from app.domain.users.constants.registration_source_type import RegistrationSourceType
+from app.domain.users.value_objects.registration_source import RegistrationSource
+
 
 class User:
     """
@@ -21,8 +23,8 @@ class User:
         id: int | None, 
         email: str,
         provider: RegistrationSource,
-        password: Optional[str] = None, 
-        provider_user_id: Optional[str] = None,        
+        password: str | None = None, 
+        provider_user_id: str | None = None,        
     ):
         self.id = id
         self.email = email

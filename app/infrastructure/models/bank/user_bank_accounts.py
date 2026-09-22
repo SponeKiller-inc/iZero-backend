@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base, ValidityMixin
 
+
 class UserBankAccountModel(Base, ValidityMixin):
     __tablename__ = "user_bank_accounts"
     

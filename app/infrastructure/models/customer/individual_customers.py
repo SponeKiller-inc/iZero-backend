@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, DateTime
+from sqlalchemy import DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
+
 
 class IndividualCustomerModel(Base):
     __tablename__ = "individual_customers"

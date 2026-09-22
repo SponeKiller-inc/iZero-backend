@@ -1,7 +1,5 @@
-from sqlalchemy.orm import Session
-
 from app.models.address import Addresses
-
+from sqlalchemy.orm import Session
 
 
 class AddressRepository:

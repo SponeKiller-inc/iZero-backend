@@ -1,11 +1,12 @@
-from typing import Optional
-from app.infrastructure.repositories.base import BaseAlchemyRepository
-from app.domain.shared.repositories.title import TitleRepository
+
 from app.domain.shared.entities.title import Title
+from app.domain.shared.repositories.title import TitleRepository
 from app.infrastructure.models.title.titles import TitleModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
+
 
 class AlchemyTitleRepository(BaseAlchemyRepository, TitleRepository):
-    def get(self, title_id: int) -> Optional[Title]:
+    def get(self, title_id: int) -> Title | None:
         """
         Get a title by its ID
 

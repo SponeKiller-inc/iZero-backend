@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import ClassVar
+
 from app.domain.shared.value_objects.base import BaseValueObject
+
 
 @dataclass(frozen=True)
 class BankCode(BaseValueObject):

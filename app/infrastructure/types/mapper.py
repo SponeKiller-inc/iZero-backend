@@ -1,12 +1,14 @@
-from typing import Type, Any, get_type_hints
-from sqlalchemy import String, Integer
+from typing import Any, get_type_hints
+
+from sqlalchemy import Integer, String
 from sqlalchemy.types import TypeDecorator
+
 
 class ValueObjectType(TypeDecorator):
     impl = String  # Dummy impl to satisfy SQLAlchemy's class-level check
     cache_ok = True
 
-    def __init__(self, cls: Type[Any], *args: Any, **kwargs: Any):
+    def __init__(self, cls: type[Any], *args: Any, **kwargs: Any):
         self.cls = cls
         
         # 1. Get type

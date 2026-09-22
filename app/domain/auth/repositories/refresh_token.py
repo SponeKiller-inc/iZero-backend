@@ -2,6 +2,7 @@ from typing import Protocol
 
 from app.domain.auth.entities.refresh_token import RefreshToken
 
+
 class RefreshTokenRepository(Protocol):
     def get_by_session_id(self, session_id: int) -> RefreshToken | None:
         """

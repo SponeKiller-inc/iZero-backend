@@ -1,6 +1,7 @@
 from enum import StrEnum
 from typing import Self
 
+
 class EntityType(StrEnum):
     ADDRESSES = "addresses"
     USERS = "users"

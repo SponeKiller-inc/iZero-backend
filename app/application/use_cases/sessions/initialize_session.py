@@ -1,13 +1,14 @@
-from app.application.ports.time_provider import TimeProvider
 from app.application.constants.session import SessionConstants
 from app.application.dto.sessions.initialize_session import (
     InitializeSessionIn,
     InitializeSessionOut,
 )
 from app.application.exceptions.user import UserNotFoundError
+from app.application.ports.time_provider import TimeProvider
 from app.domain.session.entities.session import Session
 from app.domain.session.repositories.session import SessionRepository
 from app.domain.users.repositories.user import UserRepository
+
 
 class InitializeSession:
 

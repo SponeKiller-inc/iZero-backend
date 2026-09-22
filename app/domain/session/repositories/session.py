@@ -2,6 +2,7 @@ from typing import Protocol
 
 from app.domain.session.entities.session import Session
 
+
 class SessionRepository(Protocol):
     def get(self, session_id: int) -> Session | None:
         """

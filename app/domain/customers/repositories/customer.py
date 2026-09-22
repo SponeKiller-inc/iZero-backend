@@ -1,5 +1,7 @@
 from typing import Protocol
+
 from app.domain.customers.entities.customer import Customer
+
 
 class CustomerRepository(Protocol):
     def get(self, user_id: int, customer_id: int) -> Customer | None:

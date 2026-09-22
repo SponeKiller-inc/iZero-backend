@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from typing import Optional
+
 
 @dataclass
 class InitializeSessionIn:
     """
     Input DTO for InitializeSession use-case
     """
-    user_id: Optional[int]
+    user_id: int | None
     ip_address: str
     user_agent: str
-    external_id: Optional[str]
+    external_id: str | None
 
 @dataclass
 class InitializeSessionOut:

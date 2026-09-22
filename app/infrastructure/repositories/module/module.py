@@ -2,8 +2,9 @@ from datetime import datetime
 
 from app.domain.modules.entities.module import Module
 from app.domain.shared.value_objects.period import ValidityPeriod
-from app.infrastructure.repositories.base import BaseAlchemyRepository
 from app.infrastructure.models.module.module import ModuleModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
+
 
 class AlchemyModuleRepository(BaseAlchemyRepository):
 

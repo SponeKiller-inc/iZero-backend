@@ -1,9 +1,10 @@
 import hashlib
 import hmac
 
+
 class AuthHash:
     def __init__(self, secret: str):
-        self.secret = secret.encode("utf-8")
+        self.secret = secret.encode()
 
     def generate(self, current_user_id: int, secret_message: str, entities_methods: list[tuple[str, str]]) -> list[str]:
         """
@@ -19,7 +20,7 @@ class AuthHash:
         """
         signatures = []
         for entity, method in entities_methods:
-            data_to_sign = f"{current_user_id}:{secret_message}:{entity}:{method}".encode("utf-8")
+            data_to_sign = f"{current_user_id}:{secret_message}:{entity}:{method}".encode()
             signature = hmac.new(self.secret, data_to_sign, hashlib.sha256).hexdigest()
             signatures.append(signature)
             

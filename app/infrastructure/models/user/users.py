@@ -1,11 +1,12 @@
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import (
     CheckConstraint,
-    or_,
     event,
+    or_,
 )
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
+
 
 class UserModel(Base):
     __tablename__ = "users"

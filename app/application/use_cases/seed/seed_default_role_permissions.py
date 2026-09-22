@@ -1,11 +1,11 @@
-from app.domain.shared.constants.role_type import REGULAR_ROLE_ID
-from app.domain.shared.constants.entity_type import EntityType
-from app.domain.shared.value_objects.entity import Entity
+from app.application.constants.use_case import UseCase
+from app.application.ports.time_provider import TimeProvider
 from app.domain.auth.entities.role_permission import RolePermission
 from app.domain.auth.repositories.role_permission import RolePermissionRepository
 from app.domain.auth.value_object.permission_code import PermissionCode
-from app.application.constants.use_case import UseCase
-from app.application.ports.time_provider import TimeProvider
+from app.domain.shared.constants.entity_type import EntityType
+from app.domain.shared.constants.role_type import REGULAR_ROLE_ID
+from app.domain.shared.value_objects.entity import Entity
 
 # Permissions the default "user" role needs to use the app out of the box
 DEFAULT_USER_PERMISSIONS: tuple[tuple[EntityType, UseCase], ...] = (

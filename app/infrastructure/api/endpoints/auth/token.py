@@ -1,25 +1,32 @@
-from fastapi import APIRouter, Response, Request, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.application.use_cases.auth.login_local import LoginLocal
-from app.application.use_cases.auth.login_google import LoginGoogle
-from app.application.dto.auth.login_local import LoginLocalIn
-from app.application.dto.auth.login_google import LoginGoogleIn
-from app.application.exceptions.auth import InvalidCredentialsError, IdentityProviderError
-from app.application.exceptions.user import UserNotFoundError
 from app.application.constants.security import SecurityConstants
-from app.infrastructure.api.schemas.token import TokenOut, GoogleTokenIn
-from app.infrastructure.database.session import get_db
-from app.infrastructure.repositories.user.user import AlchemyUserRepository
-from app.infrastructure.repositories.auth.refresh_token import AlchemyRefreshTokenRepository
-from app.infrastructure.services.passlib_password_hasher import PasslibPasswordHasher
-from app.infrastructure.services.jwt_access_token_generator import JwtAccessTokenGenerator
-from app.infrastructure.services.refresh_token_generator import RefreshTokenGenerator
-from app.infrastructure.services.csrf_token_generator import CsrfTokenGenerator
-from app.infrastructure.services.time_provider import SystemTimeProvider
-from app.infrastructure.providers.auth_google import GoogleIdentityProvider
+from app.application.dto.auth.login_google import LoginGoogleIn
+from app.application.dto.auth.login_local import LoginLocalIn
+from app.application.exceptions.auth import (
+    IdentityProviderError,
+    InvalidCredentialsError,
+)
+from app.application.exceptions.user import UserNotFoundError
+from app.application.use_cases.auth.login_google import LoginGoogle
+from app.application.use_cases.auth.login_local import LoginLocal
+from app.infrastructure.api.schemas.token import GoogleTokenIn, TokenOut
 from app.infrastructure.config import settings
+from app.infrastructure.database.session import get_db
+from app.infrastructure.providers.auth_google import GoogleIdentityProvider
+from app.infrastructure.repositories.auth.refresh_token import (
+    AlchemyRefreshTokenRepository,
+)
+from app.infrastructure.repositories.user.user import AlchemyUserRepository
+from app.infrastructure.services.csrf_token_generator import CsrfTokenGenerator
+from app.infrastructure.services.jwt_access_token_generator import (
+    JwtAccessTokenGenerator,
+)
+from app.infrastructure.services.passlib_password_hasher import PasslibPasswordHasher
+from app.infrastructure.services.refresh_token_generator import RefreshTokenGenerator
+from app.infrastructure.services.time_provider import SystemTimeProvider
 
 router = APIRouter(prefix="/token", tags=["authentications"])
 

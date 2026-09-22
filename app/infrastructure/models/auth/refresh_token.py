@@ -1,7 +1,8 @@
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base, ValidityMixin
+
 
 class RefreshTokenModel(Base, ValidityMixin):
     __tablename__ = "refresh_token"

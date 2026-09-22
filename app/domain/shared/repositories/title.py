@@ -1,10 +1,12 @@
-from typing import Protocol, Optional
+from typing import Protocol
+
 from app.domain.shared.entities.title import Title
+
 
 class TitleRepository(Protocol):
     """Repository interface for Title entity."""
 
-    def get(self, title_id: int) -> Optional[Title]:
+    def get(self, title_id: int) -> Title | None:
         """
         Get a title by its ID.
 

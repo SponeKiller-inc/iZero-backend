@@ -1,12 +1,13 @@
 from typing import Annotated
 
 from app.domain.value_objects.bank_identification import (
-    BankCode,
-    AccountPrefix,
     AccountNumber,
-    Swift,
+    AccountPrefix,
+    BankCode,
     Iban,
+    Swift,
 )
+
 from app.infrastructure.types.mapper import ValueObjectType
 
 BankCode = Annotated[

@@ -2,11 +2,14 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.application.security.auth_context import AuthContext
-from app.application.exceptions.auth import AccessTokenProviderError
 from app.application.constants.security import SecurityConstants
+from app.application.exceptions.auth import AccessTokenProviderError
+from app.application.security.auth_context import AuthContext
+from app.infrastructure.services.jwt_access_token_generator import (
+    JwtAccessTokenGenerator,
+)
 from app.infrastructure.services.token_provider import TokenProvider
-from app.infrastructure.services.jwt_access_token_generator import JwtAccessTokenGenerator
+
 
 class AuthMiddleware(BaseHTTPMiddleware):
     """

@@ -1,15 +1,18 @@
-from app.infrastructure.api.schemas.message_id import MessageId
-from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
-from app.application.security.auth_context import AuthContext
-from app.application.exceptions.auth import UnauthenticatedUserError
-from app.infrastructure.services.time_provider import SystemTimeProvider
 from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.application.exceptions.auth import UnauthenticatedUserError
+from app.application.security.auth_context import AuthContext
 from app.application.security.authenticate import Authenticate
-from app.infrastructure.repositories.user.user_role import AlchemyUserRoleRepository
-from app.infrastructure.repositories.auth.role_permission import AlchemyRolePermissionRepository
+from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
+from app.infrastructure.api.schemas.message_id import MessageId
 from app.infrastructure.database.session import db_session
+from app.infrastructure.repositories.auth.role_permission import (
+    AlchemyRolePermissionRepository,
+)
+from app.infrastructure.repositories.user.user_role import AlchemyUserRoleRepository
+from app.infrastructure.services.time_provider import SystemTimeProvider
+
 
 class AuthenticateMiddleware(BaseHTTPMiddleware):
     """
@@ -36,7 +39,7 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
                 )
 
                 authenticate.execute(AuthContext.get())
-        except UnauthenticatedUserError as e:
+        except UnauthenticatedUserError:
             return JSONResponse(
                 content=ResponseContainer(
                     message_id=MessageId.AUTH_NOT_AUTHENTICATED,

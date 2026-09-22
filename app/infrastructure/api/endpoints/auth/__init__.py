@@ -1,6 +1,7 @@
-import pkgutil
 import importlib
+import pkgutil
 from pathlib import Path
+
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/auth", tags=["auth"])

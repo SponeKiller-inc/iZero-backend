@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Final
 
+
 @dataclass(frozen=True)
 class TokenConstants:
     ACCESS_TOKEN_EXPIRATION_MINUTES: Final[int] = 15

@@ -1,8 +1,10 @@
 from __future__ import annotations
-from typing import Self
+
 from datetime import datetime
+from typing import Self
 
 from app.domain.shared.value_objects.period import ValidityPeriod
+
 
 class ModuleGroup:
     """

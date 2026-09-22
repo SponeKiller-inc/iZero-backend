@@ -1,11 +1,12 @@
-from app.application.ports.identity_provider import IdentityProvider
-from app.application.ports.time_provider import TimeProvider
 from app.application.dto.user.registration import RegistrationOauthIn
 from app.application.exceptions.user import RegisterOauthError
-from app.domain.users.repositories.user import UserRepository
-from app.domain.users.repositories.user_role import UserRoleRepository
+from app.application.ports.identity_provider import IdentityProvider
+from app.application.ports.time_provider import TimeProvider
 from app.domain.users.entities.user import User
 from app.domain.users.entities.user_role import UserRole
+from app.domain.users.repositories.user import UserRepository
+from app.domain.users.repositories.user_role import UserRoleRepository
+
 
 class RegisterOauth:
 

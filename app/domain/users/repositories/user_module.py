@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Protocol
+
 from app.domain.users.entities.user_module import UserModule
+
 
 class UserModuleRepository(Protocol):
     def get(self, user_id: int, ref_date: datetime) -> list[UserModule]:

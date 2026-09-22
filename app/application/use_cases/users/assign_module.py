@@ -1,14 +1,15 @@
-from app.application.security.authorize import authorize
-from app.application.exceptions.user import UserModuleNotAssignedError
-from app.application.exceptions.module import ModuleNotFoundError
-from app.domain.users.repositories.user_module import UserModuleRepository
-from app.application.ports.time_provider import TimeProvider
-from app.application.dto.user.assign_module import AssignModuleIn
-from app.domain.modules.repositories.module import ModuleRepository
-from app.domain.users.entities.user_module import UserModule
-from app.domain.shared.value_objects.period import ValidityPeriod
 from app.application.constants.use_case import UseCase
+from app.application.dto.user.assign_module import AssignModuleIn
+from app.application.exceptions.module import ModuleNotFoundError
+from app.application.exceptions.user import UserModuleNotAssignedError
+from app.application.ports.time_provider import TimeProvider
+from app.application.security.authorize import authorize
+from app.domain.modules.repositories.module import ModuleRepository
 from app.domain.shared.constants.entity_type import EntityType
+from app.domain.shared.value_objects.period import ValidityPeriod
+from app.domain.users.entities.user_module import UserModule
+from app.domain.users.repositories.user_module import UserModuleRepository
+
 
 class AssignModule:
 

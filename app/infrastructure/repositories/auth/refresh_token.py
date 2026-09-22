@@ -2,6 +2,7 @@ from app.domain.auth.entities.refresh_token import RefreshToken
 from app.infrastructure.models.auth.refresh_token import RefreshTokenModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 
+
 class AlchemyRefreshTokenRepository(BaseAlchemyRepository):
 
     def get_by_session_id(self, session_id: int) -> RefreshToken | None:

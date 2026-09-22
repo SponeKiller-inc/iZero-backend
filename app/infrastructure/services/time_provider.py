@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 
 from app.application.ports.time_provider import TimeProvider
+
 
 class SystemTimeProvider(TimeProvider):
     """Utility service for UTC time."""
@@ -19,8 +19,8 @@ class SystemTimeProvider(TimeProvider):
     @classmethod
     def get_expiration(
         cls,
-        minutes: Optional[int] = None,
-        days: Optional[int] = None,
+        minutes: int | None = None,
+        days: int | None = None,
     ) -> datetime:
         """
         Calculates expiration using the class's own 'now' method

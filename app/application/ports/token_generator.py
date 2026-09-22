@@ -1,5 +1,6 @@
 from typing import Protocol
 
+
 class TokenGenerator(Protocol):
     """Interface for token generator"""
     def generate(self, length: int) -> str:

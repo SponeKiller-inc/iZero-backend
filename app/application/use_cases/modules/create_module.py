@@ -1,11 +1,11 @@
-from app.application.ports.time_provider import TimeProvider
+from app.application.constants.use_case import UseCase
 from app.application.dto.module.create_module import CreateModuleIn, CreateModuleOut
 from app.application.exceptions.module import ModuleGroupNotFoundError
+from app.application.ports.time_provider import TimeProvider
 from app.application.security.authorize import authorize
-from app.application.constants.use_case import UseCase
+from app.domain.modules.entities.module import Module
 from app.domain.modules.repositories.module import ModuleRepository
 from app.domain.modules.repositories.module_group import ModuleGroupRepository
-from app.domain.modules.entities.module import Module
 from app.domain.shared.constants.entity_type import EntityType
 
 

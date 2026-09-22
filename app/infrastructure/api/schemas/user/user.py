@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
+
 class RegistrationLocalIn(BaseModel):
     email: EmailStr
     password: str

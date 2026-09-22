@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Optional, Self
+
 from datetime import datetime
+from typing import Self
 
 from app.domain.shared.value_objects.period import ValidityPeriod
 
@@ -18,7 +19,7 @@ class RefreshToken:
 
     def __init__(
         self,
-        id: Optional[int],
+        id: int | None,
         session_id: int,
         token: str,
         validity: ValidityPeriod,

@@ -1,9 +1,10 @@
-from google.oauth2 import id_token
-from google.auth.transport import requests
 from google.auth.exceptions import GoogleAuthError
+from google.auth.transport import requests
+from google.oauth2 import id_token
 
 from app.application.dto.auth.identity_provider import IdentityProviderOut
 from app.application.exceptions.auth import IdentityProviderError
+
 
 class GoogleIdentityProvider:   
     def __init__(self, client_id: str):

@@ -1,8 +1,10 @@
-from app.domain.shared.value_objects.period import ValidityPeriod
 from datetime import datetime
-from app.infrastructure.repositories.base import BaseAlchemyRepository
-from app.infrastructure.models.user.user_modules import UserModuleModel
+
+from app.domain.shared.value_objects.period import ValidityPeriod
 from app.domain.users.entities.user_module import UserModule
+from app.infrastructure.models.user.user_modules import UserModuleModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
+
 
 class AlchemyUserModuleRepository(BaseAlchemyRepository):
 

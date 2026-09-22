@@ -1,6 +1,7 @@
 from fastapi import Request
 from fastapi.security import OAuth2PasswordBearer
 
+
 class TokenProvider:
     """
     Extracts auth token from Request.

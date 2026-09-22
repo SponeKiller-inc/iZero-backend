@@ -1,8 +1,10 @@
-from typing import Protocol, Optional
+from typing import Protocol
+
 from app.domain.addresses.entities.address import Address
 
+
 class AddressRepository(Protocol):
-    def get(self, address_id: int) -> Optional[Address]:
+    def get(self, address_id: int) -> Address | None:
         """
         Get address by ID
         

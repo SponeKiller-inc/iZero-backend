@@ -1,8 +1,8 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
-from sqlalchemy import String
+
 
 class BusinessCustomerModel(Base):
     __tablename__ = "business_customers"

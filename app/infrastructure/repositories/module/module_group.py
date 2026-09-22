@@ -1,8 +1,10 @@
 from datetime import datetime
+
 from app.domain.modules.entities.module_group import ModuleGroup
 from app.domain.shared.value_objects.period import ValidityPeriod
-from app.infrastructure.repositories.base import BaseAlchemyRepository
 from app.infrastructure.models.module.module_group import ModuleGroupModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
+
 
 class AlchemyModuleGroupRepository(BaseAlchemyRepository):
     def get(self, module_group_id: int, ref_date: datetime) -> ModuleGroup | None:

@@ -4,8 +4,7 @@ from contextvars import ContextVar
 
 class SecretMessageContext:
     _msg_ctx: ContextVar[str] = ContextVar(
-        f"SECRET_MESSAGE_{secrets.token_hex(16)}",
-        default=secrets.token_hex(16)
+        f"SECRET_MESSAGE_{secrets.token_hex(16)}"
     )
 
     @classmethod
@@ -16,4 +15,8 @@ class SecretMessageContext:
         Returns:
             secret message
         """
-        return cls._msg_ctx.get()
+        value = cls._msg_ctx.get(None)
+        if value is None:
+            value = secrets.token_hex(16)
+            cls._msg_ctx.set(value)
+        return value
