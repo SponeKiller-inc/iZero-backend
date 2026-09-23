@@ -5,8 +5,8 @@ from app.application.dto.module.create_module_group import CreateModuleGroupIn
 from app.application.use_cases.modules.create_module_group import CreateModuleGroup
 from app.infrastructure.api.schemas.base import ResponseContainer
 from app.infrastructure.api.schemas.module.module_group import (
-    ModuleGroupIn,
-    ModuleGroupOut,
+    ModuleGroupSchemaIn,
+    ModuleGroupSchemaOut,
 )
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.module.module_group import (
@@ -19,11 +19,11 @@ router = APIRouter(tags=["module-group"])
 
 @router.post(
     "/groups",
-    response_model=ResponseContainer[ModuleGroupOut],
+    response_model=ResponseContainer[ModuleGroupSchemaOut],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_module_group(
-    module_group: ModuleGroupIn,
+    module_group: ModuleGroupSchemaIn,
     db: Session = Depends(get_db),
 ):
     module_group_repository = AlchemyModuleGroupRepository(db)
@@ -38,9 +38,4 @@ async def create_module_group(
         )
     )
 
-    return ResponseContainer(data=ModuleGroupOut(
-        id=result.id,
-        name=result.name,
-        valid_from=result.valid_from,
-        valid_to=result.valid_to,
-    ))
+    return ResponseContainer(data=ModuleGroupSchemaOut.model_validate(result))

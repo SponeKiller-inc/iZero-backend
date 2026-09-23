@@ -5,6 +5,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.application.constants.security import SecurityConstants
 from app.application.exceptions.auth import AccessTokenProviderError
 from app.application.security.auth_context import AuthContext
+from app.application.security.hash_context import HashContext
 from app.infrastructure.services.jwt_access_token_generator import (
     JwtAccessTokenGenerator,
 )
@@ -24,6 +25,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):        
         request.state.user_id = None
+
+        # Reset auth/permission contexts so a reused execution context can't
+        # leak a previous user's identity into this (possibly anonymous) request
+        AuthContext.clear()
+        HashContext.clear()
 
         # 1. Extraction from RQ
         jwt_token = await TokenProvider.extract_access_token(request)

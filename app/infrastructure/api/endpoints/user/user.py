@@ -25,7 +25,7 @@ router = APIRouter()
 
 @router.post("/local", status_code=status.HTTP_201_CREATED)
 async def register_local(
-    user: schema.RegistrationLocalIn,
+    user: schema.RegistrationLocalSchemaIn,
     db: Session = Depends(get_db)
 ):
     # Initialize registration local
@@ -57,7 +57,7 @@ async def register_local(
 
 @router.post("/google", status_code=status.HTTP_201_CREATED)
 async def register_google(
-    user: schema.RegistrationOauthIn,
+    user: schema.RegistrationOauthSchemaIn,
     db: Session = Depends(get_db)
 ):
     # Initialize registration oauth

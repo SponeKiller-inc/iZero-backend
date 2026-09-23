@@ -1,12 +1,19 @@
+import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Final
+
+from dotenv import dotenv_values
+
+_env_app = {
+    **dotenv_values(Path(__file__).resolve().parents[3] / ".env.app"),
+    **os.environ,
+}
 
 
 @dataclass(frozen=True)
 class SecurityConstants:
-    AUTH_SECRET: Final[str] = 'e4b7c2a9d8f1e0b3c5a6d7f8e9a0b1c2'
-    ACCESS_TOKEN_SECRET_KEY: Final[str] = 'a1f3c9e2b6d4f8017c5a9e3b2d6f4c81'
+    AUTH_SECRET: Final[str] = _env_app["AUTH_SECRET"]
+    ACCESS_TOKEN_SECRET_KEY: Final[str] = _env_app["ACCESS_TOKEN_SECRET_KEY"]
     BEARER_TOKEN_TYPE: Final[str] = 'bearer'
     ACCESS_TOKEN_ALGORITHM: Final[str] = 'HS256'
-    
-    

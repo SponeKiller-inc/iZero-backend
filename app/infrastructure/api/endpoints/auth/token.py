@@ -12,7 +12,7 @@ from app.application.exceptions.auth import (
 from app.application.exceptions.user import UserNotFoundError
 from app.application.use_cases.auth.login_google import LoginGoogle
 from app.application.use_cases.auth.login_local import LoginLocal
-from app.infrastructure.api.schemas.token import GoogleTokenIn, TokenOut
+from app.infrastructure.api.schemas.token import GoogleTokenScheTokenSchemaOutkenOut
 from app.infrastructure.config import settings
 from app.infrastructure.database.session import get_db
 from app.infrastructure.providers.auth_google import GoogleIdentityProvider
@@ -30,13 +30,13 @@ from app.infrastructure.services.time_provider import SystemTimeProvider
 
 router = APIRouter(prefix="/token", tags=["authentications"])
 
-@router.post("/local", response_model=TokenOut)
+@router.post("/local", response_model=TokenSchemaOut)
 async def local_login(
     response: Response,
     request: Request,
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
-) -> TokenOut:
+) -> TokenSchemaOut:
     # Initialize local login
     user_repository = AlchemyUserRepository(db)
     refresh_token_repository = AlchemyRefreshTokenRepository(db)
@@ -86,18 +86,15 @@ async def local_login(
                         secure=True,
                         samesite="strict")
 
-    return TokenOut(
-        access_token=result.access_token,
-        token_type=result.access_token_type,
-    )
+    return TokenSchemaOut.model_validate(result)
 
-@router.post("/google", response_model=TokenOut)
+@router.post("/google", response_model=TokenSchemaOut)
 async def google_login(
     response: Response,
     request: Request,
-    user_credentials: GoogleTokenIn,
+    user_credentials: GoogleTokenSchemaIn,
     db: Session = Depends(get_db),
-) -> TokenOut:
+) -> TokenSchemaOut:
     # Initialize google login
     user_repository = AlchemyUserRepository(db)
     refresh_token_repository = AlchemyRefreshTokenRepository(db)
@@ -153,7 +150,4 @@ async def google_login(
                         secure=True,
                         samesite="strict")
 
-    return TokenOut(
-        access_token=result.access_token,
-        token_type=result.access_token_type,
-    )
+    return TokenSchemaOut.model_validate(result)

@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class ModuleIn(BaseModel):
+class ModuleSchemaIn(BaseModel):
     """Schema carrying data to create a module."""
 
     name: str
@@ -11,8 +11,10 @@ class ModuleIn(BaseModel):
     valid_from: datetime
 
 
-class ModuleOut(BaseModel):
+class ModuleSchemaOut(BaseModel):
     """Schema carrying created module data."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     name: str

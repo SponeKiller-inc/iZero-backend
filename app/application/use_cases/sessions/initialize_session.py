@@ -43,8 +43,10 @@ class InitializeSession:
         Raises:
             UserNotFoundError: user with such id doesn't exist
         """
+        has_user = dto.user_id is not None and dto.user_id > 0
+
         # 1. Check if user exists
-        if dto.user_id is not None and dto.user_id > 0:
+        if has_user:
             user = self.user_repository.get(dto.user_id)
 
             if user is None:
@@ -56,13 +58,26 @@ class InitializeSession:
             session = self.session_repository.get_by_external_id(dto.external_id)
 
             if session and not session.is_expired(self.time_provider.now()):
-                return InitializeSessionOut(session.id, session.external_id)
+                # Covers both switching to another user and logging out of one;
+                # in both cases the session bound to the old user is now stale.
+                user_changed = session.user_id is not None and session.user_id != dto.user_id
+
+                if user_changed:
+                    session.expire_now(self.time_provider.now())
+                    self.session_repository.save(session)
+                elif session.user_id is None and has_user:
+                    # Only fill in the user on a still-anonymous session.
+                    session.assign_user(dto.user_id, self.time_provider.now())
+                    session = self.session_repository.save(session)
+
+                if not user_changed:
+                    return InitializeSessionOut(session.id, session.external_id)
 
         # 3. Invalidate user last session 
-        if dto.user_id is not None and dto.user_id > 0:
+        if has_user:
             last_session = self.session_repository.get_last_user_session(dto.user_id)
             if last_session is not None:
-                last_session.expire_now(self.time_provider)
+                last_session.expire_now(self.time_provider.now())
                 self.session_repository.save(last_session)
 
         # 4. Create new a return 

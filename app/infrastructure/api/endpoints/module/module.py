@@ -6,7 +6,7 @@ from app.application.exceptions.module import ModuleGroupNotFoundError
 from app.application.use_cases.modules.create_module import CreateModule
 from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
 from app.infrastructure.api.schemas.message_id import MessageId
-from app.infrastructure.api.schemas.module.module import ModuleIn, ModuleOut
+from app.infrastructure.api.schemas.module.module import ModuleSchemaIn, ModuleSchemaOut
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.module.module import AlchemyModuleRepository
 from app.infrastructure.repositories.module.module_group import (
@@ -19,11 +19,11 @@ router = APIRouter(tags=["module"])
 
 @router.post(
     "/",
-    response_model=ResponseContainer[ModuleOut],
+    response_model=ResponseContainer[ModuleSchemaOut],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_module(
-    module: ModuleIn,
+    module: ModuleSchemaIn,
     db: Session = Depends(get_db),
 ):
     module_repository = AlchemyModuleRepository(db)
@@ -50,11 +50,5 @@ async def create_module(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    return ResponseContainer(data=ModuleOut(
-        id=result.id,
-        name=result.name,
-        module_group_id=result.module_group_id,
-        valid_from=result.valid_from,
-        valid_to=result.valid_to,
-    ))
+    return ResponseContainer(data=ModuleSchemaOut.model_validate(result))
 

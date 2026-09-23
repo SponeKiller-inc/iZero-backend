@@ -3,14 +3,14 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
 
-class RegistrationLocalIn(BaseModel):
+class RegistrationLocalSchemaIn(BaseModel):
     email: EmailStr
     password: str
 
-class RegistrationOauthIn(BaseModel):
+class RegistrationOauthSchemaIn(BaseModel):
     jwt_token: str
 
-class UserModuleIn(BaseModel):
+class UserModuleSchemaIn(BaseModel):
     module_id: int
     valid_from: datetime
     valid_to: datetime

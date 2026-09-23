@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime
 from typing import Self
 
-from app.application.ports.time_provider import TimeProvider
 from app.domain.session.exceptions.session import SessionExpiredError
 from app.domain.session.value_objects.session_event import SessionEvent
 from app.domain.shared.value_objects.period import ValidityPeriod
@@ -110,16 +109,27 @@ class Session:
         """
         return not self.validity.is_active(ref_time)
 
-    def expire_now(self, time_provider: TimeProvider) -> None:
+    def assign_user(self, user_id: int, current_time: datetime) -> None:
+        """
+        Associates an already-running (e.g. anonymous) session with an
+        authenticated user, so it can later be looked up/invalidated by user id.
+
+        Args:
+            user_id (int): The user id to associate with the session.
+            current_time (datetime): The current time.
+        """
+        self.user_id = user_id
+        self.record_event("user_logged_in", current_time)
+
+    def expire_now(self, current_time: datetime) -> None:
         """
         Expires the session immediately
         
         Args:
-            time_provider (TimeProvider): The time provider.
+            current_time (datetime): The current time.
         """
-        now = time_provider.now()
         self.validity = ValidityPeriod(
             valid_from=self.validity.valid_from, 
-            valid_to=now
+            valid_to=current_time
         )
-        self.record_event("user_logged_out", now)
+        self.record_event("user_logged_out", current_time)

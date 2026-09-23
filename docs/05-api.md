@@ -22,6 +22,18 @@ All responses use the `ResponseContainer` envelope ([schemas/base.py](../app/inf
 | `message` | Optional accompanying text (not intended for end users) |
 | `data` | Endpoint payload, typed via a generic |
 
+## Schema naming
+
+Pydantic schema classes in `app/infrastructure/api/schemas/**` are suffixed `SchemaIn` / `SchemaOut`
+(e.g. `ModuleSchemaIn`, `ModuleSchemaOut`), not just `In` / `Out`. This distinguishes them from the
+application-layer DTOs in `app/application/dto/**`, which keep the plain `In` / `Out` suffix
+(e.g. `CreateModuleIn`, `CreateModuleOut`).
+
+When mapping a use-case DTO to its `SchemaOut`, prefer `SomeSchemaOut.model_validate(result)` over listing
+every field manually. This requires the schema to declare `model_config = ConfigDict(from_attributes=True)`,
+and only works when field names match between the DTO and the schema — use `Field(validation_alias="...")`
+for the fields that don't (see `TokenSchemaOut` in [schemas/token.py](../app/infrastructure/api/schemas/token.py)).
+
 ## Message IDs
 
 Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.py). Code format: `EE SS NNN` — 2 digits for the main entity, 2 digits for the sub-entity, 3 digits for the sequence number.
@@ -76,16 +88,16 @@ Implemented in [endpoints/module](../app/infrastructure/api/endpoints/module), u
 
 - **Purpose:** Create a new module.
 - **Authentication:** authenticated, `@authorize(EntityType.MODULES, UseCase.MODULES_CREATE)`.
-- **Input:** `ModuleIn` ([schemas/module/module.py](../app/infrastructure/api/schemas/module/module.py)) — `name`, `module_group_id`, `valid_from`.
-- **Response:** `ResponseContainer[ModuleOut]`, `201 Created`.
+- **Input:** `ModuleSchemaIn` ([schemas/module/module.py](../app/infrastructure/api/schemas/module/module.py)) — `name`, `module_group_id`, `valid_from`.
+- **Response:** `ResponseContainer[ModuleSchemaOut]`, `201 Created`.
 - **Errors:** `MODULE_GROUP_NOT_FOUND` (404) if `module_group_id` does not exist.
 
 #### `POST /api/modules/groups`
 
 - **Purpose:** Create a new module group.
 - **Authentication:** authenticated, `@authorize(EntityType.MODULES, UseCase.MODULES_CREATE_GROUP)`.
-- **Input:** `ModuleGroupIn` ([schemas/module/module_group.py](../app/infrastructure/api/schemas/module/module_group.py)) — `name`, `valid_from`.
-- **Response:** `ResponseContainer[ModuleGroupOut]`, `201 Created`.
+- **Input:** `ModuleGroupSchemaIn` ([schemas/module/module_group.py](../app/infrastructure/api/schemas/module/module_group.py)) — `name`, `valid_from`.
+- **Response:** `ResponseContainer[ModuleGroupSchemaOut]`, `201 Created`.
 - **Errors:** none besides validation/auth.
 
 Not yet implemented: `GET`/update endpoints for modules and module groups.
@@ -95,7 +107,7 @@ TODO: document the endpoints in [endpoints/module](../app/infrastructure/api/end
 
 Implemented in [endpoints/auth/token.py](../app/infrastructure/api/endpoints/auth/token.py), use-cases in
 [use_cases/auth](../app/application/use_cases/auth). Unlike the endpoints above, these responses are **not** wrapped
-in `ResponseContainer` — they return `TokenOut` directly and use plain `HTTPException(detail=...)` for errors.
+in `ResponseContainer` — they return `TokenSchemaOut` directly and use plain `HTTPException(detail=...)` for errors.
 
 A session (see [middleware/sid.py](../app/infrastructure/api/middleware/sid.py)) must already exist before these are
 called — `SIDMiddleware` initializes one on every request, so login use-cases never validate session existence
@@ -106,7 +118,7 @@ themselves; they read `request.state.session_id`.
 - **Purpose:** Log in with e-mail + password (`LoginLocal` use-case).
 - **Authentication:** public.
 - **Input:** `OAuth2PasswordRequestForm` (form fields `username` = e-mail, `password`).
-- **Response:** `TokenOut` (`access_token`, `token_type`), `200 OK`. Also sets httpOnly/secure `refresh_token` and
+- **Response:** `TokenSchemaOut` (`access_token`, `token_type`), `200 OK`. Also sets httpOnly/secure `refresh_token` and
   secure `csrf_token` cookies.
 - **Errors:** `401` "Invalid credentials" (`InvalidCredentialsError` — unknown user, no local password, or bad password).
 
@@ -115,8 +127,8 @@ themselves; they read `request.state.session_id`.
 - **Purpose:** Log in with a Google `id_token` (`LoginGoogle` use-case). The user must already be registered via
   `POST /api/users/google`; this endpoint does not create new users.
 - **Authentication:** public.
-- **Input:** `GoogleTokenIn` ([schemas/token.py](../app/infrastructure/api/schemas/token.py)) — `jwt_token`.
-- **Response:** `TokenOut`, `200 OK`. Same cookies as `/local`.
+- **Input:** `GoogleTokenSchemaIn` ([schemas/token.py](../app/infrastructure/api/schemas/token.py)) — `jwt_token`.
+- **Response:** `TokenSchemaOut`, `200 OK`. Same cookies as `/local`.
 - **Errors:** `401` "Invalid credentials" (`UserNotFoundError` — no user for that Google account), `400` "Google
   authentication failed" (`IdentityProviderError` — invalid/expired Google token).
 
