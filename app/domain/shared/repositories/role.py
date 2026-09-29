@@ -1,0 +1,31 @@
+from typing import Protocol
+
+from app.domain.shared.entities.role import Role
+
+
+class RoleRepository(Protocol):
+    """Repository interface for Role entity."""
+    
+    def get(self, role_id: int) -> Role | None:
+        """
+        Get a role by its ID.
+        
+        Args:
+            role_id: The ID of the role.
+            
+        Returns:
+            The Role entity if found, None otherwise.
+        """
+        ...
+
+    def save(self, role: Role) -> Role:
+        """
+        Create a new role. If role.id is set, it is persisted as-is (used for seeding fixed IDs).
+
+        Args:
+            role: The role to create.
+
+        Returns:
+            The created Role entity.
+        """
+        ...
