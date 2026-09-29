@@ -7,7 +7,6 @@ from app.application.use_cases.seed.seed_default_role_permissions import (
 )
 from app.application.use_cases.seed.seed_default_roles import SeedDefaultRoles
 from app.application.use_cases.seed.seed_default_titles import SeedDefaultTitles
-from app.infrastructure.config import settings
 from app.infrastructure.database.session import db_session
 from app.infrastructure.repositories.auth.role_permission import (
     AlchemyRolePermissionRepository,

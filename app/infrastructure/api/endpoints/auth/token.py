@@ -12,7 +12,7 @@ from app.application.exceptions.auth import (
 from app.application.exceptions.user import UserNotFoundError
 from app.application.use_cases.auth.login_google import LoginGoogle
 from app.application.use_cases.auth.login_local import LoginLocal
-from app.infrastructure.api.schemas.token import GoogleTokenScheTokenSchemaOutkenOut
+from app.infrastructure.api.schemas.token import GoogleTokenSchemaIn, TokenSchemaOut
 from app.infrastructure.config import settings
 from app.infrastructure.database.session import get_db
 from app.infrastructure.providers.auth_google import GoogleIdentityProvider

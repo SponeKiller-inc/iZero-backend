@@ -7,7 +7,6 @@ from app.domain.bank.value_objects.bank_identification import (
     Iban,
     Swift,
 )
-
 from app.infrastructure.types.mapper import ValueObjectType
 
 BankCode = Annotated[
