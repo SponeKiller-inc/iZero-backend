@@ -15,5 +15,7 @@ _env_app = {
 class SecurityConstants:
     AUTH_SECRET: Final[str] = _env_app["AUTH_SECRET"]
     ACCESS_TOKEN_SECRET_KEY: Final[str] = _env_app["ACCESS_TOKEN_SECRET_KEY"]
+    ADMIN_PASSWORD: Final[str] = _env_app["ADMIN_PASSWORD"]
     BEARER_TOKEN_TYPE: Final[str] = 'bearer'
     ACCESS_TOKEN_ALGORITHM: Final[str] = 'HS256'
+

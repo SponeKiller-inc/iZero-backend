@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Self
 
+from app.domain.users.constants.admin import ADMIN_EMAIL
 from app.domain.users.constants.registration_source_type import RegistrationSourceType
 from app.domain.users.value_objects.registration_source import RegistrationSource
 
@@ -27,7 +28,7 @@ class User:
         provider_user_id: str | None = None,        
     ):
         self.id = id
-        self.email = email
+        self.email = email.lower()
         self.password = password
         self.provider_user_id = provider_user_id
         self.provider = provider
@@ -48,6 +49,21 @@ class User:
             password=password,
         )
     
+    @classmethod
+    def create_admin(
+        cls,
+        password: str
+    ) -> Self:
+        """
+        Creates the bootstrap admin user locally. Reserved for SeedDefaultAdmin.
+        """
+        return cls(
+            id=None,
+            email=ADMIN_EMAIL,
+            provider=RegistrationSource(RegistrationSourceType.SEED),
+            password=password,
+        )
+
     @classmethod
     def create_oauth(
         cls,

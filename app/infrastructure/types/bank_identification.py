@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.domain.value_objects.bank_identification import (
+from app.domain.bank.value_objects.bank_identification import (
     AccountNumber,
     AccountPrefix,
     BankCode,

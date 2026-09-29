@@ -28,6 +28,7 @@ On startup [entrypoint.sh](../entrypoint.sh):
 | `SeedDefaultRoles` ([seed_default_roles.py](../app/application/use_cases/seed/seed_default_roles.py)) | `roles` row `"user"` — the role assigned to every newly registered user (`REGULAR_ROLE_ID`) | `1` |
 | `SeedDefaultTitles` ([seed_default_titles.py](../app/application/use_cases/seed/seed_default_titles.py)) | `titles` rows `"prefix"` / `"suffix"`, referenced by `prefix_titles`/`suffix_titles` | `1`, `2` |
 | `SeedDefaultRolePermissions` ([seed_default_role_permissions.py](../app/application/use_cases/seed/seed_default_role_permissions.py)) | `role_permission` rows granting the `"user"` role `USERS_ASSIGN_MODULE` and `USERS_RETRIEVE_MODULE` — without this, `@authorize`-protected use-cases reject every regular user | — |
+| `SeedDefaultAdmin` ([seed_default_admin.py](../app/application/use_cases/seed/seed_default_admin.py)) | `users` row for the bootstrap admin account (`email="admin"`, password from `ADMIN_PASSWORD` in `.env.app`) — created via `User.create_admin`, which only this use case is allowed to call | — |
 
 Order matters: roles are seeded before role permissions (FK dependency).
 

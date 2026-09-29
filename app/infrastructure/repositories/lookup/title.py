@@ -59,6 +59,10 @@ class AlchemyTitleRepository(BaseAlchemyRepository, TitleRepository):
         model = TitleModel(id=title.id, title_type=title.title_type)
         self.db.add(model)
         self.db.flush()
+
+        if title.id is not None:
+            self._resync_sequence("titles", "id", model.id)
+
         self.db.refresh(model)
 
         return self._to_entity(model)

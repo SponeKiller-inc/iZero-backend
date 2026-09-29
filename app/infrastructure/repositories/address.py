@@ -1,42 +1,82 @@
-from app.models.address import Addresses
-from sqlalchemy.orm import Session
+from app.domain.addresses.entities.address import Address
+from app.infrastructure.models.address.addresses import AddressModel
+from app.infrastructure.repositories.base import BaseAlchemyRepository
 
 
-class AddressRepository:
-    def __init__(self, db: Session):
-        self.db = db
-        
-    def get_address(self, address_id: int) -> Addresses | None:
+class AlchemyAddressRepository(BaseAlchemyRepository):
+    def get(self, address_id: int) -> Address | None:
         """
-        Retrieve address
+        Get address by ID
 
         Args:
-            address_id (int): address id
+            address_id: Address ID
 
         Returns:
-            Addresses or None:  address or None if no address found
+            Address entity if found, else None
         """
 
-        return (
+        address_model = (
             self.db
-                .query(Addresses)
-                .filter(
-                    Addresses.id == address_id
-                )
+                .query(AddressModel)
+                .filter(AddressModel.id == address_id)
                 .first()
-        )   
+        )
 
-    def get_all_addresses(self) -> list[Addresses] | []:
+        if address_model is None:
+            return None
+
+        return self._to_entity(address_model)
+
+    def get_all(self) -> list[Address]:
         """
         Get all addresses
 
         Returns:
-            list[Addresses] or []:  list of addresses 
-                or empty list if no addresses found
+            List of Address entities
         """
-        
-        return (
+
+        return [
+            self._to_entity(address_model)
+            for address_model in self.db.query(AddressModel).all()
+        ]
+
+    def save(self, address: Address) -> Address:
+        """
+        Save new or existing address
+
+        Args:
+            address: Address entity to save
+
+        Returns:
+            Saved address entity
+        """
+
+        if address.id is None:
+            return self._insert(address)
+        else:
+            return self._update(address)
+
+    def _insert(self, address: Address) -> Address:
+        address_model = AddressModel()
+        self.db.add(address_model)
+        self.db.flush()
+        self.db.refresh(address_model)
+
+        return self._to_entity(address_model)
+
+    def _update(self, address: Address) -> Address:
+        address_model = (
             self.db
-                .query(Addresses)
-                .all()
+                .query(AddressModel)
+                .filter(AddressModel.id == address.id)
+                .first()
         )
+
+        self.db.flush()
+        self.db.refresh(address_model)
+
+        return self._to_entity(address_model)
+
+    @staticmethod
+    def _to_entity(address_model: AddressModel) -> Address:
+        return Address(id=address_model.id)

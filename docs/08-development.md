@@ -19,8 +19,6 @@ uvicorn app.infrastructure.api.main:app --reload
 
 The API runs at `http://127.0.0.1:8000`, Swagger at `/docs`.
 
-> Note: the `Dockerfile` starts `app.main:app`, while the local entry point is `app.infrastructure.api.main:app`. TODO: unify.
-
 ## Working with the code
 
 Adding a new feature typically means:

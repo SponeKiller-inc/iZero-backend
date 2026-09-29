@@ -1,6 +1,4 @@
 
-from sqlalchemy import func, select
-
 from app.domain.shared.entities.role import Role
 from app.domain.shared.repositories.role import RoleRepository
 from app.infrastructure.models.lookup.role import RoleModel
@@ -40,10 +38,7 @@ class AlchemyRoleRepository(BaseAlchemyRepository, RoleRepository):
         self.db.flush()
 
         if role.id is not None:
-            # explicit ID bypasses the identity sequence, so re-sync it to avoid future collisions
-            self.db.execute(
-                select(func.setval(func.pg_get_serial_sequence("roles", "id"), model.id))
-            )
+            self._resync_sequence("roles", "id", model.id)
 
         self.db.refresh(model)
 

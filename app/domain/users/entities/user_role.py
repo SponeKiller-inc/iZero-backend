@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Self
 
-from app.domain.shared.constants.role_type import REGULAR_ROLE_ID
+from app.domain.shared.constants.role_type import ADMIN_ROLE_ID, REGULAR_ROLE_ID
 from app.domain.shared.value_objects.period import ValidityPeriod
 
 
@@ -50,6 +50,29 @@ class UserRole:
             id=None,
             user_id=user_id,
             role_id=REGULAR_ROLE_ID,
+            validity=ValidityPeriod(current_time)
+        )
+
+    @classmethod
+    def create_admin_role(
+        cls,
+        user_id: int,
+        current_time: datetime
+    ) -> Self:
+        """
+        Factory method for quick creation of an admin role.
+
+        Args:
+            user_id (int): The ID of the user.
+            current_time (datetime): The time the role becomes valid from.
+
+        Returns:
+            UserRole: The newly created user role.
+        """
+        return cls(
+            id=None,
+            user_id=user_id,
+            role_id=ADMIN_ROLE_ID,
             validity=ValidityPeriod(current_time)
         )
     

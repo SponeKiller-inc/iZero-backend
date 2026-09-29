@@ -22,7 +22,10 @@ class AlchemyModuleGroupRepository(BaseAlchemyRepository):
         module_group_model = (
             self.db
                 .query(ModuleGroupModel)
-                .filter(ModuleGroupModel.id == module_group_id)
+                .filter(
+                    ModuleGroupModel.id == module_group_id,
+                    ModuleGroupModel.valid_at(ref_date),
+                )
                 .first()
         )
 
