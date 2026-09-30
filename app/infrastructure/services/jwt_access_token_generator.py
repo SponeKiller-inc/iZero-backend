@@ -26,7 +26,7 @@ class JwtAccessTokenGenerator:
             str: JWT token
         """
         payload = {
-            "sub": str(user_id),
+            "user_id": str(user_id),
             "exp": int(expires_at.timestamp())
         }
         return jwt.encode(payload, self._secret_key, algorithm=self._algorithm)
@@ -51,7 +51,7 @@ class JwtAccessTokenGenerator:
                 algorithms=[self._algorithm]
             )
 
-            user_id = payload.get("sub")
+            user_id = payload.get("user_id")
             if not user_id or not str(user_id).isdigit():
                 raise AccessTokenProviderError(
                     "Invalid token payload: user_id missing or non-numeric"
