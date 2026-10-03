@@ -57,7 +57,17 @@ class AlchemyAddressRepository(BaseAlchemyRepository):
             return self._update(address)
 
     def _insert(self, address: Address) -> Address:
-        address_model = AddressModel()
+        address_model = AddressModel(
+            external_id=address.external_id,
+            street=address.street,
+            building_number=address.building_number,
+            orientation_number=address.orientation_number,
+            orientation_number_letter=address.orientation_number_letter,
+            district=address.district,
+            city=address.city,
+            postal_code=address.postal_code,
+            country_id=address.country_id,
+        )
         self.db.add(address_model)
         self.db.flush()
         self.db.refresh(address_model)
@@ -72,6 +82,16 @@ class AlchemyAddressRepository(BaseAlchemyRepository):
                 .first()
         )
 
+        address_model.external_id = address.external_id
+        address_model.street = address.street
+        address_model.building_number = address.building_number
+        address_model.orientation_number = address.orientation_number
+        address_model.orientation_number_letter = address.orientation_number_letter
+        address_model.district = address.district
+        address_model.city = address.city
+        address_model.postal_code = address.postal_code
+        address_model.country_id = address.country_id
+
         self.db.flush()
         self.db.refresh(address_model)
 
@@ -79,4 +99,15 @@ class AlchemyAddressRepository(BaseAlchemyRepository):
 
     @staticmethod
     def _to_entity(address_model: AddressModel) -> Address:
-        return Address(id=address_model.id)
+        return Address(
+            id=address_model.id,
+            external_id=address_model.external_id,
+            street=address_model.street,
+            building_number=address_model.building_number,
+            orientation_number=address_model.orientation_number,
+            orientation_number_letter=address_model.orientation_number_letter,
+            district=address_model.district,
+            city=address_model.city,
+            postal_code=address_model.postal_code,
+            country_id=address_model.country_id,
+        )
