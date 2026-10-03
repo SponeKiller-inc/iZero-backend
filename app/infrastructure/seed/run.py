@@ -1,6 +1,9 @@
 """Entrypoint for seeding default configuration data, run right after `alembic upgrade head`."""
 from sqlalchemy import func, select
 
+from app.application.use_cases.seed.seed_default_address_types import (
+    SeedDefaultAddressTypes,
+)
 from app.application.use_cases.seed.seed_default_admin import SeedDefaultAdmin
 from app.application.use_cases.seed.seed_default_countries import (
     SeedDefaultCountries,
@@ -11,10 +14,13 @@ from app.application.use_cases.seed.seed_default_role_permissions import (
 from app.application.use_cases.seed.seed_default_roles import SeedDefaultRoles
 from app.application.use_cases.seed.seed_default_titles import SeedDefaultTitles
 from app.infrastructure.database.session import db_session
+from app.infrastructure.repositories.address.address_type import (
+    AlchemyAddressTypeRepository,
+)
+from app.infrastructure.repositories.address.country import AlchemyCountryRepository
 from app.infrastructure.repositories.auth.role_permission import (
     AlchemyRolePermissionRepository,
 )
-from app.infrastructure.repositories.lookup.country import AlchemyCountryRepository
 from app.infrastructure.repositories.lookup.role import AlchemyRoleRepository
 from app.infrastructure.repositories.lookup.title import AlchemyTitleRepository
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
@@ -37,6 +43,7 @@ def run() -> None:
         SeedDefaultRoles(AlchemyRoleRepository(db)).execute()
         SeedDefaultTitles(AlchemyTitleRepository(db)).execute()
         SeedDefaultCountries(AlchemyCountryRepository(db)).execute()
+        SeedDefaultAddressTypes(AlchemyAddressTypeRepository(db)).execute()
         SeedDefaultRolePermissions(
             AlchemyRolePermissionRepository(db),
             SystemTimeProvider(),
