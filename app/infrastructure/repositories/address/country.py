@@ -58,8 +58,21 @@ class AlchemyCountryRepository(BaseAlchemyRepository):
 
     def save(self, country: Country) -> Country:
         """
-        Create a country. If country.id is set, it is persisted as-is
-        (used for seeding fixed IDs).
+        Create or update Country.
+
+        Args:
+            country (Country): data to create or update country
+
+        Returns:
+            Country: newly created or updated country
+        """
+        if country.id is None:
+            return self._insert(country)
+        return self._update(country)
+
+    def _insert(self, country: Country) -> Country:
+        """
+        Create Country.
 
         Args:
             country (Country): data to create country
@@ -68,15 +81,31 @@ class AlchemyCountryRepository(BaseAlchemyRepository):
             Country: newly created country
         """
 
-        model = CountryModel(
-            id=country.id, code=country.code.value, name=country.name
-        )
+        model = CountryModel(code=country.code.value, name=country.name)
         self.db.add(model)
         self.db.flush()
+        self.db.refresh(model)
 
-        if country.id is not None:
-            self._resync_sequence("countries", "id", model.id)
+        return self._to_entity(model)
 
+    def _update(self, country: Country) -> Country:
+        """
+        Update Country.
+
+        Args:
+            country (Country): data to update country
+
+        Returns:
+            Country: updated country
+        """
+
+        model = (
+            self.db.query(CountryModel).filter(CountryModel.id == country.id).first()
+        )
+
+        model.code = country.code.value
+        model.name = country.name
+        self.db.flush()
         self.db.refresh(model)
 
         return self._to_entity(model)
