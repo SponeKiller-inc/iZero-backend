@@ -1,4 +1,4 @@
-from app.domain.addresses.entities.address_type import AddressTyp
+from app.domain.addresses.entities.address_type import AddressType
 from app.infrastructure.models.address.address_types import AddressTypeModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 
