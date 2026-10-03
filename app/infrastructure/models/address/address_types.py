@@ -7,4 +7,5 @@ class AddressTypeModel(Base):
     __tablename__ = "address_types"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    type: Mapped[str] = mapped_column(unique=True)
     description: Mapped[str] = mapped_column()

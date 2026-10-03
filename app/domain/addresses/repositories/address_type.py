@@ -6,12 +6,12 @@ from app.domain.addresses.entities.address_type import AddressType
 class AddressTypeRepository(Protocol):
     """Repository interface for AddressType entity."""
 
-    def get(self, address_type_id: int) -> AddressType | None:
+    def get_by_type(self, address_type: str) -> AddressType | None:
         """
-        Get an address type by its ID.
+        Get an address type by its natural-key type ("permanent" or "mailing").
 
         Args:
-            address_type_id: The ID of the address type.
+            address_type: The type of the address type row.
 
         Returns:
             The AddressType entity if found, None otherwise.
@@ -20,7 +20,7 @@ class AddressTypeRepository(Protocol):
 
     def save(self, address_type: AddressType) -> AddressType:
         """
-        Create a new address type. If address_type.id is set, it is persisted as-is (used for seeding fixed IDs).
+        Create a new address type.
 
         Args:
             address_type: The address type to create.

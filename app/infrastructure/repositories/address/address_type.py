@@ -4,20 +4,21 @@ from app.infrastructure.repositories.base import BaseAlchemyRepository
 
 
 class AlchemyAddressTypeRepository(BaseAlchemyRepository):
-    def get(self, address_type_id: int) -> AddressType | None:
+    def get_by_type(self, address_type: str) -> AddressType | None:
         """
-        Get an address type by its ID
+        Get an address type by its natural-key type ("permanent" or "mailing").
 
         Args:
-            address_type_id (int): address type id
+            address_type (str): address type's type
 
         Returns:
-            AddressType or None: address type entity or None if no address type found
+            AddressType or None: address type entity or None if no address
+                type found
         """
 
         model = (
             self.db.query(AddressTypeModel)
-            .filter(AddressTypeModel.id == address_type_id)
+            .filter(AddressTypeModel.type == address_type)
             .first()
         )
         if not model:
@@ -35,14 +36,13 @@ class AlchemyAddressTypeRepository(BaseAlchemyRepository):
             AddressType: newly created or updated address type
         """
 
-
         if address_type.id is None:
             return self._insert(address_type)
         return self._update(address_type)
 
     def _insert(self, address_type: AddressType) -> AddressType:
         """
-        Create AddressType. If address_type.id is set, it is persisted as-is (used for seeding fixed IDs).
+        Create AddressType. The id is DB-assigned (auto-increment).
 
         Args:
             address_type (AddressType): data to create address type
@@ -51,13 +51,11 @@ class AlchemyAddressTypeRepository(BaseAlchemyRepository):
             AddressType: newly created address type
         """
 
-        model = AddressTypeModel(id=address_type.id, description=address_type.description)
+        model = AddressTypeModel(
+            type=address_type.type, description=address_type.description
+        )
         self.db.add(model)
         self.db.flush()
-
-        if address_type.id is not None:
-            self._resync_sequence("address_types", "id", model.id)
-
         self.db.refresh(model)
 
         return self._to_entity(model)
@@ -74,9 +72,12 @@ class AlchemyAddressTypeRepository(BaseAlchemyRepository):
         """
 
         model = (
-            self.db.query(AddressTypeModel).filter(AddressTypeModel.id == address_type.id).first()
+            self.db.query(AddressTypeModel)
+            .filter(AddressTypeModel.id == address_type.id)
+            .first()
         )
 
+        model.type = address_type.type
         model.description = address_type.description
         self.db.flush()
         self.db.refresh(model)
@@ -85,4 +86,6 @@ class AlchemyAddressTypeRepository(BaseAlchemyRepository):
 
     @staticmethod
     def _to_entity(model: AddressTypeModel) -> AddressType:
-        return AddressType(id=model.id, description=model.description)
+        return AddressType(
+            id=model.id, type=model.type, description=model.description
+        )
