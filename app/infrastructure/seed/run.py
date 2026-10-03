@@ -2,6 +2,9 @@
 from sqlalchemy import func, select
 
 from app.application.use_cases.seed.seed_default_admin import SeedDefaultAdmin
+from app.application.use_cases.seed.seed_default_countries import (
+    SeedDefaultCountries,
+)
 from app.application.use_cases.seed.seed_default_role_permissions import (
     SeedDefaultRolePermissions,
 )
@@ -11,6 +14,7 @@ from app.infrastructure.database.session import db_session
 from app.infrastructure.repositories.auth.role_permission import (
     AlchemyRolePermissionRepository,
 )
+from app.infrastructure.repositories.lookup.country import AlchemyCountryRepository
 from app.infrastructure.repositories.lookup.role import AlchemyRoleRepository
 from app.infrastructure.repositories.lookup.title import AlchemyTitleRepository
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
@@ -32,6 +36,7 @@ def run() -> None:
         # order matters: role_permission rows have a FK to roles
         SeedDefaultRoles(AlchemyRoleRepository(db)).execute()
         SeedDefaultTitles(AlchemyTitleRepository(db)).execute()
+        SeedDefaultCountries(AlchemyCountryRepository(db)).execute()
         SeedDefaultRolePermissions(
             AlchemyRolePermissionRepository(db),
             SystemTimeProvider(),
