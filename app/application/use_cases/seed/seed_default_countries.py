@@ -11,8 +11,13 @@ class SeedDefaultCountries:
         self.country_repository = country_repository
 
     def execute(self) -> None:
+        existing_codes = {
+            country.code.value for country in self.country_repository.get_all()
+        }
         for code, name in COUNTRIES:
-            if self.country_repository.get_by_code(code) is None:
-                self.country_repository.save(
-                    Country.create(code=CountryIsoCode(code), name=name)
-                )
+            if code in existing_codes:
+                continue
+
+            self.country_repository.save(
+                Country.create(code=CountryIsoCode(code), name=name)
+            )
