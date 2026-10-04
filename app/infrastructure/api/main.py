@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.application.exceptions.auth import AuthHashVerificationError
 from app.infrastructure.api.middleware.auth import AuthMiddleware
 from app.infrastructure.api.middleware.authenticate import AuthenticateMiddleware
+from app.infrastructure.api.middleware.http_audit import HttpAuditMiddleware
 from app.infrastructure.api.middleware.sid import SIDMiddleware
 from app.infrastructure.api.router import router
 from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
@@ -37,6 +38,11 @@ app.add_middleware(
 app.add_middleware(AuthenticateMiddleware)
 app.add_middleware(SIDMiddleware)
 app.add_middleware(AuthMiddleware)
+
+# HttpAuditMiddleware must be added last of all, making it the outermost
+# middleware, so it captures every incoming request/response exactly as the
+# client sent/received it, before/after any other middleware touches it.
+app.add_middleware(HttpAuditMiddleware)
 
 
 #Routing

@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     sentry_traces_sample_rate: float = 0.0
     sentry_send_default_pii: bool = False
     google_oauth_client_id:str
+    http_audit_sensitive_headers: list[str] = [
+        "authorization", "cookie", "set-cookie", "x-api-key", "proxy-authorization",
+    ]
+    http_audit_max_body_length: int = 10_000
     
 
     model_config = SettingsConfigDict(env_file=".env",
@@ -28,6 +32,7 @@ class Settings(BaseSettings):
 
     @field_validator(
         "cors_allow_origins", "cors_allow_methods", "cors_allow_headers",
+        "http_audit_sensitive_headers",
         mode="before",
     )
     @classmethod

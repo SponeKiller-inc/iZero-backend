@@ -31,6 +31,15 @@ All variables are **required** — the application will not start without them.
 | `CORS_ALLOW_HEADERS` | str | Comma-separated list of headers |
 | `SENTRY_DSN` | str | Sentry DSN (secret) |
 
+## HTTP audit
+
+Shared by both the outbound audit (external calls made via `requests`, see [http_audit.py](../app/infrastructure/providers/http_audit.py)) and the inbound audit (incoming API calls, see [http_audit.py](../app/infrastructure/api/middleware/http_audit.py)).
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `HTTP_AUDIT_SENSITIVE_HEADERS` | list[str] (JSON array) | Header names redacted before being stored by the HTTP audit logs, e.g. `["authorization","cookie"]` (default: `authorization,cookie,set-cookie,x-api-key,proxy-authorization`) |
+| `HTTP_AUDIT_MAX_BODY_LENGTH` | int | Max number of characters of request/response body stored by the HTTP audit logs before truncation (default: `10000`) |
+
 ## `.env` template
 
 TODO: keep a `.env.example` file in the repository with the same list of keys and empty values.
