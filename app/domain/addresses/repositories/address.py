@@ -24,7 +24,32 @@ class AddressRepository(Protocol):
             List of Address entities
         """
         ...
-        
+
+    def get_by_external_id(self, external_id: int, country_id: int) -> Address | None:
+        """
+        Get address by its external (e.g. RÚIAN) ID and country
+
+        Args:
+            external_id: External address ID
+            country_id: ID of the country the address belongs to
+
+        Returns:
+            Address entity if found, else None
+        """
+        ...
+
+    def exists_for_country(self, country_id: int) -> bool:
+        """
+        Check whether any address already exists for the given country
+
+        Args:
+            country_id: Country ID
+
+        Returns:
+            True if at least one address exists for the country, else False
+        """
+        ...
+
     def save(self, address: Address) -> Address:
         """
         Save new or existing address

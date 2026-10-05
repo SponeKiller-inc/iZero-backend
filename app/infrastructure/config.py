@@ -23,6 +23,9 @@ class Settings(BaseSettings):
         "authorization", "cookie", "set-cookie", "x-api-key", "proxy-authorization",
     ]
     http_audit_max_body_length: int = 10_000
+    ruian_query_url: str
+    ruian_page_size: int
+    ruian_request_timeout_seconds: int
     
 
     model_config = SettingsConfigDict(env_file=".env",
