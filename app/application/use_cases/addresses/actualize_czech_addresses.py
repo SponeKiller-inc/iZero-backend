@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import date
 
-from app.application.exceptions.address import CountryNotFoundError
 from app.application.ports.address_provider import AddressProvider
 from app.application.use_cases.seed.seed_czech_addresses import CZECH_COUNTRY_CODE
 from app.domain.addresses.entities.address import Address
@@ -33,26 +32,22 @@ class ActualizeCzechAddresses:
         self.address_repository = address_repository
         self.country_repository = country_repository
 
-    def execute(self, since: date) -> None:
+    def execute(self, modified_since: date) -> None:
         """
-        Fetches Czech addresses modified on or after `since` from the
+        Fetches Czech addresses modified on or after `modified_since` from the
         address provider and persists them, updating existing addresses
         (matched by external ID and country) or inserting new ones.
 
         Args:
-            since: Only addresses modified on or after this date are fetched.
+            modified_since: Only addresses modified on or after this date are
+                fetched.
 
         Raises:
-            CountryNotFoundError: If Czechia hasn't been seeded yet.
             AddressProviderError: If the external address provider has failed.
         """
         country = self.country_repository.get_by_code(CZECH_COUNTRY_CODE)
-        if country is None or country.id is None:
-            raise CountryNotFoundError(
-                "Czechia must be seeded before Czech addresses can be actualized."
-            )
 
-        for address_out in self.address_provider.get_modified(since):
+        for address_out in self.address_provider.get_modified(modified_since):
             if address_out.country_code.value != CZECH_COUNTRY_CODE:
                 continue
 

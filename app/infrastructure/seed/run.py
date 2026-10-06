@@ -14,8 +14,9 @@ from app.application.use_cases.seed.seed_default_role_permissions import (
 )
 from app.application.use_cases.seed.seed_default_roles import SeedDefaultRoles
 from app.application.use_cases.seed.seed_default_titles import SeedDefaultTitles
+from app.infrastructure.config import settings
 from app.infrastructure.database.session import db_session
-from app.infrastructure.providers.ruian_address_provider import RuianAddressProvider
+from app.infrastructure.providers.ruian_address import RUIANAddressProvider
 from app.infrastructure.repositories.address.address import AlchemyAddressRepository
 from app.infrastructure.repositories.address.address_type import (
     AlchemyAddressTypeRepository,
@@ -58,7 +59,11 @@ def run() -> None:
             SystemTimeProvider(),
         ).execute()
         SeedCzechAddresses(
-            RuianAddressProvider(),
+            RUIANAddressProvider(
+                query_url=settings.ruian_query_url,
+                page_size=settings.ruian_page_size,
+                request_timeout_seconds=settings.ruian_request_timeout_seconds,
+            ),
             AlchemyAddressRepository(db),
             AlchemyCountryRepository(db),
         ).execute()
