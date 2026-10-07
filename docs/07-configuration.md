@@ -40,6 +40,14 @@ Shared by both the outbound audit (external calls made via `requests`, see [http
 | `HTTP_AUDIT_SENSITIVE_HEADERS` | list[str] (JSON array) | Header names redacted before being stored by the HTTP audit logs, e.g. `["authorization","cookie"]` (default: `authorization,cookie,set-cookie,x-api-key,proxy-authorization`) |
 | `HTTP_AUDIT_MAX_BODY_LENGTH` | int | Max number of characters of request/response body stored by the HTTP audit logs before truncation (default: `10000`) |
 
+## RÚIAN address provider
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `RUIAN_QUERY_URL` | str | URL of the RÚIAN `AdresniMisto` ArcGIS REST query endpoint |
+| `RUIAN_PAGE_SIZE` | int | Number of address records requested per page |
+| `RUIAN_REQUEST_TIMEOUT_SECONDS` | int | Timeout in seconds for each page request |
+
 ## `.env` template
 
 TODO: keep a `.env.example` file in the repository with the same list of keys and empty values.
