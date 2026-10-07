@@ -68,14 +68,14 @@ class ActualizeCzechAddresses:
                     country_id=country.id,
                 )
             else:
-                address.street = address_out.street
-                address.building_number = address_out.building_number
-                address.orientation_number = address_out.orientation_number
-                address.orientation_number_letter = (
-                    address_out.orientation_number_letter
+                address.update(
+                    street=address_out.street,
+                    building_number=address_out.building_number,
+                    orientation_number=address_out.orientation_number,
+                    orientation_number_letter=address_out.orientation_number_letter,
+                    district=address_out.district,
+                    city=address_out.city,
+                    postal_code=address_out.postal_code,
                 )
-                address.district = address_out.district
-                address.city = address_out.city
-                address.postal_code = address_out.postal_code
 
             self.address_repository.save(address)
