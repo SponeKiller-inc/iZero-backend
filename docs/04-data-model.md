@@ -36,6 +36,7 @@ Further conventions:
 | Banks | `banks`, `bank_accounts`, `bank_addresses` |
 | Contacts | `emails`, `phones` |
 | Titles | `titles`, `prefix_titles`, `suffix_titles` |
+| Observability | `external_request_log`, `external_response_log`, `internal_request_log`, `internal_response_log` |
 
 See [ER Diagram](er-diagram.md) for how these tables relate to each other.
 

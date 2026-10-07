@@ -40,6 +40,52 @@ class AlchemyAddressRepository(BaseAlchemyRepository):
             for address_model in self.db.query(AddressModel).all()
         ]
 
+    def get_by_external_id(self, external_id: int, country_id: int) -> Address | None:
+        """
+        Get address by its external (e.g. RÚIAN) ID and country
+
+        Args:
+            external_id: External address ID
+            country_id: ID of the country the address belongs to
+
+        Returns:
+            Address entity if found, else None
+        """
+
+        address_model = (
+            self.db
+                .query(AddressModel)
+                .filter(
+                    AddressModel.external_id == external_id,
+                    AddressModel.country_id == country_id,
+                )
+                .first()
+        )
+
+        if address_model is None:
+            return None
+
+        return self._to_entity(address_model)
+
+    def exists_for_country(self, country_id: int) -> bool:
+        """
+        Check whether any address already exists for the given country
+
+        Args:
+            country_id: Country ID
+
+        Returns:
+            True if at least one address exists for the country, else False
+        """
+
+        return (
+            self.db
+                .query(AddressModel.id)
+                .filter(AddressModel.country_id == country_id)
+                .first()
+            is not None
+        )
+
     def save(self, address: Address) -> Address:
         """
         Save new or existing address

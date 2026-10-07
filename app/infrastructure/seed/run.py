@@ -1,6 +1,7 @@
 """Entrypoint for seeding default configuration data, run right after `alembic upgrade head`."""
 from sqlalchemy import func, select
 
+from app.application.use_cases.seed.seed_czech_addresses import SeedCzechAddresses
 from app.application.use_cases.seed.seed_default_address_types import (
     SeedDefaultAddressTypes,
 )
@@ -13,7 +14,10 @@ from app.application.use_cases.seed.seed_default_role_permissions import (
 )
 from app.application.use_cases.seed.seed_default_roles import SeedDefaultRoles
 from app.application.use_cases.seed.seed_default_titles import SeedDefaultTitles
+from app.infrastructure.config import settings
 from app.infrastructure.database.session import db_session
+from app.infrastructure.providers.ruian_address import RUIANAddressProvider
+from app.infrastructure.repositories.address.address import AlchemyAddressRepository
 from app.infrastructure.repositories.address.address_type import (
     AlchemyAddressTypeRepository,
 )
@@ -53,6 +57,17 @@ def run() -> None:
             AlchemyUserRoleRepository(db),
             PasslibPasswordHasher(),
             SystemTimeProvider(),
+        ).execute()
+        SeedCzechAddresses(
+            RUIANAddressProvider(
+                query_url=settings.ruian_query_url,
+                page_size=settings.ruian_page_size,
+                request_timeout_seconds=settings.ruian_request_timeout_seconds,
+                max_retries=settings.ruian_max_retries,
+                retry_backoff_seconds=settings.ruian_retry_backoff_seconds,
+            ),
+            AlchemyAddressRepository(db),
+            AlchemyCountryRepository(db),
         ).execute()
 
 

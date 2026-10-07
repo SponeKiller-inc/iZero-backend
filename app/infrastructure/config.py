@@ -19,6 +19,20 @@ class Settings(BaseSettings):
     sentry_traces_sample_rate: float = 0.0
     sentry_send_default_pii: bool = False
     google_oauth_client_id:str
+    http_audit_sensitive_headers: list[str] = [
+        "authorization", "cookie", "set-cookie", "x-api-key", "proxy-authorization",
+    ]
+    http_audit_sensitive_body_fields: list[str] = [
+        "password", "new_password", "old_password", "current_password",
+        "token", "access_token", "refresh_token", "id_token", "jwt_token",
+        "client_secret", "secret", "csrf_token", "api_key", "authorization",
+    ]
+    http_audit_max_body_length: int = 10_000
+    ruian_query_url: str
+    ruian_page_size: int
+    ruian_request_timeout_seconds: int
+    ruian_max_retries: int = 3
+    ruian_retry_backoff_seconds: float = 2.0
     
 
     model_config = SettingsConfigDict(env_file=".env",
@@ -28,6 +42,7 @@ class Settings(BaseSettings):
 
     @field_validator(
         "cors_allow_origins", "cors_allow_methods", "cors_allow_headers",
+        "http_audit_sensitive_headers", "http_audit_sensitive_body_fields",
         mode="before",
     )
     @classmethod
