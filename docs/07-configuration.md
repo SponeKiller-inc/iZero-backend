@@ -38,6 +38,7 @@ Shared by both the outbound audit (external calls made via `requests`, see [http
 | Variable | Type | Description |
 |----------|------|-------------|
 | `HTTP_AUDIT_SENSITIVE_HEADERS` | list[str] (JSON array) | Header names redacted before being stored by the HTTP audit logs, e.g. `["authorization","cookie"]` (default: `authorization,cookie,set-cookie,x-api-key,proxy-authorization`) |
+| `HTTP_AUDIT_SENSITIVE_BODY_FIELDS` | list[str] (JSON array) | JSON/form field names (case-insensitive, matched recursively for JSON) redacted in request/response bodies before being stored, e.g. `["password","access_token"]` (default: `password,new_password,old_password,current_password,token,access_token,refresh_token,id_token,jwt_token,client_secret,secret,csrf_token,api_key,authorization`) |
 | `HTTP_AUDIT_MAX_BODY_LENGTH` | int | Max number of characters of request/response body stored by the HTTP audit logs before truncation (default: `10000`) |
 
 ## RÚIAN address provider

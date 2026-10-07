@@ -5,7 +5,11 @@ import requests
 
 from app.infrastructure.config import settings
 from app.infrastructure.database.session import db_session
-from app.infrastructure.observability.redaction import redact_headers, stringify_body
+from app.infrastructure.observability.redaction import (
+    redact_body,
+    redact_headers,
+    stringify_body,
+)
 from app.infrastructure.repositories.observability.external_request_log import (
     AlchemyExternalRequestLogRepository,
 )
@@ -13,9 +17,11 @@ from app.infrastructure.repositories.observability.external_response_log import 
     AlchemyExternalResponseLogRepository,
 )
 
-# Headers that must never land in the DB, regardless of which service is called.
-# Configurable via HTTP_AUDIT_SENSITIVE_HEADERS / HTTP_AUDIT_MAX_BODY_LENGTH in .env.
+# Headers/body fields that must never land in the DB, regardless of which
+# service is called. Configurable via HTTP_AUDIT_SENSITIVE_HEADERS /
+# HTTP_AUDIT_SENSITIVE_BODY_FIELDS / HTTP_AUDIT_MAX_BODY_LENGTH in .env.
 _SENSITIVE_HEADERS = {h.lower() for h in settings.http_audit_sensitive_headers}
+_SENSITIVE_BODY_FIELDS = {f.lower() for f in settings.http_audit_sensitive_body_fields}
 _MAX_BODY_LENGTH = settings.http_audit_max_body_length
 
 _original_send = requests.adapters.HTTPAdapter.send
@@ -68,12 +74,13 @@ def _audited_send(self, request, **kwargs):
 
 def _log_request(request) -> int | None:
     try:
+        redacted_body = redact_body(request.body, request.headers.get("Content-Type"), _SENSITIVE_BODY_FIELDS)
         with db_session() as db:
             return AlchemyExternalRequestLogRepository(db).save(
                 method=request.method,
                 url=request.url,
                 headers=json.dumps(redact_headers(request.headers, _SENSITIVE_HEADERS)),
-                body=stringify_body(request.body, _MAX_BODY_LENGTH),
+                body=stringify_body(redacted_body, _MAX_BODY_LENGTH),
             )
     except Exception:  # noqa: BLE001 - auditing must never break the real call
         return None
@@ -91,12 +98,17 @@ def _log_response(
         return
 
     try:
+        redacted_body = (
+            redact_body(response.content, response.headers.get("Content-Type"), _SENSITIVE_BODY_FIELDS)
+            if response is not None and capture_body
+            else None
+        )
         with db_session() as db:
             AlchemyExternalResponseLogRepository(db).save(
                 request_id=request_id,
                 status_code=status_code,
                 headers=json.dumps(redact_headers(response.headers, _SENSITIVE_HEADERS)) if response is not None else None,
-                body=stringify_body(response.content, _MAX_BODY_LENGTH) if response is not None and capture_body else None,
+                body=stringify_body(redacted_body, _MAX_BODY_LENGTH) if response is not None and capture_body else None,
                 duration_ms=duration_ms,
                 error=error,
             )

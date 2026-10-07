@@ -63,6 +63,8 @@ def run() -> None:
                 query_url=settings.ruian_query_url,
                 page_size=settings.ruian_page_size,
                 request_timeout_seconds=settings.ruian_request_timeout_seconds,
+                max_retries=settings.ruian_max_retries,
+                retry_backoff_seconds=settings.ruian_retry_backoff_seconds,
             ),
             AlchemyAddressRepository(db),
             AlchemyCountryRepository(db),

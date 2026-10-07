@@ -7,7 +7,11 @@ from starlette.responses import Response
 
 from app.infrastructure.config import settings
 from app.infrastructure.database.session import db_session
-from app.infrastructure.observability.redaction import redact_headers, stringify_body
+from app.infrastructure.observability.redaction import (
+    redact_body,
+    redact_headers,
+    stringify_body,
+)
 from app.infrastructure.repositories.observability.internal_request_log import (
     AlchemyInternalRequestLogRepository,
 )
@@ -15,10 +19,12 @@ from app.infrastructure.repositories.observability.internal_response_log import 
     AlchemyInternalResponseLogRepository,
 )
 
-# Headers that must never land in the DB, regardless of which endpoint is called.
-# Shared with the outbound HTTP audit - configurable via
-# HTTP_AUDIT_SENSITIVE_HEADERS / HTTP_AUDIT_MAX_BODY_LENGTH in .env.
+# Headers/body fields that must never land in the DB, regardless of which
+# endpoint is called. Shared with the outbound HTTP audit - configurable via
+# HTTP_AUDIT_SENSITIVE_HEADERS / HTTP_AUDIT_SENSITIVE_BODY_FIELDS /
+# HTTP_AUDIT_MAX_BODY_LENGTH in .env.
 _SENSITIVE_HEADERS = {h.lower() for h in settings.http_audit_sensitive_headers}
+_SENSITIVE_BODY_FIELDS = {f.lower() for f in settings.http_audit_sensitive_body_fields}
 _MAX_BODY_LENGTH = settings.http_audit_max_body_length
 
 
@@ -66,12 +72,13 @@ async def _iter_bytes(data: bytes):
 
 def _log_request(request: Request, body: bytes) -> int | None:
     try:
+        redacted_body = redact_body(body or None, request.headers.get("content-type"), _SENSITIVE_BODY_FIELDS)
         with db_session() as db:
             return AlchemyInternalRequestLogRepository(db).save(
                 method=request.method,
                 url=str(request.url),
                 headers=json.dumps(redact_headers(request.headers, _SENSITIVE_HEADERS)),
-                body=stringify_body(body or None, _MAX_BODY_LENGTH),
+                body=stringify_body(redacted_body, _MAX_BODY_LENGTH),
             )
     except Exception:  # noqa: BLE001 - auditing must never break the real call
         return None
@@ -89,12 +96,17 @@ def _log_response(
         return
 
     try:
+        redacted_body = (
+            redact_body(response_body or None, response.headers.get("content-type"), _SENSITIVE_BODY_FIELDS)
+            if response is not None
+            else None
+        )
         with db_session() as db:
             AlchemyInternalResponseLogRepository(db).save(
                 request_id=request_id,
                 status_code=status_code,
                 headers=json.dumps(redact_headers(response.headers, _SENSITIVE_HEADERS)) if response is not None else None,
-                body=stringify_body(response_body or None, _MAX_BODY_LENGTH) if response is not None else None,
+                body=stringify_body(redacted_body, _MAX_BODY_LENGTH) if response is not None else None,
                 duration_ms=duration_ms,
                 error=error,
             )

@@ -7,6 +7,7 @@ import requests
 from app.application.dto.address.address_provider import AddressProviderOut
 from app.application.exceptions.address import AddressProviderError
 from app.domain.shared.value_objects.location import CountryIsoCode
+from app.infrastructure.providers.http_retry import call_with_retries
 
 # Matches the leading part of RÚIAN's "adresa" text before the house number,
 # optionally followed by a "č.p."/"č.ev." (house/registration number) label,
@@ -30,7 +31,14 @@ class RUIANAddressProvider:
     # Exclude expired / flagged-as-incorrect address points.
     _BASE_WHERE = "platido IS NULL AND nespravny IS NULL"
 
-    def __init__(self, query_url: str, page_size: int, request_timeout_seconds: int):
+    def __init__(
+        self,
+        query_url: str,
+        page_size: int,
+        request_timeout_seconds: int,
+        max_retries: int = 3,
+        retry_backoff_seconds: float = 2.0,
+    ):
         """
         Initialize provider.
 
@@ -38,10 +46,17 @@ class RUIANAddressProvider:
             query_url: URL of the RÚIAN "AdresniMisto" ArcGIS REST query endpoint.
             page_size: Number of records requested per page.
             request_timeout_seconds: Timeout for a single page request.
+            max_retries: Number of additional attempts for a page request
+                after a transient failure (timeout, connection error, or a
+                5xx/429 response), before giving up.
+            retry_backoff_seconds: Base delay between retries; doubled after
+                each failed attempt (exponential backoff).
         """
         self.query_url = query_url
         self.page_size = page_size
         self.request_timeout_seconds = request_timeout_seconds
+        self.max_retries = max_retries
+        self.retry_backoff_seconds = retry_backoff_seconds
 
     def get_all(self) -> list[AddressProviderOut]:
         """
@@ -108,7 +123,9 @@ class RUIANAddressProvider:
 
     def _fetch_page(self, where: str, offset: int) -> list[dict[str, Any]]:
         """
-        Fetch a single page of address features from RÚIAN.
+        Fetch a single page of address features from RÚIAN, retrying
+        transient failures (timeouts, connection errors, 5xx/429 responses)
+        with exponential backoff.
 
         Args:
             where: ArcGIS SQL `where` clause to filter the features.
@@ -118,20 +135,25 @@ class RUIANAddressProvider:
             Raw ArcGIS features for the requested page.
 
         Raises:
-            AddressProviderError: If RÚIAN cannot be reached or returns an error.
+            AddressProviderError: If RÚIAN cannot be reached or returns an
+                error after exhausting all retry attempts.
         """
         try:
-            response = requests.get(
-                self.query_url,
-                params={
-                    "where": where,
-                    "outFields": self._OUT_FIELDS,
-                    "orderByFields": "objectid",
-                    "resultOffset": offset,
-                    "resultRecordCount": self.page_size,
-                    "f": "json",
-                },
-                timeout=self.request_timeout_seconds,
+            response = call_with_retries(
+                lambda: requests.get(
+                    self.query_url,
+                    params={
+                        "where": where,
+                        "outFields": self._OUT_FIELDS,
+                        "orderByFields": "objectid",
+                        "resultOffset": offset,
+                        "resultRecordCount": self.page_size,
+                        "f": "json",
+                    },
+                    timeout=self.request_timeout_seconds,
+                ),
+                max_retries=self.max_retries,
+                base_delay_seconds=self.retry_backoff_seconds,
             )
             response.raise_for_status()
             payload = response.json()
