@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import insert
+
 from app.domain.addresses.entities.address import Address
 from app.infrastructure.models.address.addresses import AddressModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
@@ -101,6 +103,54 @@ class AlchemyAddressRepository(BaseAlchemyRepository):
             return self._insert(address)
         else:
             return self._update(address)
+
+    def upsert_many(self, addresses: list[Address]) -> None:
+        """
+        Bulk insert addresses, overwriting existing ones matched by external
+        ID and country, in a single statement. Existing rows keep their `id`.
+
+        Args:
+            addresses: Address entities to insert or update; their `id` is
+                ignored. If the same external ID and country appear more
+                than once, the last occurrence wins.
+        """
+
+        unique = {(a.external_id, a.country_id): a for a in addresses}
+        if not unique:
+            return
+
+        stmt = insert(AddressModel)
+        stmt = stmt.on_conflict_do_update(
+            constraint="uq_addresses_external_id_country_id",
+            set_={
+                "street": stmt.excluded.street,
+                "building_number": stmt.excluded.building_number,
+                "orientation_number": stmt.excluded.orientation_number,
+                "orientation_number_letter": stmt.excluded.orientation_number_letter,
+                "district": stmt.excluded.district,
+                "city": stmt.excluded.city,
+                "postal_code": stmt.excluded.postal_code,
+                "updated_at": stmt.excluded.updated_at,
+            },
+        )
+
+        self.db.execute(
+            stmt,
+            [
+                {
+                    "external_id": address.external_id,
+                    "street": address.street,
+                    "building_number": address.building_number,
+                    "orientation_number": address.orientation_number,
+                    "orientation_number_letter": address.orientation_number_letter,
+                    "district": address.district,
+                    "city": address.city,
+                    "postal_code": address.postal_code,
+                    "country_id": address.country_id,
+                }
+                for address in unique.values()
+            ],
+        )
 
     def _insert(self, address: Address) -> Address:
         address_model = AddressModel(
