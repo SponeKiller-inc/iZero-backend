@@ -12,7 +12,7 @@ class AddressSchemaOut(BaseModel):
     building_number: str
     orientation_number: str | None
     orientation_number_letter: str | None
-    district: str
+    district: str | None
     city: str
     postal_code: int
     country_id: int

@@ -13,7 +13,7 @@ class Address:
         orientation_number: The orientation number, if any.
         orientation_number_letter: The letter suffix of the orientation
             number, if any.
-        district: The district / municipal part.
+        district: The district / municipal part, if any.
         city: The city name.
         postal_code: The postal code.
         country_id: The ID of the country this address belongs to.
@@ -24,7 +24,7 @@ class Address:
         id: int | None,
         external_id: int,
         building_number: str,
-        district: str,
+        district: str | None,
         city: str,
         postal_code: int,
         country_id: int,
@@ -48,7 +48,7 @@ class Address:
         cls,
         external_id: int,
         building_number: str,
-        district: str,
+        district: str | None,
         city: str,
         postal_code: int,
         country_id: int,
@@ -62,7 +62,7 @@ class Address:
         Args:
             external_id: The external (e.g. RÚIAN) address identifier.
             building_number: The building number.
-            district: The district / municipal part.
+            district: The district / municipal part, if any.
             city: The city name.
             postal_code: The postal code.
             country_id: The ID of the country this address belongs to.
@@ -75,8 +75,8 @@ class Address:
             The newly created address.
 
         Raises:
-            ValueError: If building_number, district or city is empty/blank,
-                or postal_code is not a valid 5-digit value.
+            ValueError: If building_number or city is empty/blank, district
+                is given but blank, or postal_code is not a valid 5-digit value.
         """
         cls._validate(building_number, district, city, postal_code)
 
@@ -96,7 +96,7 @@ class Address:
     def update(
         self,
         building_number: str,
-        district: str,
+        district: str | None,
         city: str,
         postal_code: int,
         street: str | None = None,
@@ -108,7 +108,7 @@ class Address:
 
         Args:
             building_number: The building number.
-            district: The district / municipal part.
+            district: The district / municipal part, if any.
             city: The city name.
             postal_code: The postal code.
             street: The street name, if any.
@@ -117,8 +117,8 @@ class Address:
                 number, if any.
 
         Raises:
-            ValueError: If building_number, district or city is empty/blank,
-                or postal_code is not a valid 5-digit value.
+            ValueError: If building_number or city is empty/blank, district
+                is given but blank, or postal_code is not a valid 5-digit value.
         """
         self._validate(building_number, district, city, postal_code)
 
@@ -132,19 +132,19 @@ class Address:
 
     @staticmethod
     def _validate(
-        building_number: str, district: str, city: str, postal_code: int
+        building_number: str, district: str | None, city: str, postal_code: int
     ) -> None:
         """
         Validates the fields shared by `create` and `update`.
 
         Raises:
-            ValueError: If building_number, district or city is empty/blank,
-                or postal_code is not a valid 5-digit value.
+            ValueError: If building_number or city is empty/blank, district
+                is given but blank, or postal_code is not a valid 5-digit value.
         """
         if not building_number or not building_number.strip():
             raise ValueError("Address's building number must be a non-empty string.")
-        if not district or not district.strip():
-            raise ValueError("Address's district must be a non-empty string.")
+        if district is not None and not district.strip():
+            raise ValueError("Address's district must be a non-empty string, if given.")
         if not city or not city.strip():
             raise ValueError("Address's city must be a non-empty string.")
         if not 0 <= postal_code <= 99999:

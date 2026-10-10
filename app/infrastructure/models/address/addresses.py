@@ -13,7 +13,7 @@ class AddressModel(Base):
     building_number: Mapped[str] = mapped_column(String(10))
     orientation_number: Mapped[str | None] = mapped_column(String(10))
     orientation_number_letter: Mapped[str | None] = mapped_column(String(1))
-    district: Mapped[str] = mapped_column(String(48))
+    district: Mapped[str | None] = mapped_column(String(48))
     city: Mapped[str] = mapped_column(String(48))
     postal_code: Mapped[int] = mapped_column()
     country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"))

@@ -27,7 +27,7 @@ class RUIANAddressProvider:
     is hard-coded to CZE instead of being read from the external data.
     """
 
-    _OUT_FIELDS = "kod,cislodomovni,cisloorientacni,cisloorientacnipismeno,psc,adresa"
+    _OUT_FIELDS = "kod,cislodomovni,cisloorientacni,cisloorientacnipismeno,psc,ulice,adresa"
     # Exclude expired / flagged-as-incorrect address points.
     _BASE_WHERE = "platido IS NULL AND nespravny IS NULL"
 
@@ -172,8 +172,10 @@ class RUIANAddressProvider:
         RÚIAN's free-text "adresa" field is formatted either as
         "<ulice> <č.p./č.o.>, <část obce>, <psč> <obec>" when the address
         lies on a named street, or as "<část obce>[ č.p./č.ev.] <č.p.>,
-        <psč> <obec>" otherwise (with "<část obce>" omitted entirely when
-        it matches the municipality name).
+        <psč> <obec>" otherwise. "<část obce>" is omitted entirely when it
+        matches the municipality name, so the text alone can't tell a street
+        from a municipal part - the "ulice" (street code) attribute decides.
+        The district is left empty when the text doesn't contain one.
         """
         parts = [part.strip() for part in attrs["adresa"].split(",")]
         postal_code = attrs["psc"]
@@ -189,10 +191,15 @@ class RUIANAddressProvider:
         match = _NAME_PATTERN.match(parts[0])
         name = match.group("name").strip() if match else parts[0]
 
+        has_street = attrs.get("ulice") is not None
+        street = (name or None) if has_street else None
+
         if len(parts) >= 3:
-            street, district = name or None, parts[-2]
+            district = parts[-2]
+        elif has_street:
+            district = None
         else:
-            street, district = None, name or city
+            district = name or None
 
         orientation_number = attrs.get("cisloorientacni")
 
