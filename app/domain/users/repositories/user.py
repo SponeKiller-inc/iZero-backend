@@ -42,7 +42,7 @@ class UserRepository(Protocol):
 
     def exists_local(self, email: str) -> bool:
         """
-        Check if local user exists by email
+        Check if any user (local or OAuth) exists by email
         
         Args:
             email: User email

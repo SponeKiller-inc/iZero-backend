@@ -61,6 +61,7 @@ class LoginLocal:
 
         if (
             user is None
+            or not user.is_active
             or user.password is None
             or not self.password_hasher.verify(dto.password, user.password)
         ):

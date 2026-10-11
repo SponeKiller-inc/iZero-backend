@@ -76,6 +76,7 @@ Defined in [`app/domain/shared/constants/entity_type.py`](../app/domain/shared/c
 | [`AssignRolePermission`](../app/application/use_cases/auth/assign_role_permission.py) | `AUTH` | `AUTH_ASSIGN_ROLE_PERMISSION` |
 | [`AssignModule`](../app/application/use_cases/users/assign_module.py) | `USERS` | `USERS_ASSIGN_MODULE` |
 | [`RetrieveModules`](../app/application/use_cases/users/retrieve_modules.py) | `USERS` | `USERS_RETRIEVE_MODULE` |
+| [`DeleteUser`](../app/application/use_cases/users/delete_user.py) | `USERS` | `USERS_DELETE` |
 
 Use cases without an `@authorize` decorator (e.g. session initialization, login) run without a permission check by design.
 
