@@ -10,5 +10,8 @@ class RegisterOauthError(ApplicationError):
 class UserNotFoundError(ApplicationError):
     pass
 
+class UserCannotBeDeletedError(ApplicationError):
+    pass
+
 class UserModuleNotAssignedError(ApplicationError):
     pass

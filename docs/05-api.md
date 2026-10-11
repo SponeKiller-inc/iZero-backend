@@ -41,9 +41,12 @@ Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.
 | Code | Constant | Meaning |
 |------|----------|---------|
 | 1000001 | `USER_NOT_FOUND` | User not found |
+| 1000002 | `USER_ALREADY_EXISTS` | User with this e-mail / provider account already exists |
+| 1000003 | `USER_CANNOT_BE_DELETED` | User is protected (bootstrap admin or the caller) |
 | 2000001 | `AUTH_NOT_AUTHENTICATED` | User is not authenticated |
 | 2000002 | `AUTH_NOT_AUTHORIZED` | User lacks permission |
 | 2000003 | `AUTH_NOT_ACCESS` | Access denied |
+| 2000004 | `AUTH_IDENTITY_PROVIDER_FAILED` | External identity provider rejected the token |
 | 4000001 | `MODULE_GROUP_NOT_FOUND` | Module group does not exist |
 | 9000001 | `SYSTEM_INTERNAL_FAIL` | Unexpected server error |
 
@@ -59,6 +62,7 @@ When adding a new code, add a row to this table.
 | 401 | Missing or invalid authentication |
 | 403 | Insufficient permissions |
 | 404 | Resource does not exist |
+| 409 | Conflict with the current state (e.g. duplicate user, protected user) |
 | 422 | Pydantic validation error |
 | 500 | Unexpected error (reported to Sentry) |
 
@@ -79,6 +83,17 @@ Template for each endpoint:
 ### Users — `/api/user`
 
 TODO: document the endpoints in [endpoints/user](../app/infrastructure/api/endpoints/user)
+
+#### `DELETE /api/users/{user_id}`
+
+- **Purpose:** Soft delete a user (`DeleteUser` use-case) — sets `users.is_active = false`, no rows are removed.
+  An inactive user cannot log in (local or Google) and any access token issued before the delete is rejected
+  by `Authenticate` with `401`.
+- **Authentication:** authenticated, `@authorize(EntityType.USERS, UseCase.USERS_DELETE)` — seeded for the admin role only.
+- **Input:** path parameter `user_id`.
+- **Response:** `204 No Content`.
+- **Errors:** `USER_NOT_FOUND` (404) if the user does not exist or is already inactive, `USER_CANNOT_BE_DELETED` (409)
+  for the bootstrap admin or the caller's own account.
 modules`
 
 Implemented in [endpoints/module](../app/infrastructure/api/endpoints/module), use-cases in
@@ -120,7 +135,7 @@ themselves; they read `request.state.session_id`.
 - **Input:** `OAuth2PasswordRequestForm` (form fields `username` = e-mail, `password`).
 - **Response:** `TokenSchemaOut` (`access_token`, `token_type`), `200 OK`. Also sets httpOnly/secure `refresh_token` and
   secure `csrf_token` cookies.
-- **Errors:** `401` "Invalid credentials" (`InvalidCredentialsError` — unknown user, no local password, or bad password).
+- **Errors:** `401` "Invalid credentials" (`InvalidCredentialsError` — unknown or inactive user, no local password, or bad password).
 
 #### `POST /api/auth/token/google`
 
@@ -129,7 +144,7 @@ themselves; they read `request.state.session_id`.
 - **Authentication:** public.
 - **Input:** `GoogleTokenSchemaIn` ([schemas/token.py](../app/infrastructure/api/schemas/token.py)) — `jwt_token`.
 - **Response:** `TokenSchemaOut`, `200 OK`. Same cookies as `/local`.
-- **Errors:** `401` "Invalid credentials" (`UserNotFoundError` — no user for that Google account), `400` "Google
+- **Errors:** `401` "Invalid credentials" (`UserNotFoundError` — no active user for that Google account), `400` "Google
   authentication failed" (`IdentityProviderError` — invalid/expired Google token).
 
 Note: an earlier `GET /token/me` endpoint referenced non-existent modules and was dead code; it has been removed.
