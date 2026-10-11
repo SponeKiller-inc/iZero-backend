@@ -8,5 +8,5 @@ class UserInactiveError(UserValidationError):
     """User has already been soft deleted"""
 
 class UserProtectedError(UserValidationError):
-    """User must not be deactivated (bootstrap admin or the acting user)"""
+    """User must not be deactivated (bootstrap admin)"""
 

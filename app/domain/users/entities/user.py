@@ -90,21 +90,18 @@ class User:
         """
         return self.email == ADMIN_EMAIL
 
-    def deactivate(self, actor_id: int | None) -> None:
+    def deactivate(self) -> None:
         """
         Soft deletes the user.
 
-        Args:
-            actor_id: ID of the user performing the deactivation.
-
         Raises:
             UserInactiveError: If the user is already inactive.
-            UserProtectedError: If the user is the bootstrap admin or the actor itself.
+            UserProtectedError: If the user is the bootstrap admin.
         """
         if not self.is_active:
             raise UserInactiveError("User is already inactive")
 
-        if self.is_protected() or self.id == actor_id:
-            raise UserProtectedError("User cannot be deactivated")
+        if self.is_protected():
+            raise UserProtectedError("Bootstrap admin cannot be deactivated")
 
         self.is_active = False

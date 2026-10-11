@@ -1,6 +1,5 @@
 from app.application.constants.use_case import UseCase
 from app.application.exceptions.user import UserCannotBeDeletedError, UserNotFoundError
-from app.application.security.auth_context import AuthContext
 from app.application.security.authorize import authorize
 from app.domain.shared.constants.entity_type import EntityType
 from app.domain.users.exceptions.user import UserInactiveError, UserProtectedError
@@ -31,7 +30,7 @@ class DeleteUser:
 
         Raises:
             UserNotFoundError: If user does not exist or is already deleted
-            UserCannotBeDeletedError: If user is the bootstrap admin or the caller
+            UserCannotBeDeletedError: If user is the bootstrap admin
         """
         user = self.user_repository.get(user_id)
 
@@ -39,7 +38,7 @@ class DeleteUser:
             raise UserNotFoundError("User not found")
 
         try:
-            user.deactivate(actor_id=AuthContext.get())
+            user.deactivate()
         except UserInactiveError:
             raise UserNotFoundError("User not found")
         except UserProtectedError:
