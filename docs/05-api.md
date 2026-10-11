@@ -92,7 +92,8 @@ TODO: document the endpoints in [endpoints/user](../app/infrastructure/api/endpo
 - **Authentication:** authenticated, `@authorize(EntityType.USERS, UseCase.USERS_DELETE)` — seeded for the regular role.
 - **Input:** path parameter `user_id`.
 - **Response:** `204 No Content`.
-- **Errors:** `AUTH_NOT_AUTHORIZED` (403) if `user_id` is not the authenticated caller, `USER_NOT_FOUND` (404) if the user does not exist or is already inactive, `USER_CANNOT_BE_DELETED` (409)
+- **Errors:** `AUTH_NOT_AUTHORIZED` (403) if `user_id` is not the authenticated caller, `USER_NOT_FOUND` (404) if the user does not exist or is already inactive (a repeated self-delete with the same token
+  is rejected earlier by `Authenticate` with `401` `AUTH_NOT_AUTHENTICATED`), `USER_CANNOT_BE_DELETED` (409)
   for the bootstrap admin.
 modules`
 

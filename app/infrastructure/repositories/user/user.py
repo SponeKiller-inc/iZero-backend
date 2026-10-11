@@ -44,7 +44,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         user_model = (
             self.db
                 .query(UserModel)
-                .filter(UserModel.email == email)
+                .filter(UserModel.email == email.lower())
                 .first()
         )
 
@@ -90,7 +90,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         return (
             self.db
                 .query(UserModel)
-                .filter(UserModel.email == email)
+                .filter(UserModel.email == email.lower())
                 .first() is not None
         )
 
