@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Self
 
 
@@ -18,7 +18,7 @@ class ValidityPeriod:
     """
     valid_from: datetime
     valid_to: datetime = field(
-        default_factory=lambda: datetime(3000, 1, 1, tzinfo=timezone.utc)
+        default_factory=lambda: datetime(3000, 1, 1, tzinfo=UTC)
     )
 
     def __post_init__(self):

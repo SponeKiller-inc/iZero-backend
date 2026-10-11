@@ -13,5 +13,8 @@ class UserNotFoundError(ApplicationError):
 class UserCannotBeDeletedError(ApplicationError):
     pass
 
+class UserDeleteForbiddenError(ApplicationError):
+    pass
+
 class UserModuleNotAssignedError(ApplicationError):
     pass

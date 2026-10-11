@@ -10,6 +10,7 @@ from app.application.exceptions.user import (
     RegisterLocalError,
     RegisterOauthError,
     UserCannotBeDeletedError,
+    UserDeleteForbiddenError,
     UserNotFoundError,
 )
 from app.application.use_cases.users.delete_user import DeleteUser
@@ -121,6 +122,11 @@ async def delete_user(
 
     try:
         delete.execute(user_id)
+    except UserDeleteForbiddenError:
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.AUTH_NOT_AUTHORIZED),
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
     except UserNotFoundError:
         return JSONResponse(
             content=ResponseContainer(message_id=MessageId.USER_NOT_FOUND),
