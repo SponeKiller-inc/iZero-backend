@@ -1,4 +1,5 @@
 import re
+from collections.abc import Iterator
 from datetime import date
 from typing import Any
 
@@ -27,7 +28,7 @@ class RUIANAddressProvider:
     is hard-coded to CZE instead of being read from the external data.
     """
 
-    _OUT_FIELDS = "kod,cislodomovni,cisloorientacni,cisloorientacnipismeno,psc,ulice,adresa"
+    _OUT_FIELDS = "objectid,kod,cislodomovni,cisloorientacni,cisloorientacnipismeno,psc,ulice,adresa"
     # Exclude expired / flagged-as-incorrect address points.
     _BASE_WHERE = "platido IS NULL AND nespravny IS NULL"
 
@@ -58,30 +59,31 @@ class RUIANAddressProvider:
         self.max_retries = max_retries
         self.retry_backoff_seconds = retry_backoff_seconds
 
-    def get_all(self) -> list[AddressProviderOut]:
+    def get_all(self) -> Iterator[list[AddressProviderOut]]:
         """
-        Retrieve all addresses currently valid in the RÚIAN register.
+        Retrieve all addresses currently valid in the RÚIAN register, one
+        page at a time.
 
         Returns:
-            AddressProviderOut: All addresses known to RÚIAN.
+            Iterator over pages of addresses known to RÚIAN.
 
         Raises:
             AddressProviderError: If RÚIAN cannot be reached or returns an error.
         """
         return self._fetch_all(self._BASE_WHERE)
 
-    def get_modified(self, since: date) -> list[AddressProviderOut]:
+    def get_modified(self, since: date) -> Iterator[list[AddressProviderOut]]:
         """
         Retrieve addresses whose validity started on or after the given date,
         i.e. addresses that were newly created or changed since then (RÚIAN
         represents an attribute change as a new address point version with
-        its own "začátek platnosti").
+        its own "začátek platnosti"), one page at a time.
 
         Args:
             since: Only addresses modified on or after this date are returned.
 
         Returns:
-            AddressProviderOut: Addresses modified on or after `since`.
+            Iterator over pages of addresses modified on or after `since`.
 
         Raises:
             AddressProviderError: If RÚIAN cannot be reached or returns an error.
@@ -89,47 +91,47 @@ class RUIANAddressProvider:
         where = f"{self._BASE_WHERE} AND platiod >= DATE '{since.isoformat()}'"
         return self._fetch_all(where)
 
-    def _fetch_all(self, where: str) -> list[AddressProviderOut]:
+    def _fetch_all(self, where: str) -> Iterator[list[AddressProviderOut]]:
         """
-        Retrieve all address features matching the given filter, paginating
-        through the result set.
+        Yield all address features matching the given filter, page by page.
+
+        Pages are requested by keyset (`objectid > <last seen objectid>`)
+        rather than `resultOffset`: ArcGIS skips over all preceding records
+        for an offset, so offset pages get progressively slower (0.4 s at the
+        start of the catalogue vs. 2+ s at its end), while keyset pages take
+        constant time.
 
         Args:
             where: ArcGIS SQL `where` clause to filter the features.
 
         Returns:
-            AddressProviderOut: All addresses matching `where`.
+            Iterator over pages of addresses matching `where`.
 
         Raises:
             AddressProviderError: If RÚIAN cannot be reached or returns an error.
         """
-        addresses: list[AddressProviderOut] = []
-        offset = 0
+        last_object_id = 0
 
         while True:
-            features = self._fetch_page(where, offset)
-            if not features:
-                break
-
-            addresses.extend(
-                self._to_dto(feature["attributes"]) for feature in features
+            features = self._fetch_page(
+                f"{where} AND objectid > {last_object_id}"
             )
+            if not features:
+                return
 
-            if len(features) < self.page_size:
-                break
-            offset += self.page_size
+            yield [self._to_dto(feature["attributes"]) for feature in features]
 
-        return addresses
+            last_object_id = features[-1]["attributes"]["objectid"]
 
-    def _fetch_page(self, where: str, offset: int) -> list[dict[str, Any]]:
+    def _fetch_page(self, where: str) -> list[dict[str, Any]]:
         """
-        Fetch a single page of address features from RÚIAN, retrying
-        transient failures (timeouts, connection errors, 5xx/429 responses)
-        with exponential backoff.
+        Fetch a single page of address features from RÚIAN, ordered by
+        `objectid`, retrying transient failures (timeouts, connection errors,
+        5xx/429 responses) with exponential backoff.
 
         Args:
-            where: ArcGIS SQL `where` clause to filter the features.
-            offset: Number of records to skip (for pagination).
+            where: ArcGIS SQL `where` clause to filter the features, including
+                the keyset condition selecting the page.
 
         Returns:
             Raw ArcGIS features for the requested page.
@@ -146,8 +148,8 @@ class RUIANAddressProvider:
                         "where": where,
                         "outFields": self._OUT_FIELDS,
                         "orderByFields": "objectid",
-                        "resultOffset": offset,
                         "resultRecordCount": self.page_size,
+                        "returnGeometry": "false",
                         "f": "json",
                     },
                     timeout=self.request_timeout_seconds,

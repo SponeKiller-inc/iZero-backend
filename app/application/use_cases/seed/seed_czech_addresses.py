@@ -34,8 +34,8 @@ class SeedCzechAddresses:
         if self.address_repository.exists_for_country(country.id):
             return
 
-        for address_out in self.address_provider.get_all():
-            self.address_repository.save(
+        for page in self.address_provider.get_all():
+            self.address_repository.upsert_many([
                 Address.create(
                     external_id=address_out.external_id,
                     street=address_out.street,
@@ -47,4 +47,5 @@ class SeedCzechAddresses:
                     postal_code=address_out.postal_code,
                     country_id=country.id,
                 )
-            )
+                for address_out in page
+            ])
