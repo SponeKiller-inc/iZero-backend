@@ -46,7 +46,7 @@ Shared by both the outbound audit (external calls made via `requests`, see [http
 | Variable | Type | Description |
 |----------|------|-------------|
 | `RUIAN_QUERY_URL` | str | URL of the RÚIAN `AdresniMisto` ArcGIS REST query endpoint |
-| `RUIAN_PAGE_SIZE` | int | Number of address records requested per page |
+| `RUIAN_PAGE_SIZE` | int | Number of address records requested per page; each page is also persisted as one `upsert_many` batch |
 | `RUIAN_REQUEST_TIMEOUT_SECONDS` | int | Timeout in seconds for each page request |
 | `RUIAN_MAX_RETRIES` | int | Number of additional attempts for a page request after a transient failure (timeout, connection error, or a 5xx/429 response) before giving up (default: `3`) |
 | `RUIAN_RETRY_BACKOFF_SECONDS` | float | Delay before the first retry; doubled after each subsequent attempt (default: `2.0`) |
