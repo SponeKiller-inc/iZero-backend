@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from app.application.ports.time_provider import TimeProvider
 
@@ -14,7 +14,7 @@ class SystemTimeProvider(TimeProvider):
         Returns:
             datetime: current UTC time
         """
-        return datetime.now(timezone.utc)
+        return datetime.now(UTC)
 
     @classmethod
     def get_expiration(
@@ -48,4 +48,4 @@ class SystemTimeProvider(TimeProvider):
         Returns:
             datetime: UTC datetime
         """
-        return datetime.fromtimestamp(ts, tz=timezone.utc)
+        return datetime.fromtimestamp(ts, tz=UTC)
