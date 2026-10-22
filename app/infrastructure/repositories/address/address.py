@@ -150,6 +150,9 @@ class AlchemyAddressRepository(BaseAlchemyRepository):
                 }
                 for address in unique.values()
             ],
+            # ORM bulk INSERT omits None values by default, splitting rows with
+            # different NULL columns into separate statements
+            execution_options={"render_nulls": True},
         )
 
     def _insert(self, address: Address) -> Address:
