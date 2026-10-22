@@ -44,7 +44,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         user_model = (
             self.db
                 .query(UserModel)
-                .filter(UserModel.email == email)
+                .filter(UserModel.email == email.lower())
                 .first()
         )
 
@@ -90,7 +90,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         return (
             self.db
                 .query(UserModel)
-                .filter(UserModel.email == email)
+                .filter(UserModel.email == email.lower())
                 .first() is not None
         )
 
@@ -145,6 +145,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
             provider=user.provider.value.value,
             password=user.password,
             provider_user_id=user.provider_user_id,
+            is_active=user.is_active,
         )
         self.db.add(user_model)
         self.db.flush()
@@ -174,6 +175,7 @@ class AlchemyUserRepository(BaseAlchemyRepository):
         updated_user.provider = user.provider.value.value
         updated_user.password = user.password
         updated_user.provider_user_id = user.provider_user_id
+        updated_user.is_active = user.is_active
 
         self.db.flush()
         self.db.refresh(updated_user)
@@ -188,4 +190,5 @@ class AlchemyUserRepository(BaseAlchemyRepository):
             provider=RegistrationSource(RegistrationSourceType(user_model.provider)),
             password=user_model.password,
             provider_user_id=user_model.provider_user_id,
+            is_active=user_model.is_active,
         )

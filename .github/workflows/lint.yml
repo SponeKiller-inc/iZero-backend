@@ -24,3 +24,16 @@ jobs:
       - name: Lint check via ruff
         run: |
           ruff check .
+
+      - name: Install alembic package
+        run: |
+          pip install alembic==1.15.2
+
+      - name: Check single Alembic head
+        run: |
+          heads=$(alembic heads | wc -l)
+          if [ "$heads" -ne 1 ]; then
+            echo "::error::Multiple Alembic heads detected, re-point down_revision of the newest migration:"
+            alembic heads
+            exit 1
+          fi

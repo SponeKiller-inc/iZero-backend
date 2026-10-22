@@ -10,6 +10,7 @@ from app.infrastructure.database.session import db_session
 from app.infrastructure.repositories.auth.role_permission import (
     AlchemyRolePermissionRepository,
 )
+from app.infrastructure.repositories.user.user import AlchemyUserRepository
 from app.infrastructure.repositories.user.user_role import AlchemyUserRoleRepository
 from app.infrastructure.services.time_provider import SystemTimeProvider
 
@@ -28,11 +29,13 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
 
         try:
             with db_session() as db:
+                user_repository = AlchemyUserRepository(db)
                 user_role_repository = AlchemyUserRoleRepository(db)
                 role_permission_repository = AlchemyRolePermissionRepository(db)
                 time_provider = SystemTimeProvider()
 
                 authenticate = Authenticate(
+                    user_repository,
                     user_role_repository,
                     role_permission_repository,
                     time_provider

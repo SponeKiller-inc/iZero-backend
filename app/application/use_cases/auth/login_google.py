@@ -56,12 +56,12 @@ class LoginGoogle:
 
         Raises:
             IdentityProviderError: If the Google token is invalid.
-            UserNotFoundError: If no user is registered for the Google account.
+            UserNotFoundError: If no active user is registered for the Google account.
         """
         user_data = self.identity_provider.get_user_info(dto.token)
 
         user = self.user_repository.get_oauth_user(user_data.id)
-        if user is None:
+        if user is None or not user.is_active:
             raise UserNotFoundError("User not found")
 
         access_token = self.access_token_generator.encode(
