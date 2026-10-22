@@ -50,6 +50,18 @@ class AddressRepository(Protocol):
         """
         ...
 
+    def upsert_many(self, addresses: list[Address]) -> None:
+        """
+        Bulk insert addresses, overwriting existing ones matched by external
+        ID and country. Existing addresses keep their ID.
+
+        Args:
+            addresses: Address entities to insert or update; their `id` is
+                ignored. If the same external ID and country appear more
+                than once, the last occurrence wins.
+        """
+        ...
+
     def save(self, address: Address) -> Address:
         """
         Save new or existing address
