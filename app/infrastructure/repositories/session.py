@@ -1,4 +1,5 @@
 from app.domain.session.entities.session import Session
+from app.infrastructure.models.auth.session_log import SessionLogModel
 from app.infrastructure.models.auth.sessions import SessionModel
 from app.infrastructure.repositories.base import BaseAlchemyRepository
 
@@ -111,6 +112,7 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         )
         self.db.add(session_model)
         self.db.flush()
+        self._insert_events(session_model.id, session)
         self.db.refresh(session_model)
 
         return self._to_entity(session_model)
@@ -138,11 +140,32 @@ class AlchemySessionRepository(BaseAlchemyRepository):
         updated_session.user_id = session.user_id
         updated_session.ip_address = session.ip_address
         updated_session.user_agent = session.user_agent
+        self._insert_events(updated_session.id, session)
 
         self.db.flush()
         self.db.refresh(updated_session)
 
         return self._to_entity(updated_session)
+
+    def _insert_events(self, session_id: int, session: Session) -> None:
+        """
+        Store session events into session log
+
+        Events are not loaded back into the entity, so every event present
+        on the entity is a new one recorded since it was loaded.
+
+        Args:
+            session_id (int): id of persisted session
+            session (Session): session carrying recorded events
+        """
+        for event in session.events:
+            self.db.add(
+                SessionLogModel(
+                    session_id=session_id,
+                    event_type=event.event_type,
+                    created_at=event.occurred_at,
+                )
+            )
 
     @staticmethod
     def _to_entity(session_model: SessionModel) -> Session:

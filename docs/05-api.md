@@ -41,6 +41,12 @@ Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.
 | Code | Constant | Meaning |
 |------|----------|---------|
 | 1000001 | `USER_NOT_FOUND` | User not found |
+| 1000004 | `USER_INVALID_CURRENT_PASSWORD` | Current password is wrong |
+| 1000005 | `USER_PASSWORD_TOO_SHORT` | New password is shorter than 8 characters |
+| 1000006 | `USER_PASSWORD_TOO_LONG` | New password is longer than 72 bytes (UTF-8) |
+| 1000007 | `USER_PASSWORD_SAME_AS_CURRENT` | New password equals the current one |
+| 1000008 | `USER_PASSWORD_CHANGE_NOT_SUPPORTED` | Account has no password (registered via Google) |
+| 1000009 | `USER_PASSWORD_CONFIRMATION_MISMATCH` | Password confirmation differs from the new password |
 | 2000001 | `AUTH_NOT_AUTHENTICATED` | User is not authenticated |
 | 2000002 | `AUTH_NOT_AUTHORIZED` | User lacks permission |
 | 2000003 | `AUTH_NOT_ACCESS` | Access denied |
@@ -79,7 +85,22 @@ Template for each endpoint:
 ### Users — `/api/user`
 
 TODO: document the endpoints in [endpoints/user](../app/infrastructure/api/endpoints/user)
-modules`
+
+#### `PUT /api/users/{user_id}/password`
+
+- **Purpose:** Change the password of the user `user_id` (`ChangePassword` use-case). The current session stays valid
+  and records a `password_changed` event.
+- **Authentication:** authenticated, `@authorize(EntityType.USERS, UseCase.USERS_CHANGE_PASSWORD)` (granted to the
+  regular role by `SeedDefaultRolePermissions`). Only accounts created locally or by seed.
+- **Input:** `ChangePasswordSchemaIn` ([schemas/user/user.py](../app/infrastructure/api/schemas/user/user.py)) —
+  `current_password`, `new_password`, `password_confirmation`. Length rules are enforced in the domain
+  (`Password` value object), not in the schema.
+- **Response:** empty body, `204 No Content`.
+- **Errors:** `AUTH_NOT_AUTHENTICATED` (401), `AUTH_NOT_ACCESS` (403), `USER_INVALID_CURRENT_PASSWORD`,
+  `USER_PASSWORD_TOO_SHORT`, `USER_PASSWORD_TOO_LONG`, `USER_PASSWORD_CONFIRMATION_MISMATCH`,
+  `USER_PASSWORD_SAME_AS_CURRENT` (400), `USER_PASSWORD_CHANGE_NOT_SUPPORTED` (409). A refused request changes nothing.
+
+### Modules — `/api/modules`
 
 Implemented in [endpoints/module](../app/infrastructure/api/endpoints/module), use-cases in
 [use_cases/modules](../app/application/use_cases/modules).

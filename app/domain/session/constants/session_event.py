@@ -6,3 +6,4 @@ class SessionEventType(StrEnum):
     USER_LOGGED_IN        = "user_logged_in"
     USER_LOGGED_OUT       = "user_logged_out"
     SESSION_EXPIRED       = "session_expired"
+    PASSWORD_CHANGED      = "password_changed"
