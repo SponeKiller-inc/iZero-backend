@@ -1,7 +1,7 @@
 """add sessions user_id index
 
 Revision ID: e4b7c2a91d3f
-Revises: c145e8b11823
+Revises: e4a7c2d9b1f3
 Create Date: 2026-10-25 20:00:00.000000
 
 """
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = 'e4b7c2a91d3f'
-down_revision: str | None = 'c145e8b11823'
+down_revision: str | None = 'e4a7c2d9b1f3'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

@@ -11,6 +11,7 @@ from app.domain.shared.value_objects.entity import Entity
 DEFAULT_USER_PERMISSIONS: tuple[tuple[EntityType, UseCase], ...] = (
     (EntityType.USERS, UseCase.USERS_ASSIGN_MODULE),
     (EntityType.USERS, UseCase.USERS_RETRIEVE_MODULE),
+    (EntityType.USERS, UseCase.USERS_DELETE),
     (EntityType.USERS, UseCase.USERS_CHANGE_PASSWORD),
 )
 

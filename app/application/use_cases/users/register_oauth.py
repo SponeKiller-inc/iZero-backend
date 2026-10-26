@@ -38,7 +38,7 @@ class RegisterOauth:
             dto: DTO carrying user data from any identity provider.
         
         Raises:
-            RegisterOauthError: If user already exists
+            RegisterOauthError: If user or e-mail already exists
             IdentityProviderError: If identity provider has failed
         """
 
@@ -47,7 +47,10 @@ class RegisterOauth:
         if self.user_repository.exists_oauth_user(user_data.id):
             raise RegisterOauthError("User already exists")
 
-      
+        # users.email is unique across providers, so a local account blocks it too
+        if self.user_repository.exists_local(user_data.email):
+            raise RegisterOauthError("User already exists")
+
         user = User.create_oauth(
             email=user_data.email,
             provider_user_id=user_data.id,

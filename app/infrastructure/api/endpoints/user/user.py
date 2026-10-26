@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.orm import Session
 
 from app.application.dto.user.change_password import ChangePasswordIn
@@ -16,8 +16,12 @@ from app.application.exceptions.user import (
     PasswordTooShortError,
     RegisterLocalError,
     RegisterOauthError,
+    UserCannotBeDeletedError,
+    UserDeleteForbiddenError,
+    UserNotFoundError,
 )
 from app.application.use_cases.users.change_password import ChangePassword
+from app.application.use_cases.users.delete_user import DeleteUser
 from app.application.use_cases.users.register_local import RegisterLocal
 from app.application.use_cases.users.register_oauth import RegisterOauth
 from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
@@ -34,7 +38,11 @@ from app.infrastructure.services.time_provider import SystemTimeProvider
 
 router = APIRouter()
 
-@router.post("/local", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/local",
+    response_model=ResponseContainer[None],
+    status_code=status.HTTP_201_CREATED,
+)
 async def register_local(
     user: schema.RegistrationLocalSchemaIn,
     db: Session = Depends(get_db)
@@ -61,12 +69,18 @@ async def register_local(
     try:
         register.execute(dto)
     except RegisterLocalError:
-        raise HTTPException(
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.USER_ALREADY_EXISTS),
             status_code=status.HTTP_409_CONFLICT,
-            detail="User already exists"
         )
 
-@router.post("/google", status_code=status.HTTP_201_CREATED)
+    return ResponseContainer()
+
+@router.post(
+    "/google",
+    response_model=ResponseContainer[None],
+    status_code=status.HTTP_201_CREATED,
+)
 async def register_google(
     user: schema.RegistrationOauthSchemaIn,
     db: Session = Depends(get_db)
@@ -94,15 +108,17 @@ async def register_google(
     try:
         register.execute(dto)
     except RegisterOauthError:
-        raise HTTPException(
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.USER_ALREADY_EXISTS),
             status_code=status.HTTP_409_CONFLICT,
-            detail="User already exists"
         )
     except IdentityProviderError:
-        raise HTTPException(
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.AUTH_IDENTITY_PROVIDER_FAILED),
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Google authentication failed"
         )
+
+    return ResponseContainer()
 
 @router.put("/{user_id}/password", status_code=status.HTTP_204_NO_CONTENT)
 async def change_password(
@@ -163,5 +179,32 @@ async def change_password(
     except PasswordChangeNotSupportedError:
         return JSONResponse(
             content=ResponseContainer(message_id=MessageId.USER_PASSWORD_CHANGE_NOT_SUPPORTED),
+            status_code=status.HTTP_409_CONFLICT,
+        )
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    user_repository = AlchemyUserRepository(db)
+
+    delete = DeleteUser(user_repository)
+
+    try:
+        delete.execute(user_id)
+    except UserDeleteForbiddenError:
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.AUTH_NOT_AUTHORIZED),
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+    except UserNotFoundError:
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.USER_NOT_FOUND),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except UserCannotBeDeletedError:
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.USER_CANNOT_BE_DELETED),
             status_code=status.HTTP_409_CONFLICT,
         )

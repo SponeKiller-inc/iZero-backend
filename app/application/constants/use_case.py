@@ -5,6 +5,7 @@ from typing import Self
 class UseCase(str, Enum):
     USERS_ASSIGN_MODULE = "assign_module"
     USERS_RETRIEVE_MODULE = "retrieve_module"
+    USERS_DELETE = "delete_user"
     USERS_CHANGE_PASSWORD = "change_password"
     AUTH_ASSIGN_ROLE_PERMISSION = "assign_role_permission"
     MODULES_CREATE = "create_module"

@@ -4,7 +4,11 @@ from typing import Self
 
 from app.domain.users.constants.admin import ADMIN_EMAIL
 from app.domain.users.constants.registration_source_type import RegistrationSourceType
-from app.domain.users.exceptions.user import UserHasNoPasswordError
+from app.domain.users.exceptions.user import (
+    UserHasNoPasswordError,
+    UserInactiveError,
+    UserProtectedError,
+)
 from app.domain.users.value_objects.registration_source import RegistrationSource
 
 
@@ -18,6 +22,7 @@ class User:
         password: The user password.
         provider_user_id: The provider user ID.
         provider: The provider.
+        is_active: False once the user has been soft deleted.
     """
     
     def __init__(
@@ -26,13 +31,15 @@ class User:
         email: str,
         provider: RegistrationSource,
         password: str | None = None, 
-        provider_user_id: str | None = None,        
+        provider_user_id: str | None = None,
+        is_active: bool = True,
     ):
         self.id = id
         self.email = email.lower()
         self.password = password
         self.provider_user_id = provider_user_id
         self.provider = provider
+        self.is_active = is_active
 
     @classmethod
     def create_local(
@@ -80,6 +87,28 @@ class User:
             provider=RegistrationSource(RegistrationSourceType.OAUTH),
             provider_user_id=provider_user_id,
         )
+
+    def is_protected(self) -> bool:
+        """
+        Whether the user is the bootstrap admin, which must never be deleted.
+        """
+        return self.email == ADMIN_EMAIL
+
+    def deactivate(self) -> None:
+        """
+        Soft deletes the user.
+
+        Raises:
+            UserInactiveError: If the user is already inactive.
+            UserProtectedError: If the user is the bootstrap admin.
+        """
+        if not self.is_active:
+            raise UserInactiveError("User is already inactive")
+
+        if self.is_protected():
+            raise UserProtectedError("Bootstrap admin cannot be deactivated")
+
+        self.is_active = False
 
     def has_password(self) -> bool:
         """

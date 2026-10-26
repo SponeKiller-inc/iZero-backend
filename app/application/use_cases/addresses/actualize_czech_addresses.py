@@ -47,16 +47,9 @@ class ActualizeCzechAddresses:
         """
         country = self.country_repository.get_by_code(CZECH_COUNTRY_CODE)
 
-        for address_out in self.address_provider.get_modified(modified_since):
-            if address_out.country_code.value != CZECH_COUNTRY_CODE:
-                continue
-
-            address = self.address_repository.get_by_external_id(
-                address_out.external_id, country.id
-            )
-
-            if address is None:
-                address = Address.create(
+        for page in self.address_provider.get_modified(modified_since):
+            self.address_repository.upsert_many([
+                Address.create(
                     external_id=address_out.external_id,
                     street=address_out.street,
                     building_number=address_out.building_number,
@@ -67,15 +60,6 @@ class ActualizeCzechAddresses:
                     postal_code=address_out.postal_code,
                     country_id=country.id,
                 )
-            else:
-                address.update(
-                    street=address_out.street,
-                    building_number=address_out.building_number,
-                    orientation_number=address_out.orientation_number,
-                    orientation_number_letter=address_out.orientation_number_letter,
-                    district=address_out.district,
-                    city=address_out.city,
-                    postal_code=address_out.postal_code,
-                )
-
-            self.address_repository.save(address)
+                for address_out in page
+                if address_out.country_code.value == CZECH_COUNTRY_CODE
+            ])

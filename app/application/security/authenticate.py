@@ -10,12 +10,14 @@ from app.application.security.secret_message_context import (
 from app.domain.auth.repositories.role_permission import (
     RolePermissionRepository,
 )
+from app.domain.users.repositories.user import UserRepository
 from app.domain.users.repositories.user_role import UserRoleRepository
 
 
 class Authenticate:
     def __init__(
         self,
+        user_repository: UserRepository,
         user_role_repository: UserRoleRepository,
         role_permission_repository: RolePermissionRepository,
         time_provider: TimeProvider,
@@ -24,10 +26,12 @@ class Authenticate:
         Initialize use-case
 
         Args:
+            user_repository: User repository
             user_role_repository: User role repository
             role_permission_repository: Role permission repository
             time_provider: Time provider
         """
+        self.user_repository = user_repository
         self.user_role_repository = user_role_repository
         self.role_permission_repository = role_permission_repository
         self.time_provider = time_provider
@@ -40,10 +44,15 @@ class Authenticate:
             user_id: User id
         
         Raises:
-            UnauthenticatedUserError: If user is not authenticated
+            UnauthenticatedUserError: If user is not authenticated or is inactive
         """
 
         if user_id is None:
+            raise UnauthenticatedUserError("You are not authenticated")
+
+        # Access tokens issued before a soft delete must stop working immediately
+        user = self.user_repository.get(user_id)
+        if user is None or not user.is_active:
             raise UnauthenticatedUserError("You are not authenticated")
 
         auth_hash = AuthHash(SecurityConstants.AUTH_SECRET)
