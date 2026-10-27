@@ -34,7 +34,7 @@ sequenceDiagram
     C->>API: requests with Authorization: Bearer <access_token>
 ```
 
-JWT payload: `sub` (user_id), `exp`. Signed with `SecurityConstants.ACCESS_TOKEN_ALGORITHM` using `SecurityConstants.ACCESS_TOKEN_SECRET_KEY` ([constants/security.py](../app/application/constants/security.py)).
+JWT payload: `user_id`, `provider` (`local` / `seed` / `oauth`, from `User.provider`), `exp`. Signed with `SecurityConstants.ACCESS_TOKEN_ALGORITHM` using `SecurityConstants.ACCESS_TOKEN_SECRET_KEY` ([constants/security.py](../app/application/constants/security.py)).
 
 TODO: describe access token renewal via the refresh token and logout (session invalidation).
 
