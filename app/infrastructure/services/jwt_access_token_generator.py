@@ -65,11 +65,12 @@ class JwtAccessTokenGenerator:
                     "Invalid token payload: user_id missing or non-numeric"
                 )
             
-            provider = payload.get("provider")
-            if provider not in RegistrationSourceType:
+            try:
+                provider = RegistrationSourceType(payload.get("provider"))
+            except ValueError as e:
                 raise AccessTokenProviderError(
                     "Invalid token payload: provider missing or unknown"
-                )
+                ) from e
 
             expired_at = payload.get("exp")
             if not expired_at:
@@ -77,7 +78,7 @@ class JwtAccessTokenGenerator:
 
             return TokenPayload(
                 user_id=int(user_id),
-                provider=RegistrationSourceType(provider),
+                provider=provider,
                 expired_at=SystemTimeProvider.from_timestamp(expired_at)
             )
             
