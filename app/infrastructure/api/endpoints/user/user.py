@@ -151,6 +151,11 @@ async def change_password(
     # change password
     try:
         change.execute(dto)
+    except UserNotFoundError:
+        return JSONResponse(
+            content=ResponseContainer(message_id=MessageId.USER_NOT_FOUND),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
     except InvalidCurrentPasswordError:
         return JSONResponse(
             content=ResponseContainer(message_id=MessageId.USER_INVALID_CURRENT_PASSWORD),

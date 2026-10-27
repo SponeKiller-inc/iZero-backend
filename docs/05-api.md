@@ -100,7 +100,8 @@ TODO: document the endpoints in [endpoints/user](../app/infrastructure/api/endpo
   `current_password`, `new_password`, `password_confirmation`. Length rules are enforced in the domain
   (`Password` value object), not in the schema.
 - **Response:** empty body, `204 No Content`.
-- **Errors:** `AUTH_NOT_AUTHENTICATED` (401), `AUTH_NOT_ACCESS` (403), `USER_INVALID_CURRENT_PASSWORD`,
+- **Errors:** `AUTH_NOT_AUTHENTICATED` (401), `AUTH_NOT_ACCESS` (403), `AUTH_NOT_AUTHORIZED` (403) if `user_id` is not
+  the authenticated caller, `USER_NOT_FOUND` (404), `USER_INVALID_CURRENT_PASSWORD`,
   `USER_PASSWORD_TOO_SHORT`, `USER_PASSWORD_TOO_LONG`, `USER_PASSWORD_CONFIRMATION_MISMATCH`,
   `USER_PASSWORD_SAME_AS_CURRENT` (400), `USER_PASSWORD_CHANGE_NOT_SUPPORTED` (409). A refused request changes nothing.
 

@@ -1,7 +1,11 @@
 from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.routing import Match
 
-from app.application.exceptions.auth import UnauthenticatedUserError
+from app.application.exceptions.auth import (
+    ResourceForbiddenError,
+    UnauthenticatedUserError,
+)
 from app.application.security.auth_context import AuthContext
 from app.application.security.authenticate import Authenticate
 from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
@@ -41,7 +45,10 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
                     time_provider
                 )
 
-                authenticate.execute(AuthContext.get())
+                authenticate.execute(
+                    AuthContext.get(),
+                    self._target_user_id(request),
+                )
         except UnauthenticatedUserError:
             return JSONResponse(
                 content=ResponseContainer(
@@ -49,5 +56,34 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
                 ),
                 status_code=status.HTTP_401_UNAUTHORIZED,
             )
+        except ResourceForbiddenError:
+            return JSONResponse(
+                content=ResponseContainer(
+                    message_id=MessageId.AUTH_NOT_AUTHORIZED,
+                ),
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
 
         return await call_next(request)
+
+    @staticmethod
+    def _target_user_id(request: Request) -> int | None:
+        """
+        Resolve user_id path parameter of the route the request is heading to.
+        Middleware runs before routing, so the routes are matched the same way the router does.
+
+        Args:
+            request: Incoming request
+
+        Returns:
+            Target user id or None if the route has no user_id
+        """
+        for route in request.app.router.routes:
+            match, child_scope = route.matches(request.scope)
+            print(match.value)
+            print(child_scope)
+            if match == Match.FULL:
+                user_id = child_scope.get("path_params", {}).get("user_id")
+                return int(user_id) if user_id and user_id.isdigit() else None
+
+        return None

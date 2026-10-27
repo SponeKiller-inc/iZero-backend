@@ -51,6 +51,8 @@ role_permission = entity_type + method
 
 [`Authenticate`](../app/application/security/authenticate.py) runs on every request for an authenticated user. It loads the user's currently valid roles and, for each one, their currently valid `role_permission` rows (`entity_type` + `method`). For every allowed `(entity_type, method)` pair it generates an HMAC-SHA256 signature over `user_id:secret_message:entity:method` ([`AuthHash.generate`](../app/application/security/auth_hash.py)) and stores the resulting list of hashes in `HashContext`. This step only proves the user is authenticated and has *some* valid role — it does not yet check access to a specific use case.
 
+**User resources are self-service only.** `AuthenticateMiddleware` matches the request against the app routes (the same way the router does) and passes the route's `user_id` path parameter to `Authenticate` as `target_user_id`. When it differs from the caller, `Authenticate` raises `ResourceForbiddenError` → 403 `AUTH_NOT_AUTHORIZED`.
+
 **Step 2 — real access check (`@authorize` on the use case)**
 
 The endpoint calls the use case, but the use case itself decides whether the call is allowed. A use case that requires authorization decorates its `execute()` method with `@authorize(entity, use_case)` ([application/security/authorize.py](../app/application/security/authorize.py)):

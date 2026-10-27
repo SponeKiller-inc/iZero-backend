@@ -7,6 +7,7 @@ from app.application.exceptions.user import (
     PasswordSameAsCurrentError,
     PasswordTooLongError,
     PasswordTooShortError,
+    UserNotFoundError,
 )
 from app.application.ports.password_hasher import PasswordHasher
 from app.application.ports.time_provider import TimeProvider
@@ -53,6 +54,7 @@ class ChangePassword:
                 and the current session id.
 
         Raises:
+            UserNotFoundError: If user does not exist
             PasswordChangeNotSupportedError: If user account has no password
             InvalidCurrentPasswordError: If current password is wrong
             PasswordTooShortError: If new password is too short
@@ -63,6 +65,10 @@ class ChangePassword:
 
         now = self.time_provider.now()
         user = self.user_repository.get(dto.user_id)
+
+        if user is None:
+            raise UserNotFoundError("User not found")
+
         current_session = self.session_repository.get(dto.session_id)
 
         if not user.has_password():
