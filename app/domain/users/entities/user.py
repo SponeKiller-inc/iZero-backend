@@ -4,7 +4,11 @@ from typing import Self
 
 from app.domain.users.constants.admin import ADMIN_EMAIL
 from app.domain.users.constants.registration_source_type import RegistrationSourceType
-from app.domain.users.exceptions.user import UserInactiveError, UserProtectedError
+from app.domain.users.exceptions.user import (
+    UserHasNoPasswordError,
+    UserInactiveError,
+    UserProtectedError,
+)
 from app.domain.users.value_objects.registration_source import RegistrationSource
 
 
@@ -105,3 +109,31 @@ class User:
             raise UserProtectedError("Bootstrap admin cannot be deactivated")
 
         self.is_active = False
+
+    def has_password(self) -> bool:
+        """
+        Checks if the user logs in with a password.
+        Only accounts created locally or by seed have one.
+        """
+        return (
+            self.password is not None
+            and self.provider.value in (
+                RegistrationSourceType.LOCAL,
+                RegistrationSourceType.SEED,
+            )
+        )
+
+    def change_password(self, password_hash: str) -> None:
+        """
+        Replaces the current password with a new one.
+
+        Args:
+            password_hash: Hash of the new password.
+
+        Raises:
+            UserHasNoPasswordError: If the user does not log in with a password.
+        """
+        if not self.has_password():
+            raise UserHasNoPasswordError("User has no password to change")
+
+        self.password = password_hash

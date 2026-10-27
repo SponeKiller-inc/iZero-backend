@@ -16,6 +16,9 @@ class AuthHashVerificationError(ApplicationError):
 class UnauthenticatedUserError(ApplicationError):
     """Specific error indicating that user is not authenticated."""
 
+class ResourceForbiddenError(ApplicationError):
+    """Specific error indicating that user tries to access another user's resource."""
+
 class InvalidCredentialsError(ApplicationError):
     """Specific error indicating that provided credentials are invalid."""
 

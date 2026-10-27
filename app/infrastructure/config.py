@@ -23,7 +23,7 @@ class Settings(BaseSettings):
         "authorization", "cookie", "set-cookie", "x-api-key", "proxy-authorization",
     ]
     http_audit_sensitive_body_fields: list[str] = [
-        "password", "new_password", "old_password", "current_password",
+        "password", "new_password", "old_password", "current_password", "password_confirmation",
         "token", "access_token", "refresh_token", "id_token", "jwt_token",
         "client_secret", "secret", "csrf_token", "api_key", "authorization",
     ]

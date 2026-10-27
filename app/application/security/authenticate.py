@@ -1,5 +1,8 @@
 from app.application.constants.security import SecurityConstants
-from app.application.exceptions.auth import UnauthenticatedUserError
+from app.application.exceptions.auth import (
+    ResourceForbiddenError,
+    UnauthenticatedUserError,
+)
 from app.application.ports.time_provider import TimeProvider
 from app.application.security.auth_context import AuthContext
 from app.application.security.auth_hash import AuthHash
@@ -36,15 +39,18 @@ class Authenticate:
         self.role_permission_repository = role_permission_repository
         self.time_provider = time_provider
 
-    def execute(self, user_id: int) -> None:
+    def execute(self, user_id: int, target_user_id: int | None = None) -> None:
         """
         Authenticate user and set hash context
 
         Args:
             user_id: User id
-        
+            target_user_id: Id of the user whose resource is requested,
+                None if the request does not target a user resource
+
         Raises:
             UnauthenticatedUserError: If user is not authenticated or is inactive
+            ResourceForbiddenError: If user tries to access another user's resource
         """
 
         if user_id is None:
@@ -54,6 +60,10 @@ class Authenticate:
         user = self.user_repository.get(user_id)
         if user is None or not user.is_active:
             raise UnauthenticatedUserError("You are not authenticated")
+
+        # User resources are self-service only
+        if target_user_id is not None and target_user_id != user_id:
+            raise ResourceForbiddenError("You can access only your own resources")
 
         auth_hash = AuthHash(SecurityConstants.AUTH_SECRET)
         entities_methods: list[tuple[str, str]] = []

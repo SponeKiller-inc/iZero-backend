@@ -11,7 +11,8 @@ class SessionModel(Base, ValidityMixin):
     external_id: Mapped[str] = mapped_column(nullable=False, unique=True, index=True)
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), 
-        nullable=True
+        nullable=True,
+        index=True,
     )
     ip_address: Mapped[str] = mapped_column(nullable=False)
     user_agent: Mapped[str] = mapped_column(nullable=False)
