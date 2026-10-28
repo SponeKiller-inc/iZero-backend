@@ -45,7 +45,7 @@ Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.
 | 1000003 | `USER_CANNOT_BE_DELETED` | User is protected (bootstrap admin) |
 | 1000004 | `USER_INVALID_CURRENT_PASSWORD` | Current password is wrong |
 | 1000005 | `USER_PASSWORD_TOO_SHORT` | New password is shorter than 8 characters |
-| 1000006 | `USER_PASSWORD_TOO_LONG` | New password is longer than 72 bytes (UTF-8) |
+| 1000006 | `USER_PASSWORD_TOO_LONG` | New password is longer than 128 characters |
 | 1000007 | `USER_PASSWORD_SAME_AS_CURRENT` | New password equals the current one |
 | 1000008 | `USER_PASSWORD_CHANGE_NOT_SUPPORTED` | Account has no password (registered via Google) |
 | 1000009 | `USER_PASSWORD_CONFIRMATION_MISMATCH` | Password confirmation differs from the new password |

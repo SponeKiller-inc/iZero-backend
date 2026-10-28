@@ -18,7 +18,7 @@ All variables are **required** — the application will not start without them.
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `PWD_CONTEXT_SCHEME` | str | Password hashing scheme for passlib |
+| `PWD_CONTEXT_SCHEME` | str | Password hashing scheme for passlib (`bcrypt_sha256`; plain `bcrypt` truncates passwords at 72 bytes). |
 | `GOOGLE_OAUTH_CLIENT_ID` | str | Client ID used to verify the Google id_token |
 
 ## Application

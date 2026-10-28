@@ -15,7 +15,7 @@ Cookies are set with `secure=True` and `samesite="strict"`.
 
 Supported providers:
 
-1. **Local** — e-mail + password, hashed via passlib (`PWD_CONTEXT_SCHEME`).
+1. **Local** — e-mail + password, hashed via passlib (`PWD_CONTEXT_SCHEME`, `bcrypt_sha256` pre-hashes the password so its full length counts).
 2. **Google** — `id_token` verified against `GOOGLE_OAUTH_CLIENT_ID` ([providers/auth_google.py](../app/infrastructure/providers/auth_google.py)).
 
 ### Login flow
