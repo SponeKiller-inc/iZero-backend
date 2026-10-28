@@ -14,8 +14,7 @@ class Password:
     """
     value: str = field(repr=False)
     min_length: ClassVar[int] = 8
-    # bcrypt silently ignores everything past 72 bytes
-    max_bytes: ClassVar[int] = 72
+    max_length: ClassVar[int] = 128
 
     def __post_init__(self):
         if len(self.value) < self.min_length:
@@ -23,7 +22,7 @@ class Password:
                 f"Password is too short (min {self.min_length})"
             )
 
-        if len(self.value.encode("utf-8")) > self.max_bytes:
+        if len(self.value) > self.max_length:
             raise PasswordTooLongError(
-                f"Password is too long (max {self.max_bytes} bytes)"
+                f"Password is too long (max {self.max_length})"
             )
