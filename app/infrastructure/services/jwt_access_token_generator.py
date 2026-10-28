@@ -4,6 +4,7 @@ from jose import JWTError, jwt
 
 from app.application.dto.auth.token import TokenPayload
 from app.application.exceptions.auth import AccessTokenProviderError
+from app.domain.users.constants.registration_source_type import RegistrationSourceType
 from app.infrastructure.services.time_provider import SystemTimeProvider
 
 
@@ -14,12 +15,18 @@ class JwtAccessTokenGenerator:
         self._secret_key = secret_key
         self._algorithm = algorithm
 
-    def encode(self, user_id: int, expires_at: datetime) -> str:
+    def encode(
+        self,
+        user_id: int,
+        provider: RegistrationSourceType,
+        expires_at: datetime,
+    ) -> str:
         """
         Encodes JWT token
 
         Args:
             user_id (int): user_id
+            provider (RegistrationSourceType): how the user account was created
             expires_at (datetime): expiration time (UTC)
 
         Returns:
@@ -27,6 +34,7 @@ class JwtAccessTokenGenerator:
         """
         payload = {
             "user_id": str(user_id),
+            "provider": provider.value,
             "exp": int(expires_at.timestamp())
         }
         return jwt.encode(payload, self._secret_key, algorithm=self._algorithm)
@@ -57,12 +65,20 @@ class JwtAccessTokenGenerator:
                     "Invalid token payload: user_id missing or non-numeric"
                 )
             
+            try:
+                provider = RegistrationSourceType(payload.get("provider"))
+            except ValueError as e:
+                raise AccessTokenProviderError(
+                    "Invalid token payload: provider missing or unknown"
+                ) from e
+
             expired_at = payload.get("exp")
             if not expired_at:
                 raise AccessTokenProviderError("Invalid token payload: expired_at missing")
-            
+
             return TokenPayload(
                 user_id=int(user_id),
+                provider=provider,
                 expired_at=SystemTimeProvider.from_timestamp(expired_at)
             )
             

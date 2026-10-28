@@ -66,6 +66,7 @@ class LoginGoogle:
 
         access_token = self.access_token_generator.encode(
             user.id,
+            user.provider.value,
             self.time_provider.get_expiration(
                 minutes=TokenConstants.ACCESS_TOKEN_EXPIRATION_MINUTES,
             ),
