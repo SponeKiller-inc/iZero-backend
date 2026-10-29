@@ -54,6 +54,10 @@ Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.
 | 2000003 | `AUTH_NOT_ACCESS` | Access denied |
 | 2000004 | `AUTH_IDENTITY_PROVIDER_FAILED` | External identity provider rejected the token |
 | 4000001 | `MODULE_GROUP_NOT_FOUND` | Module group does not exist |
+| 6000001 | `BANK_NOT_FOUND` | Bank is not in the bank catalogue |
+| 6010001 | `BANK_ACCOUNT_NOT_FOUND` | User has no bank account |
+| 6010002 | `BANK_ACCOUNT_ALREADY_EXISTS` | User already has a bank account |
+| 6010003 | `BANK_ACCOUNT_VALIDATION_FAILED` | Bank account violates the bank account rules (`BankAccountValidationError` — invalid format of account prefix, account number or IBAN, empty owner name, IBAN is not a Czech one) |
 | 9000001 | `SYSTEM_INTERNAL_FAIL` | Unexpected server error |
 
 When adding a new code, add a row to this table.

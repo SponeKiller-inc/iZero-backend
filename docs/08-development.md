@@ -39,6 +39,7 @@ Adding a new feature typically means:
 - Type hints are mandatory on public methods.
 - Always work with time through `SystemTimeProvider` (UTC), never `datetime.now()` without a timezone.
 - Domain exceptions are not surfaced as HTTP details — translation to a `message_id` happens in the API layer.
+- New entities are built through a `create` class method. Entities of link tables (an assignment of one entity to another, e.g. `UserModule`, `UserBankAccount`) use `assign` instead of `create`.
 
 TODO: document the configured linter/formatter (ruff, black) and its settings.
 

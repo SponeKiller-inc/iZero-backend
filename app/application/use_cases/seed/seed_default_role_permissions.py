@@ -13,6 +13,13 @@ DEFAULT_USER_PERMISSIONS: tuple[tuple[EntityType, UseCase], ...] = (
     (EntityType.USERS, UseCase.USERS_RETRIEVE_MODULE),
     (EntityType.USERS, UseCase.USERS_DELETE),
     (EntityType.USERS, UseCase.USERS_CHANGE_PASSWORD),
+    (EntityType.BANK, UseCase.BANKS_RETRIEVE),
+    (EntityType.BANK, UseCase.BANKS_RETRIEVE_ACCOUNT),
+    (EntityType.BANK, UseCase.BANKS_ADD_ACCOUNT),
+    (EntityType.BANK, UseCase.BANKS_CHANGE_ACCOUNT),
+    (EntityType.BANK, UseCase.BANKS_ADD_USER_ACCOUNT),
+    (EntityType.BANK, UseCase.BANKS_RETRIEVE_USER_ACCOUNT),
+    (EntityType.BANK, UseCase.BANKS_CHANGE_USER_ACCOUNT),
 )
 
 

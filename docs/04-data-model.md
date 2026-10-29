@@ -27,13 +27,13 @@ Further conventions:
 
 | Area | Tables |
 |------|--------|
-| Users | `users`, `user_roles`, `user_modules`, `user_addresses` |
+| Users | `users`, `user_roles`, `user_modules`, `user_addresses`, `user_bank_accounts` |
 | Authorization | `roles`, `role_permission` |
 | Sessions | `sessions`, `refresh_token`, `session_log` |
 | Modules | `module_groups`, `modules` |
 | Customers | `customers`, `entity_types` |
 | Addresses | `addresses`, `address_types`, `countries` |
-| Banks | `banks`, `bank_accounts`, `bank_addresses` |
+| Banks | `banks`, `bank_accounts` |
 | Contacts | `emails`, `phones` |
 | Titles | `titles`, `prefix_titles`, `suffix_titles` |
 | Observability | `external_request_log`, `external_response_log`, `internal_request_log`, `internal_response_log` |
