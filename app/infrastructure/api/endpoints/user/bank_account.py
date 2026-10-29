@@ -19,12 +19,12 @@ from app.application.use_cases.users.change_user_bank_account import (
 from app.application.use_cases.users.retrieve_user_bank_account import (
     RetrieveUserBankAccount,
 )
+from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
+from app.infrastructure.api.schemas.message_id import MessageId
 from app.infrastructure.api.schemas.user.bank_account import (
     UserBankAccountSchemaIn,
     UserBankAccountSchemaOut,
 )
-from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
-from app.infrastructure.api.schemas.message_id import MessageId
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.bank.bank import AlchemyBankRepository
 from app.infrastructure.repositories.bank.bank_account import (
