@@ -1,4 +1,4 @@
-from app.domain.addresses.constants.countries import COUNTRIES
+from app.application.seed_data.countries import COUNTRIES
 from app.domain.addresses.entities.country import Country
 from app.domain.addresses.repositories.country import CountryRepository
 from app.domain.shared.value_objects.location import CountryIsoCode

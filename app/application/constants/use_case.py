@@ -10,6 +10,13 @@ class UseCase(str, Enum):
     AUTH_ASSIGN_ROLE_PERMISSION = "assign_role_permission"
     MODULES_CREATE = "create_module"
     MODULES_CREATE_GROUP = "create_module_group"
+    BANKS_RETRIEVE = "retrieve_banks"
+    BANKS_RETRIEVE_ACCOUNT = "retrieve_bank_account"
+    BANKS_ADD_ACCOUNT = "add_bank_account"
+    BANKS_CHANGE_ACCOUNT = "change_bank_account"
+    BANKS_ADD_USER_ACCOUNT = "add_user_bank_account"
+    BANKS_RETRIEVE_USER_ACCOUNT = "retrieve_user_bank_account"
+    BANKS_CHANGE_USER_ACCOUNT = "change_user_bank_account"
 
     @classmethod
     def has_member(cls, name: str) -> bool:

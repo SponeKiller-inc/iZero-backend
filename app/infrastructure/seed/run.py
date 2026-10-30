@@ -6,6 +6,7 @@ from app.application.use_cases.seed.seed_default_address_types import (
     SeedDefaultAddressTypes,
 )
 from app.application.use_cases.seed.seed_default_admin import SeedDefaultAdmin
+from app.application.use_cases.seed.seed_default_banks import SeedDefaultBanks
 from app.application.use_cases.seed.seed_default_countries import (
     SeedDefaultCountries,
 )
@@ -25,6 +26,7 @@ from app.infrastructure.repositories.address.country import AlchemyCountryReposi
 from app.infrastructure.repositories.auth.role_permission import (
     AlchemyRolePermissionRepository,
 )
+from app.infrastructure.repositories.bank.bank import AlchemyBankRepository
 from app.infrastructure.repositories.lookup.role import AlchemyRoleRepository
 from app.infrastructure.repositories.lookup.title import AlchemyTitleRepository
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
@@ -66,6 +68,12 @@ def run() -> None:
                 max_retries=settings.ruian_max_retries,
                 retry_backoff_seconds=settings.ruian_retry_backoff_seconds,
             ),
+            AlchemyAddressRepository(db),
+            AlchemyCountryRepository(db),
+        ).execute()
+        # order matters: bank seats are resolved against the seeded Czech addresses
+        SeedDefaultBanks(
+            AlchemyBankRepository(db),
             AlchemyAddressRepository(db),
             AlchemyCountryRepository(db),
         ).execute()

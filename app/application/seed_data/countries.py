@@ -1,4 +1,4 @@
-# Seeded (ISO 3166-1 alpha-3 code, name) pairs for all officially assigned countries.
+#(ISO 3166-1 alpha-3 code, name) pairs for all officially assigned countries.
 COUNTRIES: tuple[tuple[str, str], ...] = (
     ("AFG", "Afghanistan"),
     ("ALA", "Åland Islands"),

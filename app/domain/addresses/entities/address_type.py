@@ -3,8 +3,7 @@ from typing import Self
 
 class AddressType:
     """
-    Represents the address-type entity (e.g. permanent/mailing), referenced
-    by user_addresses/bank_addresses/customer_addresses.
+    Represents the address-type entity (e.g. permanent/mailing)
 
     Attributes:
         id: The address type ID.
