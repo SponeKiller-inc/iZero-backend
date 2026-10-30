@@ -19,6 +19,9 @@ class UnauthenticatedUserError(ApplicationError):
 class ResourceForbiddenError(ApplicationError):
     """Specific error indicating that user tries to access another user's resource."""
 
+class InvalidTargetUserIdError(ApplicationError):
+    """Specific error indicating that the requested user id is not a number."""
+
 class InvalidCredentialsError(ApplicationError):
     """Specific error indicating that provided credentials are invalid."""
 

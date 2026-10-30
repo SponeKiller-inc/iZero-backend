@@ -3,6 +3,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.routing import Match
 
 from app.application.exceptions.auth import (
+    InvalidTargetUserIdError,
     ResourceForbiddenError,
     UnauthenticatedUserError,
 )
@@ -49,6 +50,13 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
                     AuthContext.get(),
                     self._target_user_id(request),
                 )
+        except InvalidTargetUserIdError:
+            return JSONResponse(
+                content=ResponseContainer(
+                    message_id=MessageId.USER_INVALID_ID,
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
         except UnauthenticatedUserError:
             return JSONResponse(
                 content=ResponseContainer(
@@ -67,7 +75,7 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
     @staticmethod
-    def _target_user_id(request: Request) -> int | None:
+    def _target_user_id(request: Request) -> str | None:
         """
         Resolve user_id path parameter of the route the request is heading to.
         Middleware runs before routing, so the routes are matched the same way the router does.
@@ -80,10 +88,7 @@ class AuthenticateMiddleware(BaseHTTPMiddleware):
         """
         for route in request.app.router.routes:
             match, child_scope = route.matches(request.scope)
-            print(match.value)
-            print(child_scope)
             if match == Match.FULL:
-                user_id = child_scope.get("path_params", {}).get("user_id")
-                return int(user_id) if user_id and user_id.isdigit() else None
+                return child_scope.get("path_params", {}).get("user_id")
 
         return None
