@@ -72,7 +72,7 @@ class AddNaturalPerson:
             PersonValidationError: If a name is empty, the person is younger than 18 or
                 a title does not exist
         """
-        titles = self.title_repository.get_many(dto.title_ids)
+        titles = self.title_repository.get(dto.title_ids)
 
         if len(titles) != len(set(dto.title_ids)):
             raise PersonValidationError("Some of the titles do not exist")

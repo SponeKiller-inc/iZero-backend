@@ -5,7 +5,7 @@ from app.infrastructure.repositories.base import BaseAlchemyRepository
 
 
 class AlchemyTitleRepository(BaseAlchemyRepository, TitleRepository):
-    def get_many(self, title_ids: list[int]) -> list[Title]:
+    def get(self, title_ids: list[int]) -> list[Title]:
         """
         Get titles by their IDs
 

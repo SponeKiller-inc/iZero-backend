@@ -6,7 +6,7 @@ from app.domain.shared.entities.title import Title
 class TitleRepository(Protocol):
     """Repository interface for Title entity."""
 
-    def get_many(self, title_ids: list[int]) -> list[Title]:
+    def get(self, title_ids: list[int]) -> list[Title]:
         """
         Get titles by their IDs
 

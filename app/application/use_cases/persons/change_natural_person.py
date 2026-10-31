@@ -90,7 +90,7 @@ class ChangeNaturalPerson:
         if natural_person is None:
             raise PersonNotFoundError("Natural person details do not exist")
 
-        titles = self.title_repository.get_many(dto.title_ids)
+        titles = self.title_repository.get(dto.title_ids)
 
         if len(titles) != len(set(dto.title_ids)):
             raise PersonValidationError("Some of the titles do not exist")
