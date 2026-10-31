@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Backend of the iZero invoicing system. Provides a REST API for managing users, their roles and modules, customers, addresses and banking details.
+Backend of the iZero invoicing system. Provides a REST API for managing users, their roles and modules, persons (natural persons, entrepreneurs, companies), customers, addresses and banking details.
 
 TODO: add the business goal and target users.
 

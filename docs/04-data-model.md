@@ -31,11 +31,11 @@ Further conventions:
 | Authorization | `roles`, `role_permission` |
 | Sessions | `sessions`, `refresh_token`, `session_log` |
 | Modules | `module_groups`, `modules` |
-| Customers | `customers`, `entity_types` |
+| Persons | `persons`, `natural_persons`, `entrepreneurs`, `companies`, `person_titles`, `person_addresses`, `legal_forms` |
 | Addresses | `addresses`, `address_types`, `countries` |
 | Banks | `banks`, `bank_accounts` |
-| Contacts | `emails`, `phones` |
-| Titles | `titles`, `prefix_titles`, `suffix_titles` |
+| Contacts | `emails`, `phones` (calling code + national number), `phone_prefixes` |
+| Titles | `titles` (catalogue of academic titles, prefix and suffix ones) |
 | Observability | `external_request_log`, `external_response_log`, `internal_request_log`, `internal_response_log` |
 
 See [ER Diagram](er-diagram.md) for how these tables relate to each other.
