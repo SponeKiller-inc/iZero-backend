@@ -9,6 +9,7 @@ class EntityType(StrEnum):
     BANK = "banks"
     SESSION = "session"
     CUSTOMERS = "customers"
+    PERSONS = "persons"
     MODULES = "modules"
 
     @classmethod

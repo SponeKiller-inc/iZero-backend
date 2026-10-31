@@ -26,14 +26,15 @@ On startup [entrypoint.sh](../entrypoint.sh):
 | Use case | What it seeds | Fixed ID(s) |
 |----------|----------------|-------------|
 | `SeedDefaultRoles` ([seed_default_roles.py](../app/application/use_cases/seed/seed_default_roles.py)) | `roles` row `"user"` — the role assigned to every newly registered user (`REGULAR_ROLE_ID`) | `1` |
-| `SeedDefaultTitles` ([seed_default_titles.py](../app/application/use_cases/seed/seed_default_titles.py)) | `titles` rows `"prefix"` / `"suffix"`, referenced by `prefix_titles`/`suffix_titles` | `1`, `2` |
+| `SeedDefaultTitles` ([seed_default_titles.py](../app/application/use_cases/seed/seed_default_titles.py)) | catalogue of academic titles from [titles.py](../app/application/seed_data/titles.py) (Bc., Ing., Mgr., MUDr., doc., prof., Ph.D., MBA, …) into `titles`; upsert by name | — |
+| `SeedDefaultLegalForms` ([seed_default_legal_forms.py](../app/application/use_cases/seed/seed_default_legal_forms.py)) | catalogue of legal forms of companies in `legal_forms` (s.r.o., a.s., v.o.s., k.s., …) from [legal_forms.py](../app/application/seed_data/legal_forms.py); upsert by code | — |
+| `SeedDefaultPhonePrefixes` ([seed_default_phone_prefixes.py](../app/application/use_cases/seed/seed_default_phone_prefixes.py)) | catalogue of phone calling codes in `phone_prefixes` from [phone_prefixes.py](../app/application/seed_data/phone_prefixes.py) (currently only 420 for CZE, stored without "+" or "00"); upsert by prefix, runs after `SeedDefaultCountries` | — |
 | `SeedDefaultRolePermissions` ([seed_default_role_permissions.py](../app/application/use_cases/seed/seed_default_role_permissions.py)) | `role_permission` rows granting the `"user"` role `USERS_ASSIGN_MODULE` and `USERS_RETRIEVE_MODULE` — without this, `@authorize`-protected use-cases reject every regular user | — |
 | `SeedDefaultAdmin` ([seed_default_admin.py](../app/application/use_cases/seed/seed_default_admin.py)) | `users` row for the bootstrap admin account (`email="admin"`, password from `ADMIN_PASSWORD` in `.env.app`) — created via `User.create_admin`, which only this use case is allowed to call | — |
 
 Order matters: roles are seeded before role permissions (FK dependency).
 
 Not seeded yet (deliberately, no canonical values exist in code — needs a product decision before implementing):
-- `entity_types` (customer type — individual/business/proprietor/...)
 - `module_groups` / `modules` — created dynamically via `MODULES_CREATE_GROUP` / `MODULES_CREATE` use-cases, not fixed reference data
 
 ## Build and run

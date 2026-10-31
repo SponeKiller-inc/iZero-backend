@@ -20,7 +20,7 @@ flowchart TD
 
 ```
 app/
-├── domain/            # addresses, auth, bank, customers, modules, session, shared, users
+├── domain/            # addresses, auth, bank, customers, modules, persons, session, shared, users
 │   └── <context>/
 │       ├── entities/          # domain entities
 │       ├── value_objects/     # immutable value types

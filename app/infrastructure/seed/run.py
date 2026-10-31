@@ -10,6 +10,12 @@ from app.application.use_cases.seed.seed_default_banks import SeedDefaultBanks
 from app.application.use_cases.seed.seed_default_countries import (
     SeedDefaultCountries,
 )
+from app.application.use_cases.seed.seed_default_legal_forms import (
+    SeedDefaultLegalForms,
+)
+from app.application.use_cases.seed.seed_default_phone_prefixes import (
+    SeedDefaultPhonePrefixes,
+)
 from app.application.use_cases.seed.seed_default_role_permissions import (
     SeedDefaultRolePermissions,
 )
@@ -27,6 +33,10 @@ from app.infrastructure.repositories.auth.role_permission import (
     AlchemyRolePermissionRepository,
 )
 from app.infrastructure.repositories.bank.bank import AlchemyBankRepository
+from app.infrastructure.repositories.lookup.legal_form import AlchemyLegalFormRepository
+from app.infrastructure.repositories.lookup.phone_prefix import (
+    AlchemyPhonePrefixRepository,
+)
 from app.infrastructure.repositories.lookup.role import AlchemyRoleRepository
 from app.infrastructure.repositories.lookup.title import AlchemyTitleRepository
 from app.infrastructure.repositories.user.user import AlchemyUserRepository
@@ -45,11 +55,15 @@ def run() -> None:
         # Transaction-scoped lock auto-releases on commit/rollback (db_session's exit).
         db.execute(select(func.pg_advisory_xact_lock(SEED_LOCK_KEY)))
 
-        # order matters: role_permission rows have a FK to roles
         SeedDefaultRoles(AlchemyRoleRepository(db)).execute()
         SeedDefaultTitles(AlchemyTitleRepository(db)).execute()
+        SeedDefaultLegalForms(AlchemyLegalFormRepository(db)).execute()
         SeedDefaultCountries(AlchemyCountryRepository(db)).execute()
         SeedDefaultAddressTypes(AlchemyAddressTypeRepository(db)).execute()
+        SeedDefaultPhonePrefixes(
+            AlchemyPhonePrefixRepository(db),
+            AlchemyCountryRepository(db),
+        ).execute()
         SeedDefaultRolePermissions(
             AlchemyRolePermissionRepository(db),
             SystemTimeProvider(),
