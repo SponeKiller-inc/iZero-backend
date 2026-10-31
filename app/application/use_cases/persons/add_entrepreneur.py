@@ -1,6 +1,6 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.entrepreneur import EntrepreneurIn
-from app.application.dto.person.retrieve_person import RetrievePersonOut
+from app.application.dto.person.person import PersonOut
 from app.application.exceptions.person import (
     PersonAlreadyExistsError,
     PersonValidationError,
@@ -59,7 +59,7 @@ class AddEntrepreneur:
         self.retrieve_person = retrieve_person
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_ADD)
-    def execute(self, dto: EntrepreneurIn) -> RetrievePersonOut:
+    def execute(self, dto: EntrepreneurIn) -> PersonOut:
         """
         Add a new entrepreneur
 

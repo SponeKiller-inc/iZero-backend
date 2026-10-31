@@ -1,6 +1,6 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.company import CompanyIn
-from app.application.dto.person.retrieve_person import RetrievePersonOut
+from app.application.dto.person.person import PersonOut
 from app.application.exceptions.person import (
     PersonAlreadyExistsError,
     PersonNotFoundError,
@@ -63,7 +63,7 @@ class ChangeCompany:
         self.retrieve_person = retrieve_person
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_CHANGE)
-    def execute(self, person_id: int, dto: CompanyIn) -> RetrievePersonOut:
+    def execute(self, person_id: int, dto: CompanyIn) -> PersonOut:
         """
         Change details of a company
 

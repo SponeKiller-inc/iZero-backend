@@ -1,6 +1,6 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.natural_person import NaturalPersonIn
-from app.application.dto.person.retrieve_person import RetrievePersonOut
+from app.application.dto.person.person import PersonOut
 from app.application.exceptions.person import (
     PersonNotFoundError,
     PersonTypeChangeNotAllowedError,
@@ -64,7 +64,7 @@ class ChangeNaturalPerson:
         self.retrieve_person = retrieve_person
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_CHANGE)
-    def execute(self, person_id: int, dto: NaturalPersonIn) -> RetrievePersonOut:
+    def execute(self, person_id: int, dto: NaturalPersonIn) -> PersonOut:
         """
         Change details of a natural person
 

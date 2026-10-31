@@ -1,6 +1,6 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.natural_person import NaturalPersonIn
-from app.application.dto.person.retrieve_person import RetrievePersonOut
+from app.application.dto.person.person import PersonOut
 from app.application.exceptions.person import PersonValidationError
 from app.application.ports.time_provider import TimeProvider
 from app.application.security.authorize import authorize
@@ -62,7 +62,7 @@ class AddNaturalPerson:
         self.retrieve_person = retrieve_person
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_ADD)
-    def execute(self, dto: NaturalPersonIn) -> RetrievePersonOut:
+    def execute(self, dto: NaturalPersonIn) -> PersonOut:
         """
         Add a new natural person
 

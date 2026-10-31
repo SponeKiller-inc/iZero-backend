@@ -1,10 +1,8 @@
 from app.application.constants.use_case import UseCase
-from app.application.dto.person.retrieve_person import (
-    RetrieveCompanyOut,
-    RetrieveEntrepreneurOut,
-    RetrieveNaturalPersonOut,
-    RetrievePersonOut,
-)
+from app.application.dto.person.company import CompanyOut
+from app.application.dto.person.entrepreneur import EntrepreneurOut
+from app.application.dto.person.natural_person import NaturalPersonOut
+from app.application.dto.person.person import PersonOut
 from app.application.exceptions.person import PersonNotFoundError
 from app.application.ports.time_provider import TimeProvider
 from app.application.security.authorize import authorize
@@ -68,7 +66,7 @@ class RetrievePerson:
         self.time_provider = time_provider
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_RETRIEVE)
-    def execute(self, person_id: int) -> RetrievePersonOut:
+    def execute(self, person_id: int) -> PersonOut:
         """
         Retrieve a person with the details of its type
 
@@ -88,25 +86,25 @@ class RetrievePerson:
 
         match person.person_type:
             case PersonType.NATURAL_PERSON:
-                return RetrievePersonOut(
+                return PersonOut(
                     id=person.id,
                     person_type=person.person_type.value,
                     natural_person=self._retrieve_natural_person(person.id),
                 )
             case PersonType.ENTREPRENEUR:
-                return RetrievePersonOut(
+                return PersonOut(
                     id=person.id,
                     person_type=person.person_type.value,
                     entrepreneur=self._retrieve_entrepreneur(person.id),
                 )
             case PersonType.COMPANY:
-                return RetrievePersonOut(
+                return PersonOut(
                     id=person.id,
                     person_type=person.person_type.value,
                     company=self._retrieve_company(person.id),
                 )
 
-    def _retrieve_natural_person(self, person_id: int) -> RetrieveNaturalPersonOut:
+    def _retrieve_natural_person(self, person_id: int) -> NaturalPersonOut:
         natural_person = self.natural_person_repository.get_by_person_id(person_id)
 
         if natural_person is None:
@@ -117,7 +115,7 @@ class RetrievePerson:
 
         phone_prefix_id, phone_prefix, phone_number = self._get_phone(natural_person.phone_id)
 
-        return RetrieveNaturalPersonOut(
+        return NaturalPersonOut(
             first_name=natural_person.first_name,
             last_name=natural_person.last_name,
             date_of_birth=natural_person.date_of_birth,
@@ -129,7 +127,7 @@ class RetrievePerson:
             email=self._get_email(natural_person.email_id),
         )
 
-    def _retrieve_entrepreneur(self, person_id: int) -> RetrieveEntrepreneurOut:
+    def _retrieve_entrepreneur(self, person_id: int) -> EntrepreneurOut:
         entrepreneur = self.entrepreneur_repository.get_by_person_id(person_id)
 
         if entrepreneur is None:
@@ -137,7 +135,7 @@ class RetrievePerson:
 
         phone_prefix_id, phone_prefix, phone_number = self._get_phone(entrepreneur.phone_id)
 
-        return RetrieveEntrepreneurOut(
+        return EntrepreneurOut(
             name=entrepreneur.name,
             registration_number=entrepreneur.registration_number.value,
             vat_number=entrepreneur.vat_number.value if entrepreneur.vat_number else None,
@@ -148,7 +146,7 @@ class RetrievePerson:
             email=self._get_email(entrepreneur.email_id),
         )
 
-    def _retrieve_company(self, person_id: int) -> RetrieveCompanyOut:
+    def _retrieve_company(self, person_id: int) -> CompanyOut:
         company = self.company_repository.get_by_person_id(person_id)
 
         if company is None:
@@ -158,7 +156,7 @@ class RetrievePerson:
 
         phone_prefix_id, phone_prefix, phone_number = self._get_phone(company.phone_id)
 
-        return RetrieveCompanyOut(
+        return CompanyOut(
             name=company.name,
             legal_form_id=company.legal_form_id,
             legal_form=legal_form.code,
