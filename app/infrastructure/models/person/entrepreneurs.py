@@ -13,7 +13,7 @@ class EntrepreneurModel(Base):
         unique=True,
     )
     name: Mapped[str] = mapped_column()
-    registration_number: Mapped[str] = mapped_column(String(8), unique=True)
+    registration_number: Mapped[str] = mapped_column(String(8))
     vat_number: Mapped[str | None] = mapped_column(String(12))
     is_vat_payer: Mapped[bool] = mapped_column(default=False)
     phone_id: Mapped[int | None] = mapped_column(ForeignKey("phones.id"))

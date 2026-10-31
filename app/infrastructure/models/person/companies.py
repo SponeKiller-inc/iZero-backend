@@ -14,7 +14,7 @@ class CompanyModel(Base):
     )
     name: Mapped[str] = mapped_column()
     legal_form_id: Mapped[int] = mapped_column(ForeignKey("legal_forms.id"))
-    registration_number: Mapped[str] = mapped_column(String(8), unique=True)
+    registration_number: Mapped[str] = mapped_column(String(8))
     vat_number: Mapped[str | None] = mapped_column(String(12))
     is_vat_payer: Mapped[bool] = mapped_column(default=False)
     representative_person_id: Mapped[int] = mapped_column(

@@ -23,6 +23,8 @@ DEFAULT_USER_PERMISSIONS: tuple[tuple[EntityType, UseCase], ...] = (
     (EntityType.PERSONS, UseCase.PERSONS_ADD),
     (EntityType.PERSONS, UseCase.PERSONS_RETRIEVE),
     (EntityType.PERSONS, UseCase.PERSONS_CHANGE),
+    (EntityType.CONTACTS, UseCase.CONTACTS_RETRIEVE_PHONE),
+    (EntityType.CONTACTS, UseCase.CONTACTS_RETRIEVE_EMAIL),
 )
 
 

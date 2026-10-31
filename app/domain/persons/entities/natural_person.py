@@ -4,8 +4,6 @@ from typing import Self
 from app.domain.persons.constants.person_type import PersonType
 from app.domain.persons.entities.person import Person
 from app.domain.persons.exceptions.person import PersonValidationError
-from app.domain.shared.entities.email import Email
-from app.domain.shared.entities.phone import Phone
 from app.domain.shared.services.time_span import full_years_between
 
 
@@ -50,8 +48,8 @@ class NaturalPerson:
         first_name: str,
         last_name: str,
         date_of_birth: date,
-        phone: Phone | None,
-        email: Email | None,
+        phone_id: int | None,
+        email_id: int | None,
         current_time: datetime,
     ) -> Self:
         """
@@ -62,8 +60,8 @@ class NaturalPerson:
             first_name: The first name.
             last_name: The last name.
             date_of_birth: The date of birth.
-            phone: The phone number, if known.
-            email: The e-mail address, if known.
+            phone_id: The ID of the phone, if known.
+            email_id: The ID of the e-mail, if known.
             current_time: The current time.
 
         Returns:
@@ -81,8 +79,8 @@ class NaturalPerson:
             first_name=first_name,
             last_name=last_name,
             date_of_birth=date_of_birth,
-            phone_id=phone.id if phone else None,
-            email_id=email.id if email else None,
+            phone_id=phone_id,
+            email_id=email_id,
         )
 
     def update(
@@ -91,8 +89,8 @@ class NaturalPerson:
         first_name: str,
         last_name: str,
         date_of_birth: date,
-        phone: Phone | None,
-        email: Email | None,
+        phone_id: int | None,
+        email_id: int | None,
         current_time: datetime,
     ) -> None:
         """
@@ -103,8 +101,8 @@ class NaturalPerson:
             first_name: The first name.
             last_name: The last name.
             date_of_birth: The date of birth.
-            phone: The phone number, if known.
-            email: The e-mail address, if known.
+            phone_id: The ID of the phone, if known.
+            email_id: The ID of the e-mail, if known.
             current_time: The current time.
 
         Raises:
@@ -116,8 +114,8 @@ class NaturalPerson:
         self.first_name = first_name
         self.last_name = last_name
         self.date_of_birth = date_of_birth
-        self.phone_id = phone.id if phone else None
-        self.email_id = email.id if email else None
+        self.phone_id = phone_id
+        self.email_id = email_id
 
     @classmethod
     def _validate(

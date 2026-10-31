@@ -20,6 +20,8 @@ class UseCase(str, Enum):
     PERSONS_ADD = "add_person"
     PERSONS_RETRIEVE = "retrieve_person"
     PERSONS_CHANGE = "change_person"
+    CONTACTS_RETRIEVE_PHONE = "retrieve_phone"
+    CONTACTS_RETRIEVE_EMAIL = "retrieve_email"
 
     @classmethod
     def has_member(cls, name: str) -> bool:

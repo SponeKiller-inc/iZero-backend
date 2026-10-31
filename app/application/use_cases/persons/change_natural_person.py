@@ -8,8 +8,8 @@ from app.application.exceptions.person import (
 )
 from app.application.ports.time_provider import TimeProvider
 from app.application.security.authorize import authorize
-from app.application.use_cases.persons.email import get_or_create_email
-from app.application.use_cases.persons.phone import get_or_create_phone
+from app.application.use_cases.contacts.retrieve_email import RetrieveEmail
+from app.application.use_cases.contacts.retrieve_phone import RetrievePhone
 from app.application.use_cases.persons.retrieve_person import RetrievePerson
 from app.domain.persons.constants.person_type import PersonType
 from app.domain.persons.entities.person_title import PersonTitle
@@ -18,10 +18,6 @@ from app.domain.persons.repositories.natural_person import NaturalPersonReposito
 from app.domain.persons.repositories.person import PersonRepository
 from app.domain.persons.repositories.person_title import PersonTitleRepository
 from app.domain.shared.constants.entity_type import EntityType
-from app.domain.shared.entities.title import Title
-from app.domain.shared.repositories.email import EmailRepository
-from app.domain.shared.repositories.phone import PhoneRepository
-from app.domain.shared.repositories.phone_prefix import PhonePrefixRepository
 from app.domain.shared.repositories.title import TitleRepository
 
 
@@ -34,9 +30,8 @@ class ChangeNaturalPerson:
         title_repository: TitleRepository,
         person_title_repository: PersonTitleRepository,
         time_provider: TimeProvider,
-        phone_prefix_repository: PhonePrefixRepository,
-        phone_repository: PhoneRepository,
-        email_repository: EmailRepository,
+        retrieve_phone: RetrievePhone,
+        retrieve_email: RetrieveEmail,
         retrieve_person: RetrievePerson,
     ) -> None:
         """
@@ -48,9 +43,8 @@ class ChangeNaturalPerson:
             title_repository: Title repository
             person_title_repository: Person title repository
             time_provider: Time provider
-            phone_prefix_repository: Phone prefix repository
-            phone_repository: Phone repository
-            email_repository: E-mail repository
+            retrieve_phone: Retrieve phone use-case
+            retrieve_email: Retrieve e-mail use-case
             retrieve_person: Retrieve person use-case
         """
         self.person_repository = person_repository
@@ -58,9 +52,8 @@ class ChangeNaturalPerson:
         self.title_repository = title_repository
         self.person_title_repository = person_title_repository
         self.time_provider = time_provider
-        self.phone_prefix_repository = phone_prefix_repository
-        self.phone_repository = phone_repository
-        self.email_repository = email_repository
+        self.retrieve_phone = retrieve_phone
+        self.retrieve_email = retrieve_email
         self.retrieve_person = retrieve_person
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_CHANGE)
@@ -78,9 +71,11 @@ class ChangeNaturalPerson:
         Raises:
             PersonNotFoundError: If the person or its natural person details do not exist
             PersonTypeChangeNotAllowedError: If the person is not a natural person
-            PersonValidationError: If the phone is incomplete or its calling code does not
-                exist, phone number or e-mail has invalid format, a name is empty,
-                the person is younger than 18 or a title does not exist or cannot be assigned
+            PhoneValidationError: If the phone is incomplete, its calling code does not exist
+                or the number has invalid format
+            EmailValidationError: If the e-mail address has invalid format
+            PersonValidationError: If a name is empty, the person is younger than 18 or
+                a title does not exist
         """
         person = self.person_repository.get(person_id)
 
@@ -95,14 +90,17 @@ class ChangeNaturalPerson:
         if natural_person is None:
             raise PersonNotFoundError("Natural person details do not exist")
 
-        titles = self._get_titles(dto.title_ids)
-        phone = get_or_create_phone(
-            self.phone_prefix_repository,
-            self.phone_repository,
-            dto.phone_prefix_id,
-            dto.phone_number,
+        titles = self.title_repository.get_many(dto.title_ids)
+
+        if len(titles) != len(set(dto.title_ids)):
+            raise PersonValidationError("Some of the titles do not exist")
+
+        phone = (
+            self.retrieve_phone.execute(dto.phone_prefix_id, dto.phone_number)
+            if dto.phone_prefix_id is not None or dto.phone_number
+            else None
         )
-        email = get_or_create_email(self.email_repository, dto.email)
+        email = self.retrieve_email.execute(dto.email) if dto.email else None
 
         now = self.time_provider.now()
         current_person_titles = self.person_title_repository.get(person_id, now)
@@ -115,8 +113,8 @@ class ChangeNaturalPerson:
                 first_name=dto.first_name,
                 last_name=dto.last_name,
                 date_of_birth=dto.date_of_birth,
-                phone=phone,
-                email=email,
+                phone_id=phone.id if phone else None,
+                email_id=email.id if email else None,
                 current_time=now,
             )
 
@@ -143,17 +141,3 @@ class ChangeNaturalPerson:
             self.person_title_repository.save(person_title)
 
         return self.retrieve_person.execute(person_id)
-
-    def _get_titles(self, title_ids: list[int]) -> list[Title]:
-        """
-        Load the requested titles in the order they are written next to the name.
-
-        Raises:
-            PersonValidationError: If a title does not exist
-        """
-        titles = self.title_repository.get_many(title_ids)
-
-        if len(titles) != len(set(title_ids)):
-            raise PersonValidationError("Some of the titles do not exist")
-
-        return titles

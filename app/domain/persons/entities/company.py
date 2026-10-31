@@ -3,9 +3,7 @@ from typing import Self
 from app.domain.persons.constants.person_type import PersonType
 from app.domain.persons.entities.person import Person
 from app.domain.persons.exceptions.person import PersonValidationError
-from app.domain.shared.entities.email import Email
 from app.domain.shared.entities.legal_form import LegalForm
-from app.domain.shared.entities.phone import Phone
 from app.domain.shared.value_objects.identification import (
     RegistrationNumber,
     VatNumber,
@@ -63,8 +61,8 @@ class Company:
         vat_number: VatNumber | None,
         is_vat_payer: bool,
         representative: Person,
-        phone: Phone | None,
-        email: Email | None,
+        phone_id: int | None,
+        email_id: int | None,
     ) -> Self:
         """
         Creates the details of a company.
@@ -77,8 +75,8 @@ class Company:
             vat_number: The VAT ID, if assigned.
             is_vat_payer: Whether the company is registered for VAT.
             representative: The natural person representing the company.
-            phone: The phone number, if known.
-            email: The e-mail address, if known.
+            phone_id: The ID of the phone, if known.
+            email_id: The ID of the e-mail, if known.
 
         Returns:
             The newly created company.
@@ -98,8 +96,8 @@ class Company:
             vat_number=vat_number,
             is_vat_payer=is_vat_payer,
             representative_person_id=representative.id,
-            phone_id=phone.id if phone else None,
-            email_id=email.id if email else None,
+            phone_id=phone_id,
+            email_id=email_id,
         )
 
     def update(
@@ -111,8 +109,8 @@ class Company:
         vat_number: VatNumber | None,
         is_vat_payer: bool,
         representative: Person,
-        phone: Phone | None,
-        email: Email | None,
+        phone_id: int | None,
+        email_id: int | None,
     ) -> None:
         """
         Updates the details of the company.
@@ -125,8 +123,8 @@ class Company:
             vat_number: The VAT ID, if assigned.
             is_vat_payer: Whether the company is registered for VAT.
             representative: The natural person representing the company.
-            phone: The phone number, if known.
-            email: The e-mail address, if known.
+            phone_id: The ID of the phone, if known.
+            email_id: The ID of the e-mail, if known.
 
         Raises:
             PersonValidationError: If the person is not a company, name is empty/blank,
@@ -140,8 +138,8 @@ class Company:
         self.vat_number = vat_number
         self.is_vat_payer = is_vat_payer
         self.representative_person_id = representative.id
-        self.phone_id = phone.id if phone else None
-        self.email_id = email.id if email else None
+        self.phone_id = phone_id
+        self.email_id = email_id
 
     @staticmethod
     def _validate(

@@ -3,8 +3,6 @@ from typing import Self
 from app.domain.persons.constants.person_type import PersonType
 from app.domain.persons.entities.person import Person
 from app.domain.persons.exceptions.person import PersonValidationError
-from app.domain.shared.entities.email import Email
-from app.domain.shared.entities.phone import Phone
 from app.domain.shared.value_objects.identification import (
     RegistrationNumber,
     VatNumber,
@@ -54,8 +52,8 @@ class Entrepreneur:
         registration_number: RegistrationNumber,
         vat_number: VatNumber | None,
         is_vat_payer: bool,
-        phone: Phone | None,
-        email: Email | None,
+        phone_id: int | None,
+        email_id: int | None,
     ) -> Self:
         """
         Creates the details of an entrepreneur.
@@ -66,8 +64,8 @@ class Entrepreneur:
             registration_number: The company registration number.
             vat_number: The VAT ID , if assigned.
             is_vat_payer: Whether the entrepreneur is registered for VAT.
-            phone: The phone number, if known.
-            email: The e-mail address, if known.
+            phone_id: The ID of the phone, if known.
+            email_id: The ID of the e-mail, if known.
 
         Returns:
             The newly created entrepreneur.
@@ -85,8 +83,8 @@ class Entrepreneur:
             registration_number=registration_number,
             vat_number=vat_number,
             is_vat_payer=is_vat_payer,
-            phone_id=phone.id if phone else None,
-            email_id=email.id if email else None,
+            phone_id=phone_id,
+            email_id=email_id,
         )
 
     def update(
@@ -96,8 +94,8 @@ class Entrepreneur:
         registration_number: RegistrationNumber,
         vat_number: VatNumber | None,
         is_vat_payer: bool,
-        phone: Phone | None,
-        email: Email | None,
+        phone_id: int | None,
+        email_id: int | None,
     ) -> None:
         """
         Updates the details of the entrepreneur.
@@ -108,8 +106,8 @@ class Entrepreneur:
             registration_number: The company registration number.
             vat_number: The VAT ID, if assigned.
             is_vat_payer: Whether the entrepreneur is registered for VAT.
-            phone: The phone number, if known.
-            email: The e-mail address, if known.
+            phone_id: The ID of the phone, if known.
+            email_id: The ID of the e-mail, if known.
 
         Raises:
             PersonValidationError: If the person is not an entrepreneur, name is
@@ -121,8 +119,8 @@ class Entrepreneur:
         self.registration_number = registration_number
         self.vat_number = vat_number
         self.is_vat_payer = is_vat_payer
-        self.phone_id = phone.id if phone else None
-        self.email_id = email.id if email else None
+        self.phone_id = phone_id
+        self.email_id = email_id
 
     @staticmethod
     def _validate(person: Person, name: str, vat_number: VatNumber | None, is_vat_payer: bool) -> None:

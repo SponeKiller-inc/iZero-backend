@@ -91,8 +91,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['person_id'], ['persons.id'], name=op.f('fk_entrepreneurs_person_id_persons'), ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['phone_id'], ['phones.id'], name=op.f('fk_entrepreneurs_phone_id_phones')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_entrepreneurs')),
-    sa.UniqueConstraint('person_id', name=op.f('uq_entrepreneurs_person_id')),
-    sa.UniqueConstraint('registration_number', name=op.f('uq_entrepreneurs_registration_number'))
+    sa.UniqueConstraint('person_id', name=op.f('uq_entrepreneurs_person_id'))
     )
     op.create_table('natural_persons',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -129,8 +128,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['phone_id'], ['phones.id'], name=op.f('fk_companies_phone_id_phones')),
     sa.ForeignKeyConstraint(['representative_person_id'], ['natural_persons.person_id'], name=op.f('fk_companies_representative_person_id_natural_persons')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_companies')),
-    sa.UniqueConstraint('person_id', name=op.f('uq_companies_person_id')),
-    sa.UniqueConstraint('registration_number', name=op.f('uq_companies_registration_number'))
+    sa.UniqueConstraint('person_id', name=op.f('uq_companies_person_id'))
     )
     op.create_index(op.f('ix_companies_representative_person_id'), 'companies', ['representative_person_id'], unique=False)
     # Tables referencing customers must be dropped before customers, customers before entity_types
