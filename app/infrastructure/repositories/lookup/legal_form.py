@@ -27,6 +27,19 @@ class AlchemyLegalFormRepository(BaseAlchemyRepository):
 
         return self._to_entity(model)
 
+    def get_all(self) -> list[LegalForm]:
+        """
+        Get all legal forms of the catalogue
+
+        Returns:
+            List of LegalForm entities
+        """
+
+        return [
+            self._to_entity(model)
+            for model in self.db.query(LegalFormModel).order_by(LegalFormModel.code).all()
+        ]
+
     def get_by_code(self, code: str) -> LegalForm | None:
         """
         Get legal form by its code

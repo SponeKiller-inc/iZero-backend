@@ -16,6 +16,15 @@ class LegalFormRepository(Protocol):
         """
         ...
 
+    def get_all(self) -> list[LegalForm]:
+        """
+        Get all legal forms of the catalogue
+
+        Returns:
+            List of LegalForm entities
+        """
+        ...
+
     def get_by_code(self, code: str) -> LegalForm | None:
         """
         Get legal form by its code
