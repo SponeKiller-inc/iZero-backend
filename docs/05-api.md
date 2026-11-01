@@ -146,6 +146,19 @@ Implemented in [endpoints/module](../app/infrastructure/api/endpoints/module), u
 Not yet implemented: `GET`/update endpoints for modules and module groups.
 TODO: document the endpoints in [endpoints/module](../app/infrastructure/api/endpoints/module)
 
+### Lookups — `/api/lookups`
+
+Implemented in [endpoints/lookup](../app/infrastructure/api/endpoints/lookup), use-case in
+[use_cases/legal_forms](../app/application/use_cases/legal_forms).
+
+#### `GET /api/lookups/legal-forms`
+
+- **Purpose:** Retrieve the legal form catalogue, e.g. to get the `legal_form_id` of a company.
+- **Authentication:** authenticated, `@authorize(EntityType.PERSONS, UseCase.PERSONS_RETRIEVE_LEGAL_FORMS)`.
+- **Input:** none.
+- **Response:** `ResponseContainer[list[LegalFormSchemaOut]]` ([schemas/lookup/legal_form.py](../app/infrastructure/api/schemas/lookup/legal_form.py)) — `id`, `code`, `name`; `200 OK`.
+- **Errors:** none besides auth.
+
 ### Tokens — `/api/auth/token`
 
 Implemented in [endpoints/auth/token.py](../app/infrastructure/api/endpoints/auth/token.py), use-cases in
