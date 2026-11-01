@@ -20,6 +20,8 @@ class UseCase(str, Enum):
     PERSONS_ADD = "add_person"
     PERSONS_RETRIEVE = "retrieve_person"
     PERSONS_CHANGE = "change_person"
+    PERSONS_ASSIGN_ADDRESS = "assign_person_address"
+    PERSONS_RETRIEVE_ADDRESS = "retrieve_person_address"
     CONTACTS_RETRIEVE_PHONE = "retrieve_phone"
     CONTACTS_RETRIEVE_EMAIL = "retrieve_email"
 
