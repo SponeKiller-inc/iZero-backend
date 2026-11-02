@@ -71,6 +71,12 @@ Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.
 
 When adding a new code, add a row to this table.
 
+Endpoints do not catch application errors. Each error is mapped to its message ID and status code in
+[application_errors.py](../app/infrastructure/api/application_errors.py) and answered by a global handler in
+[main.py](../app/infrastructure/api/main.py). The error passes through `get_db`, which rolls the transaction back, so a
+rejected request stores nothing. An application error missing from the mapping ends as `SYSTEM_INTERNAL_FAIL` (500).
+The token endpoints are the exception: they catch their errors and raise `HTTPException` with their own response.
+
 ## HTTP status codes
 
 | Code | Usage |
@@ -148,7 +154,7 @@ TODO: document the endpoints in [endpoints/user](../app/infrastructure/api/endpo
 - **Errors:** `AUTH_NOT_AUTHENTICATED` (401), `AUTH_NOT_ACCESS` (403), `AUTH_NOT_AUTHORIZED` (403) if `user_id` is not the
   authenticated caller, `USER_INVALID_ID` (400), `PERSON_NOT_FOUND` (404), `PERSON_ALREADY_EXISTS` (409, POST),
   `PERSON_TYPE_CHANGE_NOT_ALLOWED` (409, PUT), `ADDRESS_NOT_FOUND`, `ADDRESS_TYPE_NOT_FOUND` (404, POST, PUT), `PERSON_VALIDATION_FAILED`, `PHONE_VALIDATION_FAILED`,
-  `EMAIL_VALIDATION_FAILED` (400). A rejected request stores nothing.
+  `EMAIL_VALIDATION_FAILED` (400).
 
 ### Modules — `/api/modules`
 

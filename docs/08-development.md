@@ -30,7 +30,7 @@ Adding a new feature typically means:
 5. ORM model in `app/infrastructure/models/<area>/` + Alembic migration
 6. Repository implementation in `app/infrastructure/repositories/<area>/`
 7. Pydantic schema + endpoint in `app/infrastructure/api/`
-8. DI container in `app/infrastructure/api/dependencies/`
+8. DI container in `app/infrastructure/api/dependency/`
 9. Tests + documentation update
 
 ## Conventions

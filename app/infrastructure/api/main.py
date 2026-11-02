@@ -3,6 +3,8 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.application.exceptions.auth import AuthHashVerificationError
+from app.application.exceptions.base import ApplicationError
+from app.infrastructure.api.application_errors import APPLICATION_ERRORS
 from app.infrastructure.api.middleware.auth import AuthMiddleware
 from app.infrastructure.api.middleware.authenticate import AuthenticateMiddleware
 from app.infrastructure.api.middleware.http_audit import HttpAuditMiddleware
@@ -51,6 +53,17 @@ app.add_middleware(HttpAuditMiddleware)
 app.include_router(router)
 
 #Global exceptions
+async def application_error_handler(request: Request, exc: ApplicationError):
+    message_id, status_code = APPLICATION_ERRORS[type(exc)]
+
+    return JSONResponse(
+        content=ResponseContainer(message_id=message_id),
+        status_code=status_code,
+    )
+
+for application_error in APPLICATION_ERRORS:
+    app.add_exception_handler(application_error, application_error_handler)
+
 @app.exception_handler(AuthHashVerificationError)
 async def user_not_authorized_handler(request: Request, exc: AuthHashVerificationError):
     return JSONResponse(

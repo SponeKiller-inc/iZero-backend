@@ -2,10 +2,8 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.application.dto.module.create_module import CreateModuleIn
-from app.application.exceptions.module import ModuleGroupNotFoundError
 from app.application.use_cases.modules.create_module import CreateModule
-from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
-from app.infrastructure.api.schemas.message_id import MessageId
+from app.infrastructure.api.schemas.base import ResponseContainer
 from app.infrastructure.api.schemas.module.module import ModuleSchemaIn, ModuleSchemaOut
 from app.infrastructure.database.session import get_db
 from app.infrastructure.repositories.module.module import AlchemyModuleRepository
@@ -36,19 +34,13 @@ async def create_module(
         time_provider,
     )
 
-    try:
-        result = module_creator.execute(
-            CreateModuleIn(
-                name=module.name,
-                module_group_id=module.module_group_id,
-                valid_from=module.valid_from,
-            )
+    result = module_creator.execute(
+        CreateModuleIn(
+            name=module.name,
+            module_group_id=module.module_group_id,
+            valid_from=module.valid_from,
         )
-    except ModuleGroupNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.MODULE_GROUP_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
+    )
 
     return ResponseContainer(data=ModuleSchemaOut.model_validate(result))
 
