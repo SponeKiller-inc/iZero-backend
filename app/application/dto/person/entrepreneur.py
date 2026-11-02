@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from app.application.dto.person.person_address import AddressIn, PersonAddressOut
+
 
 @dataclass(frozen=True)
 class EntrepreneurIn:
@@ -13,6 +15,7 @@ class EntrepreneurIn:
     phone_prefix_id: int | None
     phone_number: str | None
     email: str | None
+    addresses: list[AddressIn]
 
 @dataclass(frozen=True)
 class EntrepreneurOut:
@@ -25,3 +28,4 @@ class EntrepreneurOut:
     phone_prefix: str | None
     phone_number: str | None
     email: str | None
+    addresses: list[PersonAddressOut]

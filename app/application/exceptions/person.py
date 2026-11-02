@@ -5,10 +5,10 @@ class PersonNotFoundError(ApplicationError):
     pass
 
 class PersonAlreadyExistsError(ApplicationError):
-    """Company registration number already identifies another entrepreneur or company (BR-6)."""
+    """User already has a person."""
 
 class PersonTypeChangeNotAllowedError(ApplicationError):
-    """Changed details belong to another person type than the person has (BR-8)."""
+    """Changed details belong to another person type than the person has."""
 
 class PersonValidationError(ApplicationError):
     """Person details violate the person rules (format of an identifier or contact, empty name,

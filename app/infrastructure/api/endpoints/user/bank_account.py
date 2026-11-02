@@ -3,12 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.application.dto.bank.bank_account import BankAccountIn
 from app.application.dto.user.user_bank_account import UserBankAccountIn
-from app.application.exceptions.bank import (
-    BankAccountAlreadyExistsError,
-    BankAccountNotFoundError,
-    BankAccountValidationError,
-    BankNotFoundError,
-)
 from app.application.use_cases.banks.add_bank_account import AddBankAccount
 from app.application.use_cases.banks.change_bank_account import ChangeBankAccount
 from app.application.use_cases.banks.retrieve_bank_account import RetrieveBankAccount
@@ -19,8 +13,7 @@ from app.application.use_cases.users.change_user_bank_account import (
 from app.application.use_cases.users.retrieve_user_bank_account import (
     RetrieveUserBankAccount,
 )
-from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
-from app.infrastructure.api.schemas.message_id import MessageId
+from app.infrastructure.api.schemas.base import ResponseContainer
 from app.infrastructure.api.schemas.user.bank_account import (
     UserBankAccountSchemaIn,
     UserBankAccountSchemaOut,
@@ -56,18 +49,7 @@ async def get_user_bank_account(user_id: int, db: Session = Depends(get_db)):
         retrieve_bank_account,
     )
 
-    try:
-        bank_account = retrieve_user_bank_account.execute(user_id)
-    except BankAccountNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_ACCOUNT_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    except BankNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
+    bank_account = retrieve_user_bank_account.execute(user_id)
 
     return ResponseContainer(data=bank_account)
 
@@ -112,23 +94,7 @@ async def add_user_bank_account(
         ),
     )
 
-    try:
-        added = add_user_bank_account.execute(dto)
-    except BankAccountAlreadyExistsError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_ACCOUNT_ALREADY_EXISTS),
-            status_code=status.HTTP_409_CONFLICT,
-        )
-    except BankNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    except BankAccountValidationError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_ACCOUNT_VALIDATION_FAILED),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
+    added = add_user_bank_account.execute(dto)
 
     return ResponseContainer(data=added)
 
@@ -174,22 +140,6 @@ async def change_user_bank_account(
     )
 
     # change user bank account
-    try:
-        changed = change_user_bank_account.execute(dto)
-    except BankAccountNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_ACCOUNT_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    except BankNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    except BankAccountValidationError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.BANK_ACCOUNT_VALIDATION_FAILED),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
+    changed = change_user_bank_account.execute(dto)
 
     return ResponseContainer(data=changed)

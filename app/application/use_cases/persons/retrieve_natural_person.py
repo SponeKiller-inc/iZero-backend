@@ -3,6 +3,9 @@ from app.application.dto.person.natural_person import NaturalPersonOut
 from app.application.exceptions.person import PersonNotFoundError
 from app.application.ports.time_provider import TimeProvider
 from app.application.security.authorize import authorize
+from app.application.use_cases.persons.retrieve_person_addresses import (
+    RetrievePersonAddresses,
+)
 from app.domain.persons.repositories.natural_person import NaturalPersonRepository
 from app.domain.persons.repositories.person_title import PersonTitleRepository
 from app.domain.shared.constants.entity_type import EntityType
@@ -24,6 +27,7 @@ class RetrieveNaturalPerson:
         phone_prefix_repository: PhonePrefixRepository,
         email_repository: EmailRepository,
         time_provider: TimeProvider,
+        retrieve_person_addresses: RetrievePersonAddresses,
     ) -> None:
         """
         Initialize use-case
@@ -36,6 +40,7 @@ class RetrieveNaturalPerson:
             phone_prefix_repository: Phone prefix repository
             email_repository: E-mail repository
             time_provider: Time provider
+            retrieve_person_addresses: Retrieve person addresses use-case
         """
         self.natural_person_repository = natural_person_repository
         self.title_repository = title_repository
@@ -44,6 +49,7 @@ class RetrieveNaturalPerson:
         self.phone_prefix_repository = phone_prefix_repository
         self.email_repository = email_repository
         self.time_provider = time_provider
+        self.retrieve_person_addresses = retrieve_person_addresses
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_RETRIEVE)
     def execute(self, person_id: int) -> NaturalPersonOut:
@@ -70,6 +76,7 @@ class RetrieveNaturalPerson:
         phone = self.phone_repository.get(natural_person.phone_id) if natural_person.phone_id is not None else None
         phone_prefix = self.phone_prefix_repository.get(phone.phone_prefix_id) if phone else None
         email = self.email_repository.get(natural_person.email_id) if natural_person.email_id is not None else None
+        addresses = self.retrieve_person_addresses.execute(person_id)
 
         return NaturalPersonOut(
             first_name=natural_person.first_name,
@@ -81,4 +88,5 @@ class RetrieveNaturalPerson:
             phone_prefix=phone_prefix.prefix if phone_prefix else None,
             phone_number=phone.number.value if phone else None,
             email=email.address.value if email else None,
+            addresses=addresses,
         )

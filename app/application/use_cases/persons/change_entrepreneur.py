@@ -1,6 +1,7 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.entrepreneur import EntrepreneurIn
 from app.application.dto.person.person import PersonOut
+from app.application.dto.person.person_address import PersonAddressIn
 from app.application.exceptions.person import (
     PersonNotFoundError,
     PersonTypeChangeNotAllowedError,
@@ -9,6 +10,7 @@ from app.application.exceptions.person import (
 from app.application.security.authorize import authorize
 from app.application.use_cases.contacts.retrieve_email import RetrieveEmail
 from app.application.use_cases.contacts.retrieve_phone import RetrievePhone
+from app.application.use_cases.persons.assign_person_address import AssignPersonAddress
 from app.application.use_cases.persons.retrieve_person import RetrievePerson
 from app.domain.persons.constants.person_type import PersonType
 from app.domain.persons.exceptions import person as person_errors
@@ -30,6 +32,7 @@ class ChangeEntrepreneur:
         retrieve_phone: RetrievePhone,
         retrieve_email: RetrieveEmail,
         retrieve_person: RetrievePerson,
+        assign_person_address: AssignPersonAddress,
     ) -> None:
         """
         Initialize use-case
@@ -40,12 +43,14 @@ class ChangeEntrepreneur:
             retrieve_phone: Retrieve phone use-case
             retrieve_email: Retrieve e-mail use-case
             retrieve_person: Retrieve person use-case
+            assign_person_address: Assign person address use-case
         """
         self.person_repository = person_repository
         self.entrepreneur_repository = entrepreneur_repository
         self.retrieve_phone = retrieve_phone
         self.retrieve_email = retrieve_email
         self.retrieve_person = retrieve_person
+        self.assign_person_address = assign_person_address
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_CHANGE)
     def execute(self, person_id: int, dto: EntrepreneurIn) -> PersonOut:
@@ -65,6 +70,8 @@ class ChangeEntrepreneur:
             PhoneValidationError: If the phone is incomplete, its calling code does not exist
                 or the number has invalid format
             EmailValidationError: If the e-mail address has invalid format
+            AddressNotFoundError: If an address does not exist
+            AddressTypeNotFoundError: If an address type does not exist
             PersonValidationError: If registration number or VAT ID has invalid format, name
                 is empty or a VAT payer has no VAT ID
         """
@@ -108,5 +115,9 @@ class ChangeEntrepreneur:
             raise PersonValidationError(str(e)) from e
 
         self.entrepreneur_repository.save(entrepreneur)
+
+        self.assign_person_address.execute(
+            PersonAddressIn(person_id=person_id, addresses=dto.addresses)
+        )
 
         return self.retrieve_person.execute(person_id)

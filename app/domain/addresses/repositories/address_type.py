@@ -6,6 +6,18 @@ from app.domain.addresses.entities.address_type import AddressType
 class AddressTypeRepository(Protocol):
     """Repository interface for AddressType entity."""
 
+    def get(self, address_type_id: int) -> AddressType | None:
+        """
+        Get an address type by its ID.
+
+        Args:
+            address_type_id: The ID of the address type.
+
+        Returns:
+            The AddressType entity if found, None otherwise.
+        """
+        ...
+
     def get_by_type(self, address_type: str) -> AddressType | None:
         """
         Get an address type by its natural-key type ("permanent" or "mailing").

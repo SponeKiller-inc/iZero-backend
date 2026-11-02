@@ -55,13 +55,27 @@ Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.
 | 2000003 | `AUTH_NOT_ACCESS` | Access denied |
 | 2000004 | `AUTH_IDENTITY_PROVIDER_FAILED` | External identity provider rejected the token |
 | 4000001 | `MODULE_GROUP_NOT_FOUND` | Module group does not exist |
+| 5000001 | `ADDRESS_NOT_FOUND` | Address does not exist |
+| 5000002 | `ADDRESS_TYPE_NOT_FOUND` | Address type does not exist |
 | 6000001 | `BANK_NOT_FOUND` | Bank is not in the bank catalogue |
 | 6010001 | `BANK_ACCOUNT_NOT_FOUND` | User has no bank account |
 | 6010002 | `BANK_ACCOUNT_ALREADY_EXISTS` | User already has a bank account |
 | 6010003 | `BANK_ACCOUNT_VALIDATION_FAILED` | Bank account violates the bank account rules (`BankAccountValidationError` — invalid format of account prefix, account number or IBAN, empty owner name, IBAN is not a Czech one) |
+| 7000001 | `PERSON_NOT_FOUND` | User has no person, or the assigned person's details do not exist |
+| 7000002 | `PERSON_ALREADY_EXISTS` | User already has a person |
+| 7000003 | `PERSON_TYPE_CHANGE_NOT_ALLOWED` | Changed details belong to another person type than the user's person has |
+| 7000004 | `PERSON_VALIDATION_FAILED` | Person details violate the person rules (`PersonValidationError` — invalid IČO or VAT ID, empty name, age under 18, unknown title or legal form, VAT payer without VAT ID) |
+| 8000001 | `PHONE_VALIDATION_FAILED` | Phone violates the phone rules (`PhoneValidationError` — incomplete phone, unknown calling code, number that is not a Czech 9-digit number) |
+| 8010001 | `EMAIL_VALIDATION_FAILED` | E-mail address has invalid format (`EmailValidationError`) |
 | 9000001 | `SYSTEM_INTERNAL_FAIL` | Unexpected server error |
 
 When adding a new code, add a row to this table.
+
+Endpoints do not catch application errors. Each error is mapped to its message ID and status code in
+[errors](../app/infrastructure/api/errors), organized like the endpoints and joined in its `__init__.py`, and answered by a global handler in
+[main.py](../app/infrastructure/api/main.py). The error passes through `get_db`, which rolls the transaction back, so a
+rejected request stores nothing. An application error missing from the mapping ends as `SYSTEM_INTERNAL_FAIL` (500).
+The token endpoints are the exception: they catch their errors and raise `HTTPException` with their own response.
 
 ## HTTP status codes
 
@@ -122,6 +136,26 @@ TODO: document the endpoints in [endpoints/user](../app/infrastructure/api/endpo
   is rejected earlier by `Authenticate` with `401` `AUTH_NOT_AUTHENTICATED`), `USER_CANNOT_BE_DELETED` (409)
   for the bootstrap admin.
 
+#### `GET | POST | PUT /api/users/{user_id}/person`
+
+- **Purpose:** View, add and change the person details of the user `user_id` (`RetrieveUserPerson`, `AddUserPerson`,
+  `ChangeUserPerson` use-cases). A user has at most one person, assigned through `user_persons`; the person type cannot
+  be changed once added.
+- **Authentication:** authenticated, `@authorize(EntityType.PERSONS, UseCase.PERSONS_RETRIEVE_USER_PERSON | PERSONS_ADD_USER_PERSON | PERSONS_CHANGE_USER_PERSON)`
+  (granted to the regular role by `SeedDefaultRolePermissions`). `user_id` must be the authenticated caller.
+- **Input (POST, PUT):** `UserPersonSchemaIn` ([schemas/user/user_person.py](../app/infrastructure/api/schemas/user/user_person.py)) —
+  the field `person` carries the details of the requested type (`NaturalPersonSchemaIn`, `EntrepreneurSchemaIn` or
+  `CompanySchemaIn`), told apart by their fields. All fields are required, optional ones are sent as `null`, and unknown
+  fields are ignored. A company carries its `representative` as natural person fields. `addresses` is a list of
+  `address_id` and `address_type_id`; a changed address ends the previous one of its type, which
+  stays in history, and a type not listed keeps its current address (PUT).
+- **Response:** `UserPersonSchemaOut` ([schemas/user/user_person.py](../app/infrastructure/api/schemas/user/user_person.py)), based on `PersonSchemaOut` — `id`, `person_type` and the details of the type in `natural_person`, `entrepreneur`
+  or `company` (the others are `null`); each of them carries its current `addresses` (`id`, `address_type`, `address`). `200` (GET, PUT), `201` (POST). GET returns `data: null` when the user has no person.
+- **Errors:** `AUTH_NOT_AUTHENTICATED` (401), `AUTH_NOT_ACCESS` (403), `AUTH_NOT_AUTHORIZED` (403) if `user_id` is not the
+  authenticated caller, `USER_INVALID_ID` (400), `PERSON_NOT_FOUND` (404), `PERSON_ALREADY_EXISTS` (409, POST),
+  `PERSON_TYPE_CHANGE_NOT_ALLOWED` (409, PUT), `ADDRESS_NOT_FOUND`, `ADDRESS_TYPE_NOT_FOUND` (404, POST, PUT), `PERSON_VALIDATION_FAILED`, `PHONE_VALIDATION_FAILED`,
+  `EMAIL_VALIDATION_FAILED` (400).
+
 ### Modules — `/api/modules`
 
 Implemented in [endpoints/module](../app/infrastructure/api/endpoints/module), use-cases in
@@ -148,8 +182,8 @@ TODO: document the endpoints in [endpoints/module](../app/infrastructure/api/end
 
 ### Lookups — `/api/lookups`
 
-Implemented in [endpoints/lookup](../app/infrastructure/api/endpoints/lookup), use-case in
-[use_cases/legal_forms](../app/application/use_cases/legal_forms).
+Implemented in [endpoints/lookup](../app/infrastructure/api/endpoints/lookup), use-cases in
+[use_cases/lookup](../app/application/use_cases/lookup).
 
 #### `GET /api/lookups/legal-forms`
 
@@ -157,6 +191,22 @@ Implemented in [endpoints/lookup](../app/infrastructure/api/endpoints/lookup), u
 - **Authentication:** authenticated, `@authorize(EntityType.PERSONS, UseCase.PERSONS_RETRIEVE_LEGAL_FORMS)`.
 - **Input:** none.
 - **Response:** `ResponseContainer[list[LegalFormSchemaOut]]` ([schemas/lookup/legal_form.py](../app/infrastructure/api/schemas/lookup/legal_form.py)) — `id`, `code`, `name`; `200 OK`.
+- **Errors:** none besides auth.
+
+#### `GET /api/lookups/titles`
+
+- **Purpose:** Retrieve the title catalogue, e.g. to get the `title_ids` of a natural person.
+- **Authentication:** authenticated, `@authorize(EntityType.PERSONS, UseCase.PERSONS_RETRIEVE_TITLES)`.
+- **Input:** none.
+- **Response:** `ResponseContainer[list[TitleSchemaOut]]` ([schemas/lookup/title.py](../app/infrastructure/api/schemas/lookup/title.py)) — `id`, `title_type`, `name`; prefix titles first, each type ordered by priority; `200 OK`.
+- **Errors:** none besides auth.
+
+#### `GET /api/lookups/phone-prefixes`
+
+- **Purpose:** Retrieve the phone prefix catalogue, e.g. to get the `phone_prefix_id` of a person.
+- **Authentication:** authenticated, `@authorize(EntityType.CONTACTS, UseCase.CONTACTS_RETRIEVE_PHONE_PREFIXES)`.
+- **Input:** none.
+- **Response:** `ResponseContainer[list[PhonePrefixSchemaOut]]` ([schemas/lookup/phone_prefix.py](../app/infrastructure/api/schemas/lookup/phone_prefix.py)) — `id`, `prefix`, `country_id`; ordered by prefix; `200 OK`.
 - **Errors:** none besides auth.
 
 ### Tokens — `/api/auth/token`

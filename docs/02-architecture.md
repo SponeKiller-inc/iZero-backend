@@ -34,7 +34,7 @@ app/
 │   ├── constants/
 │   └── exceptions/
 └── infrastructure/
-    ├── api/           # main.py, router.py, endpoints/, middleware/, schemas/, dependencies/
+    ├── api/           # main.py, router.py, endpoints/, middleware/, schemas/, dependency/
     ├── models/        # SQLAlchemy ORM models
     ├── repositories/  # repository implementations (Alchemy*)
     ├── services/      # JWT, hashing, token generators, time
@@ -88,7 +88,7 @@ sequenceDiagram
 
 ## Dependency injection
 
-Dependencies are composed in `app/infrastructure/api/dependencies/` using `Depends`. The container builds repositories and services and passes them to the use case.
+Dependencies are composed in `app/infrastructure/api/dependency/` using `Depends`. The container builds repositories and services and passes them to the use case.
 
 TODO: decide whether to introduce a single DI container instead of inheriting from use case classes.
 

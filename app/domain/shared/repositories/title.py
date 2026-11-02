@@ -19,6 +19,16 @@ class TitleRepository(Protocol):
         """
         ...
 
+    def get_all(self) -> list[Title]:
+        """
+        Get all titles of the catalogue
+
+        Returns:
+            List of Title entities, prefix titles first, each type ordered by
+            priority
+        """
+        ...
+
     def get_by_name(self, title_type: str, name: str) -> Title | None:
         """
         Get title of the given type by its name

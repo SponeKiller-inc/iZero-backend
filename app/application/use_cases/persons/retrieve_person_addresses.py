@@ -4,10 +4,6 @@ from app.application.exceptions.person import PersonNotFoundError
 from app.application.ports.time_provider import TimeProvider
 from app.application.security.authorize import authorize
 from app.application.use_cases.addresses.retrieve_address import RetrieveAddress
-from app.domain.addresses.constants.address_type import (
-    ADDRESS_TYPE_MAILING_TYPE,
-    ADDRESS_TYPE_PERMANENT_TYPE,
-)
 from app.domain.addresses.repositories.address_type import AddressTypeRepository
 from app.domain.persons.repositories.person import PersonRepository
 from app.domain.persons.repositories.person_address import PersonAddressRepository
@@ -60,18 +56,13 @@ class RetrievePersonAddresses:
             raise PersonNotFoundError("Person does not exist")
 
         person_addresses = self.person_address_repository.get(person_id, self.time_provider.now())
-        address_types = {
-            address_type.id: address_type.type
-            for address_type in (
-                self.address_type_repository.get_by_type(ADDRESS_TYPE_PERMANENT_TYPE),
-                self.address_type_repository.get_by_type(ADDRESS_TYPE_MAILING_TYPE),
-            )
-        }
 
         return [
             PersonAddressOut(
                 id=person_address.id,
-                address_type=address_types[person_address.address_type_id],
+                address_type=self.address_type_repository.get(
+                    person_address.address_type_id
+                ).type,
                 address=self.retrieve_address.execute(person_address.address_id),
             )
             for person_address in person_addresses

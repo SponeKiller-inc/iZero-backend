@@ -1,6 +1,7 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.company import CompanyIn
 from app.application.dto.person.person import PersonOut
+from app.application.dto.person.person_address import PersonAddressIn
 from app.application.exceptions.person import (
     PersonNotFoundError,
     PersonTypeChangeNotAllowedError,
@@ -9,6 +10,7 @@ from app.application.exceptions.person import (
 from app.application.security.authorize import authorize
 from app.application.use_cases.contacts.retrieve_email import RetrieveEmail
 from app.application.use_cases.contacts.retrieve_phone import RetrievePhone
+from app.application.use_cases.persons.assign_person_address import AssignPersonAddress
 from app.application.use_cases.persons.change_natural_person import ChangeNaturalPerson
 from app.application.use_cases.persons.retrieve_person import RetrievePerson
 from app.domain.persons.constants.person_type import PersonType
@@ -34,6 +36,7 @@ class ChangeCompany:
         retrieve_email: RetrieveEmail,
         change_natural_person: ChangeNaturalPerson,
         retrieve_person: RetrievePerson,
+        assign_person_address: AssignPersonAddress,
     ) -> None:
         """
         Initialize use-case
@@ -46,6 +49,7 @@ class ChangeCompany:
             retrieve_email: Retrieve e-mail use-case
             change_natural_person: Change natural person use-case (changes the representative)
             retrieve_person: Retrieve person use-case
+            assign_person_address: Assign person address use-case
         """
         self.person_repository = person_repository
         self.company_repository = company_repository
@@ -54,6 +58,7 @@ class ChangeCompany:
         self.retrieve_email = retrieve_email
         self.change_natural_person = change_natural_person
         self.retrieve_person = retrieve_person
+        self.assign_person_address = assign_person_address
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_CHANGE)
     def execute(self, person_id: int, dto: CompanyIn) -> PersonOut:
@@ -74,6 +79,9 @@ class ChangeCompany:
                 incomplete, its calling code does not exist or the number has invalid format
             EmailValidationError: If the e-mail address of the company or the representative
                 has invalid format
+            AddressNotFoundError: If an address of the company or the
+                representative does not exist
+            AddressTypeNotFoundError: If an address type does not exist
             PersonValidationError: If legal form does not exist, registration number or VAT ID
                 has invalid format, name is empty, a VAT payer has no VAT ID or the
                 representative's details are invalid (see ChangeNaturalPerson)
@@ -128,5 +136,9 @@ class ChangeCompany:
             raise PersonValidationError(str(e)) from e
 
         self.company_repository.save(company)
+
+        self.assign_person_address.execute(
+            PersonAddressIn(person_id=person_id, addresses=dto.addresses)
+        )
 
         return self.retrieve_person.execute(person_id)

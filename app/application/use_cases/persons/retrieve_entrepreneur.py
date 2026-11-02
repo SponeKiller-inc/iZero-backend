@@ -2,6 +2,9 @@ from app.application.constants.use_case import UseCase
 from app.application.dto.person.entrepreneur import EntrepreneurOut
 from app.application.exceptions.person import PersonNotFoundError
 from app.application.security.authorize import authorize
+from app.application.use_cases.persons.retrieve_person_addresses import (
+    RetrievePersonAddresses,
+)
 from app.domain.persons.repositories.entrepreneur import EntrepreneurRepository
 from app.domain.shared.constants.entity_type import EntityType
 from app.domain.shared.repositories.email import EmailRepository
@@ -17,6 +20,7 @@ class RetrieveEntrepreneur:
         phone_repository: PhoneRepository,
         phone_prefix_repository: PhonePrefixRepository,
         email_repository: EmailRepository,
+        retrieve_person_addresses: RetrievePersonAddresses,
     ) -> None:
         """
         Initialize use-case
@@ -26,11 +30,13 @@ class RetrieveEntrepreneur:
             phone_repository: Phone repository
             phone_prefix_repository: Phone prefix repository
             email_repository: E-mail repository
+            retrieve_person_addresses: Retrieve person addresses use-case
         """
         self.entrepreneur_repository = entrepreneur_repository
         self.phone_repository = phone_repository
         self.phone_prefix_repository = phone_prefix_repository
         self.email_repository = email_repository
+        self.retrieve_person_addresses = retrieve_person_addresses
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_RETRIEVE)
     def execute(self, person_id: int) -> EntrepreneurOut:
@@ -54,6 +60,7 @@ class RetrieveEntrepreneur:
         phone = self.phone_repository.get(entrepreneur.phone_id) if entrepreneur.phone_id is not None else None
         phone_prefix = self.phone_prefix_repository.get(phone.phone_prefix_id) if phone else None
         email = self.email_repository.get(entrepreneur.email_id) if entrepreneur.email_id is not None else None
+        addresses = self.retrieve_person_addresses.execute(person_id)
 
         return EntrepreneurOut(
             name=entrepreneur.name,
@@ -64,4 +71,5 @@ class RetrieveEntrepreneur:
             phone_prefix=phone_prefix.prefix if phone_prefix else None,
             phone_number=phone.number.value if phone else None,
             email=email.address.value if email else None,
+            addresses=addresses,
         )

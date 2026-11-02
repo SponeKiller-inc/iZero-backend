@@ -1,6 +1,7 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.natural_person import NaturalPersonIn
 from app.application.dto.person.person import PersonOut
+from app.application.dto.person.person_address import PersonAddressIn
 from app.application.exceptions.person import (
     PersonNotFoundError,
     PersonTypeChangeNotAllowedError,
@@ -10,6 +11,7 @@ from app.application.ports.time_provider import TimeProvider
 from app.application.security.authorize import authorize
 from app.application.use_cases.contacts.retrieve_email import RetrieveEmail
 from app.application.use_cases.contacts.retrieve_phone import RetrievePhone
+from app.application.use_cases.persons.assign_person_address import AssignPersonAddress
 from app.application.use_cases.persons.retrieve_person import RetrievePerson
 from app.domain.persons.constants.person_type import PersonType
 from app.domain.persons.entities.person_title import PersonTitle
@@ -33,6 +35,7 @@ class ChangeNaturalPerson:
         retrieve_phone: RetrievePhone,
         retrieve_email: RetrieveEmail,
         retrieve_person: RetrievePerson,
+        assign_person_address: AssignPersonAddress,
     ) -> None:
         """
         Initialize use-case
@@ -46,6 +49,7 @@ class ChangeNaturalPerson:
             retrieve_phone: Retrieve phone use-case
             retrieve_email: Retrieve e-mail use-case
             retrieve_person: Retrieve person use-case
+            assign_person_address: Assign person address use-case
         """
         self.person_repository = person_repository
         self.natural_person_repository = natural_person_repository
@@ -55,6 +59,7 @@ class ChangeNaturalPerson:
         self.retrieve_phone = retrieve_phone
         self.retrieve_email = retrieve_email
         self.retrieve_person = retrieve_person
+        self.assign_person_address = assign_person_address
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_CHANGE)
     def execute(self, person_id: int, dto: NaturalPersonIn) -> PersonOut:
@@ -74,6 +79,8 @@ class ChangeNaturalPerson:
             PhoneValidationError: If the phone is incomplete, its calling code does not exist
                 or the number has invalid format
             EmailValidationError: If the e-mail address has invalid format
+            AddressNotFoundError: If an address does not exist
+            AddressTypeNotFoundError: If an address type does not exist
             PersonValidationError: If a name is empty, the person is younger than 18 or
                 a title does not exist
         """
@@ -139,5 +146,9 @@ class ChangeNaturalPerson:
 
         for person_title in ended_person_titles + assigned_person_titles:
             self.person_title_repository.save(person_title)
+
+        self.assign_person_address.execute(
+            PersonAddressIn(person_id=person_id, addresses=dto.addresses)
+        )
 
         return self.retrieve_person.execute(person_id)

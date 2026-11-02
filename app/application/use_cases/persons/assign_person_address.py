@@ -49,59 +49,80 @@ class AssignPersonAddress:
         self.retrieve_person_addresses = retrieve_person_addresses
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_ASSIGN_ADDRESS)
-    def execute(self, person_id: int, dto: PersonAddressIn) -> list[PersonAddressOut]:
+    def execute(self, dto: PersonAddressIn) -> list[PersonAddressOut]:
         """
-        Assign an address of the given type to a person; the address the person had
-        of that type so far is ended and kept in history
+        Assign addresses of the given types to a person; the address the
+        person had of a type so far is ended and kept in history
 
         Args:
-            person_id: Person ID
-            dto: DTO carrying the assigned address and its type
+            dto: DTO carrying the person and the assigned addresses with their
+                types
 
         Returns:
             The current addresses of the person
 
         Raises:
             PersonNotFoundError: If the person does not exist
-            AddressNotFoundError: If the address does not exist
-            AddressTypeNotFoundError: If the address type does not exist
-            PersonValidationError: If the current address of the type cannot be ended
+            AddressNotFoundError: If an address does not exist
+            AddressTypeNotFoundError: If an address type does not exist
+            PersonValidationError: If the current address of a type cannot be
+                ended
         """
-        person = self.person_repository.get(person_id)
+        person = self.person_repository.get(dto.person_id)
 
         if person is None:
             raise PersonNotFoundError("Person does not exist")
 
-        address = self.address_repository.get(dto.address_id)
+        for assigned_address in dto.addresses:
+            address = self.address_repository.get(assigned_address.address_id)
 
-        if address is None:
-            raise AddressNotFoundError("Address does not exist")
+            if address is None:
+                raise AddressNotFoundError("Address does not exist")
 
-        address_type = self.address_type_repository.get_by_type(dto.address_type)
+            address_type = self.address_type_repository.get(
+                assigned_address.address_type_id
+            )
 
-        if address_type is None:
-            raise AddressTypeNotFoundError("Address type does not exist")
+            if address_type is None:
+                raise AddressTypeNotFoundError("Address type does not exist")
 
-        current_person_address = next(
-            (
-                person_address
-                for person_address in self.person_address_repository.get(person_id, self.time_provider.now())
-                if person_address.address_type_id == address_type.id
-            ),
-            None,
-        )
+            current_person_address = next(
+                (
+                    person_address
+                    for person_address in self.person_address_repository.get(
+                        dto.person_id, self.time_provider.now()
+                    )
+                    if person_address.address_type_id == address_type.id
+                ),
+                None,
+            )
 
-        try:
+            # The same address of the same type is already assigned, nothing
+            # changes
+            if (
+                current_person_address is not None
+                and current_person_address.address_id == address.id
+            ):
+                continue
+
+            try:
+                if current_person_address is not None:
+                    current_person_address.end(self.time_provider.now())
+
+                # Validity is inclusive on both ends, the new address starts
+                # later so that the two never overlap
+                assigned_person_address = PersonAddress.assign(
+                    person,
+                    address,
+                    address_type,
+                    self.time_provider.shifted_now(),
+                )
+            except (ValueError, person_errors.PersonValidationError) as e:
+                raise PersonValidationError(str(e)) from e
+
             if current_person_address is not None:
-                current_person_address.end(self.time_provider.now())
+                self.person_address_repository.save(current_person_address)
 
-            assigned_person_address = PersonAddress.assign(person, address, address_type, self.time_provider.now())
-        except (ValueError, person_errors.PersonValidationError) as e:
-            raise PersonValidationError(str(e)) from e
+            self.person_address_repository.save(assigned_person_address)
 
-        if current_person_address is not None:
-            self.person_address_repository.save(current_person_address)
-
-        self.person_address_repository.save(assigned_person_address)
-
-        return self.retrieve_person_addresses.execute(person_id)
+        return self.retrieve_person_addresses.execute(dto.person_id)

@@ -6,26 +6,11 @@ from app.application.dto.user.registration import (
     RegistrationLocalIn,
     RegistrationOauthIn,
 )
-from app.application.exceptions.auth import IdentityProviderError
-from app.application.exceptions.user import (
-    InvalidCurrentPasswordError,
-    PasswordChangeNotSupportedError,
-    PasswordConfirmationMismatchError,
-    PasswordSameAsCurrentError,
-    PasswordTooLongError,
-    PasswordTooShortError,
-    RegisterLocalError,
-    RegisterOauthError,
-    UserCannotBeDeletedError,
-    UserDeleteForbiddenError,
-    UserNotFoundError,
-)
 from app.application.use_cases.users.change_password import ChangePassword
 from app.application.use_cases.users.delete_user import DeleteUser
 from app.application.use_cases.users.register_local import RegisterLocal
 from app.application.use_cases.users.register_oauth import RegisterOauth
-from app.infrastructure.api.schemas.base import JSONResponse, ResponseContainer
-from app.infrastructure.api.schemas.message_id import MessageId
+from app.infrastructure.api.schemas.base import ResponseContainer
 from app.infrastructure.api.schemas.user import user as schema
 from app.infrastructure.config import settings
 from app.infrastructure.database.session import get_db
@@ -66,13 +51,7 @@ async def register_local(
     )
 
     # registration
-    try:
-        register.execute(dto)
-    except RegisterLocalError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_ALREADY_EXISTS),
-            status_code=status.HTTP_409_CONFLICT,
-        )
+    register.execute(dto)
 
     return ResponseContainer()
 
@@ -105,18 +84,7 @@ async def register_google(
     )
 
     # registration
-    try:
-        register.execute(dto)
-    except RegisterOauthError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_ALREADY_EXISTS),
-            status_code=status.HTTP_409_CONFLICT,
-        )
-    except IdentityProviderError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.AUTH_IDENTITY_PROVIDER_FAILED),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
+    register.execute(dto)
 
     return ResponseContainer()
 
@@ -149,43 +117,7 @@ async def change_password(
     )
 
     # change password
-    try:
-        change.execute(dto)
-    except UserNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    except InvalidCurrentPasswordError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_INVALID_CURRENT_PASSWORD),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
-    except PasswordTooShortError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_PASSWORD_TOO_SHORT),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
-    except PasswordTooLongError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_PASSWORD_TOO_LONG),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
-    except PasswordConfirmationMismatchError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_PASSWORD_CONFIRMATION_MISMATCH),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
-    except PasswordSameAsCurrentError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_PASSWORD_SAME_AS_CURRENT),
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
-    except PasswordChangeNotSupportedError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_PASSWORD_CHANGE_NOT_SUPPORTED),
-            status_code=status.HTTP_409_CONFLICT,
-        )
+    change.execute(dto)
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
@@ -196,20 +128,4 @@ async def delete_user(
 
     delete = DeleteUser(user_repository)
 
-    try:
-        delete.execute(user_id)
-    except UserDeleteForbiddenError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.AUTH_NOT_AUTHORIZED),
-            status_code=status.HTTP_403_FORBIDDEN,
-        )
-    except UserNotFoundError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_NOT_FOUND),
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    except UserCannotBeDeletedError:
-        return JSONResponse(
-            content=ResponseContainer(message_id=MessageId.USER_CANNOT_BE_DELETED),
-            status_code=status.HTTP_409_CONFLICT,
-        )
+    delete.execute(user_id)

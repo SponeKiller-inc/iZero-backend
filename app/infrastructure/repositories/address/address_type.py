@@ -4,6 +4,27 @@ from app.infrastructure.repositories.base import BaseAlchemyRepository
 
 
 class AlchemyAddressTypeRepository(BaseAlchemyRepository):
+    def get(self, address_type_id: int) -> AddressType | None:
+        """
+        Get an address type by its ID.
+
+        Args:
+            address_type_id (int): address type ID
+
+        Returns:
+            AddressType or None: address type entity or None if no address
+                type found
+        """
+
+        model = (
+            self.db.query(AddressTypeModel)
+            .filter(AddressTypeModel.id == address_type_id)
+            .first()
+        )
+        if not model:
+            return None
+        return self._to_entity(model)
+
     def get_by_type(self, address_type: str) -> AddressType | None:
         """
         Get an address type by its natural-key type ("permanent" or "mailing").

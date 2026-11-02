@@ -27,7 +27,7 @@ Further conventions:
 
 | Area | Tables |
 |------|--------|
-| Users | `users`, `user_roles`, `user_modules`, `user_addresses`, `user_bank_accounts` |
+| Users | `users`, `user_roles`, `user_modules`, `user_addresses`, `user_bank_accounts`, `user_persons` |
 | Authorization | `roles`, `role_permission` |
 | Sessions | `sessions`, `refresh_token`, `session_log` |
 | Modules | `module_groups`, `modules` |
