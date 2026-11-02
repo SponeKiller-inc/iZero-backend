@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.application.exceptions.auth import AuthHashVerificationError
 from app.application.exceptions.base import ApplicationError
-from app.infrastructure.api.application_errors import APPLICATION_ERRORS
+from app.infrastructure.api.errors import APPLICATION_ERRORS
 from app.infrastructure.api.middleware.auth import AuthMiddleware
 from app.infrastructure.api.middleware.authenticate import AuthenticateMiddleware
 from app.infrastructure.api.middleware.http_audit import HttpAuditMiddleware

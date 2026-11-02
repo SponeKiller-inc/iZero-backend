@@ -72,7 +72,7 @@ Defined in [schemas/message_id.py](../app/infrastructure/api/schemas/message_id.
 When adding a new code, add a row to this table.
 
 Endpoints do not catch application errors. Each error is mapped to its message ID and status code in
-[application_errors.py](../app/infrastructure/api/application_errors.py) and answered by a global handler in
+[errors](../app/infrastructure/api/errors), organized like the endpoints and joined in its `__init__.py`, and answered by a global handler in
 [main.py](../app/infrastructure/api/main.py). The error passes through `get_db`, which rolls the transaction back, so a
 rejected request stores nothing. An application error missing from the mapping ends as `SYSTEM_INTERNAL_FAIL` (500).
 The token endpoints are the exception: they catch their errors and raise `HTTPException` with their own response.
