@@ -17,6 +17,17 @@ class SystemTimeProvider(TimeProvider):
         return datetime.now(UTC)
 
     @classmethod
+    def shifted_now(cls) -> datetime:
+        """
+        Returns the current UTC time shifted by 1 microsecond, so it is always
+        later than a time returned by an earlier call of `now`
+
+        Returns:
+            datetime: current UTC time + 1 microsecond
+        """
+        return cls.now() + timedelta(microseconds=1)
+
+    @classmethod
     def get_expiration(
         cls,
         minutes: int | None = None,

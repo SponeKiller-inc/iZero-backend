@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 
-from app.application.dto.person.natural_person import NaturalPersonIn
+from app.application.dto.person.natural_person import (
+    NaturalPersonIn,
+    NaturalPersonOut,
+)
+from app.application.dto.person.person_address import AddressIn, PersonAddressOut
 
 
 @dataclass(frozen=True)
@@ -18,6 +22,7 @@ class CompanyIn:
     phone_prefix_id: int | None
     phone_number: str | None
     email: str | None
+    addresses: list[AddressIn]
 
 @dataclass(frozen=True)
 class CompanyOut:
@@ -28,8 +33,9 @@ class CompanyOut:
     registration_number: str
     vat_number: str | None
     is_vat_payer: bool
-    representative_person_id: int
+    representative: NaturalPersonOut
     phone_prefix_id: int | None
     phone_prefix: str | None
     phone_number: str | None
     email: str | None
+    addresses: list[PersonAddressOut]

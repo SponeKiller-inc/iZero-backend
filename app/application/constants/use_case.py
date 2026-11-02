@@ -23,8 +23,13 @@ class UseCase(str, Enum):
     PERSONS_ASSIGN_ADDRESS = "assign_person_address"
     PERSONS_RETRIEVE_ADDRESS = "retrieve_person_address"
     PERSONS_RETRIEVE_LEGAL_FORMS = "retrieve_legal_forms"
+    PERSONS_RETRIEVE_TITLES = "retrieve_titles"
+    PERSONS_ADD_USER_PERSON = "add_user_person"
+    PERSONS_RETRIEVE_USER_PERSON = "retrieve_user_person"
+    PERSONS_CHANGE_USER_PERSON = "change_user_person"
     CONTACTS_RETRIEVE_PHONE = "retrieve_phone"
     CONTACTS_RETRIEVE_EMAIL = "retrieve_email"
+    CONTACTS_RETRIEVE_PHONE_PREFIXES = "retrieve_phone_prefixes"
 
     @classmethod
     def has_member(cls, name: str) -> bool:

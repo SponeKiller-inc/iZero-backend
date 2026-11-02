@@ -16,6 +16,15 @@ class PhonePrefixRepository(Protocol):
         """
         ...
 
+    def get_all(self) -> list[PhonePrefix]:
+        """
+        Get all phone prefixes of the catalogue
+
+        Returns:
+            List of PhonePrefix entities
+        """
+        ...
+
     def get_by_prefix(self, prefix: str) -> PhonePrefix | None:
         """
         Get phone prefix by its calling code

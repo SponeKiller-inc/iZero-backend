@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import date
 
+from app.application.dto.person.person_address import AddressIn, PersonAddressOut
+
 
 @dataclass(frozen=True)
 class NaturalPersonIn:
@@ -14,6 +16,7 @@ class NaturalPersonIn:
     phone_prefix_id: int | None
     phone_number: str | None
     email: str | None
+    addresses: list[AddressIn]
 
 @dataclass(frozen=True)
 class NaturalPersonOut:
@@ -27,3 +30,4 @@ class NaturalPersonOut:
     phone_prefix: str | None
     phone_number: str | None
     email: str | None
+    addresses: list[PersonAddressOut]

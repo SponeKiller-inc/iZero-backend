@@ -1,11 +1,13 @@
 from app.application.constants.use_case import UseCase
 from app.application.dto.person.company import CompanyIn
 from app.application.dto.person.person import PersonOut
+from app.application.dto.person.person_address import PersonAddressIn
 from app.application.exceptions.person import PersonValidationError
 from app.application.security.authorize import authorize
 from app.application.use_cases.contacts.retrieve_email import RetrieveEmail
 from app.application.use_cases.contacts.retrieve_phone import RetrievePhone
 from app.application.use_cases.persons.add_natural_person import AddNaturalPerson
+from app.application.use_cases.persons.assign_person_address import AssignPersonAddress
 from app.application.use_cases.persons.retrieve_person import RetrievePerson
 from app.domain.persons.constants.person_type import PersonType
 from app.domain.persons.entities.company import Company
@@ -32,6 +34,7 @@ class AddCompany:
         retrieve_email: RetrieveEmail,
         add_natural_person: AddNaturalPerson,
         retrieve_person: RetrievePerson,
+        assign_person_address: AssignPersonAddress,
     ) -> None:
         """
         Initialize use-case
@@ -44,6 +47,7 @@ class AddCompany:
             retrieve_email: Retrieve e-mail use-case
             add_natural_person: Add natural person use-case (creates the representative)
             retrieve_person: Retrieve person use-case
+            assign_person_address: Assign person address use-case
         """
         self.person_repository = person_repository
         self.company_repository = company_repository
@@ -52,6 +56,7 @@ class AddCompany:
         self.retrieve_email = retrieve_email
         self.add_natural_person = add_natural_person
         self.retrieve_person = retrieve_person
+        self.assign_person_address = assign_person_address
 
     @authorize(EntityType.PERSONS, UseCase.PERSONS_ADD)
     def execute(self, dto: CompanyIn) -> PersonOut:
@@ -69,6 +74,9 @@ class AddCompany:
                 incomplete, its calling code does not exist or the number has invalid format
             EmailValidationError: If the e-mail address of the company or the representative
                 has invalid format
+            AddressNotFoundError: If an address of the company or the
+                representative does not exist
+            AddressTypeNotFoundError: If an address type does not exist
             PersonValidationError: If legal form does not exist, registration number or VAT ID
                 has invalid format, name is empty, a VAT payer has no VAT ID or the
                 representative's details are invalid (see AddNaturalPerson)
@@ -113,5 +121,9 @@ class AddCompany:
             raise PersonValidationError(str(e)) from e
 
         self.company_repository.save(company)
+
+        self.assign_person_address.execute(
+            PersonAddressIn(person_id=person.id, addresses=dto.addresses)
+        )
 
         return self.retrieve_person.execute(person.id)

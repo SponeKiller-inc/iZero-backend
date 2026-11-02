@@ -31,6 +31,29 @@ class AlchemyTitleRepository(BaseAlchemyRepository, TitleRepository):
             )
         ]
 
+    def get_all(self) -> list[Title]:
+        """
+        Get all titles of the catalogue
+
+        Returns:
+            list[Title]: all titles, prefix titles first, each type ordered by
+            priority
+        """
+
+        return [
+            self._to_entity(model)
+            for model in (
+                self.db
+                    .query(TitleModel)
+                    .order_by(
+                        TitleModel.title_type,
+                        TitleModel.priority,
+                        TitleModel.id,
+                    )
+                    .all()
+            )
+        ]
+
     def get_by_name(self, title_type: str, name: str) -> Title | None:
         """
         Get title of the given type by its name

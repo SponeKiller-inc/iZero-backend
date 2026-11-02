@@ -20,6 +20,18 @@ class TimeProvider(ABC):
 
     @classmethod
     @abstractmethod
+    def shifted_now(cls) -> datetime:
+        """
+        Returns the current UTC time shifted by 1 microsecond, so it is always
+        later than a time returned by an earlier call of `now`
+
+        Returns:
+            datetime: current UTC time + 1 microsecond
+        """
+        ...
+
+    @classmethod
+    @abstractmethod
     def get_expiration(
         cls,
         minutes: int | None = None,

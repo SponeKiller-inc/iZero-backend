@@ -27,6 +27,24 @@ class AlchemyPhonePrefixRepository(BaseAlchemyRepository):
 
         return self._to_entity(model)
 
+    def get_all(self) -> list[PhonePrefix]:
+        """
+        Get all phone prefixes of the catalogue
+
+        Returns:
+            List of PhonePrefix entities
+        """
+
+        return [
+            self._to_entity(model)
+            for model in (
+                self.db
+                    .query(PhonePrefixModel)
+                    .order_by(PhonePrefixModel.prefix)
+                    .all()
+            )
+        ]
+
     def get_by_prefix(self, prefix: str) -> PhonePrefix | None:
         """
         Get phone prefix by its calling code
