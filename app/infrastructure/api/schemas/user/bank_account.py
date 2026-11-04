@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from app.infrastructure.api.schemas.bank.bank_account import BankSchemaOut
+from app.infrastructure.api.schemas.lookup.bank import BankSchemaOut
 
 
 class UserBankAccountSchemaIn(BaseModel):
